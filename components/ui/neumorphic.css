@@ -1,0 +1,18 @@
+@layer components {
+  .neumorphic-outset {
+    @apply bg-neumorphic-bg text-gray-700 font-semibold rounded-xl shadow-[5px_5px_10px_var(--neumorphic-shadow-dark),-5px_-5px_10px_var(--neumorphic-shadow-light)] transition-all duration-200 hover:shadow-[2px_2px_5px_var(--neumorphic-shadow-dark),-2px_-2px_5px_var(--neumorphic-shadow-light)] active:shadow-[inset_2px_2px_5px_var(--neumorphic-shadow-dark),inset_-2px_-2px_5px_var(--neumorphic-shadow-light)];
+  }
+  .dark .neumorphic-outset-dark {
+    @apply bg-neumorphic-bg text-gray-300 shadow-[5px_5px_10px_var(--neumorphic-shadow-dark),-5px_-5px_10px_var(--neumorphic-shadow-light)] hover:shadow-[2px_2px_5px_var(--neumorphic-shadow-dark),-2px_-2px_5px_var(--neumorphic-shadow-light)] active:shadow-[inset_2px_2px_5px_var(--neumorphic-shadow-dark),inset_-2px_-2px_5px_var(--neumorphic-shadow-light)];
+  }
+  .neumorphic-inset {
+    @apply shadow-[inset_5px_5px_10px_var(--neumorphic-shadow-dark),inset_-5px_-5px_10px_var(--neumorphic-shadow-light)] text-green-600;
+  }
+  .dark .neumorphic-inset-dark {
+    @apply shadow-[inset_5px_5px_10px_var(--neumorphic-shadow-dark),inset_-5px_-5px_10px_var(--neumorphic-shadow-light)] text-green-400;
+  }
+  .glassmorphic-card {
+    /* Standardized glassmorphic style using theme variables */
+    @apply bg-card/50 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg;
+  }
+}

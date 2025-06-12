@@ -1,0 +1,51 @@
+import { cities, formatCityName } from "@/lib/cities"
+import type { Metadata } from "next"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
+import CityPageTemplate from "@/components/city-page-template"
+
+interface CityPageProps {
+  params: {
+    city: string
+  }
+}
+
+// Generate metadata dynamically for each city page
+export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
+  const formattedCity = formatCityName(params.city)
+  const title = `THC delivery in ${formattedCity}`
+  const description = `Get fast, reliable, and discreet cannabis delivery in ${formattedCity}, MN. DankDeals offers a wide selection of flower, edibles, and vapes. Order now!`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/delivery/${params.city}`,
+    },
+  }
+}
+
+// Pre-render all city pages at build time
+export async function generateStaticParams() {
+  return cities.map((city) => ({
+    city,
+  }))
+}
+
+export default function Page({ params }: CityPageProps) {
+  // Redirect if the city is not in our list (optional but good practice)
+  if (!cities.includes(params.city)) {
+    // In a real app, you might redirect to a 404 or a service area page
+    // For now, we assume valid cities based on generateStaticParams
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background">
+      <Header />
+      <main className="pt-20">
+        <CityPageTemplate city={params.city} />
+      </main>
+      <Footer />
+    </div>
+  )
+}

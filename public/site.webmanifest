@@ -1,0 +1,21 @@
+{
+  "name": "DankDeals.org - Premier Cannabis Gifting",
+  "short_name": "DankDeals",
+  "description": "Explore our showcase of premium cannabis products. Your trusted source for THC delivery and cannabis gifting in Minneapolis & St. Paul. Featuring our revolutionary AI Budtender.",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#1a202c",
+  "background_color": "#1a202c",
+  "display": "standalone",
+  "start_url": "/"
+}
