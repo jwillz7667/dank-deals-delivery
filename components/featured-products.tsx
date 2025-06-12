@@ -42,10 +42,20 @@ export default function FeaturedProducts({ products, onProductClick }: FeaturedP
                   style={{ objectFit: "cover" }}
                   className="group-hover:opacity-90 transition-opacity"
                 />
+                {product.soldOut && (
+                  <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-lg font-bold text-xs shadow-lg">
+                    SOLD OUT
+                  </div>
+                )}
               </div>
               <div className="p-4">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white">{product.name}</h4>
                 <p className="text-sm text-green-700 dark:text-green-400 font-medium">{product.category}</p>
+                {product.category === "Flower" && product.pricing && !product.soldOut && (
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
+                    From ${product.pricing[0].price}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -11,8 +11,7 @@ interface CityPageTemplateProps {
 export default function CityPageTemplate({ city }: CityPageTemplateProps) {
   const formattedCity = formatCityName(city)
   const mapQuery = encodeURIComponent(`${formattedCity}, MN`)
-  // IMPORTANT: Replace YOUR_GOOGLE_MAPS_API_KEY with your actual API key
-  const mapSrc = `https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${mapQuery}&zoom=11`
+  const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${mapQuery}&zoom=11`
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-4xl">

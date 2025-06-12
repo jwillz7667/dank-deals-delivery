@@ -3,7 +3,7 @@
 import { useEffect, type RefObject } from "react"
 
 const useIntersectionObserver = (
-  elementRefs: RefObject<HTMLElement>[],
+  elementRefs: RefObject<HTMLElement | null>[],
   options: IntersectionObserverInit = { root: null, rootMargin: "0px", threshold: 0.1 },
 ) => {
   useEffect(() => {

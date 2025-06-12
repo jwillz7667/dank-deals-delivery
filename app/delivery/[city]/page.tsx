@@ -5,14 +5,15 @@ import Footer from "@/components/footer"
 import CityPageTemplate from "@/components/city-page-template"
 
 interface CityPageProps {
-  params: {
+  params: Promise<{
     city: string
-  }
+  }>
 }
 
 // Generate metadata dynamically for each city page
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
-  const formattedCity = formatCityName(params.city)
+  const { city } = await params
+  const formattedCity = formatCityName(city)
   const title = `THC delivery in ${formattedCity}`
   const description = `Get fast, reliable, and discreet cannabis delivery in ${formattedCity}, MN. DankDeals offers a wide selection of flower, edibles, and vapes. Order now!`
 
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     title,
     description,
     alternates: {
-      canonical: `/delivery/${params.city}`,
+      canonical: `/delivery/${city}`,
     },
   }
 }
@@ -32,9 +33,11 @@ export async function generateStaticParams() {
   }))
 }
 
-export default function Page({ params }: CityPageProps) {
+export default async function Page({ params }: CityPageProps) {
+  const { city } = await params
+  
   // Redirect if the city is not in our list (optional but good practice)
-  if (!cities.includes(params.city)) {
+  if (!cities.includes(city)) {
     // In a real app, you might redirect to a 404 or a service area page
     // For now, we assume valid cities based on generateStaticParams
   }
@@ -43,7 +46,7 @@ export default function Page({ params }: CityPageProps) {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="pt-20">
-        <CityPageTemplate city={params.city} />
+        <CityPageTemplate city={city} />
       </main>
       <Footer />
     </div>

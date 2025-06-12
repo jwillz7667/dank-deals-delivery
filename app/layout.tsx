@@ -46,11 +46,22 @@ export const metadata: Metadata = {
     creator: "@dankdeals", // Replace with actual Twitter handle if available
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/my-favicon/favicon.ico" },
+      { url: "/my-favicon/favicon.svg", type: "image/svg+xml" },
+      { url: "/my-favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" }
+    ],
+    shortcut: "/my-favicon/favicon.ico",
+    apple: "/my-favicon/apple-touch-icon.png",
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/my-favicon/favicon.svg",
+        color: "#1a202c"
+      }
+    ]
   },
-  manifest: "/site.webmanifest", // Relative to metadataBase
+  manifest: "/my-favicon/site.webmanifest", // Relative to metadataBase
   alternates: {
     canonical: "/",
   },

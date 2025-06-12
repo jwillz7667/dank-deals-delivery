@@ -57,11 +57,21 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
                     style={{ objectFit: "cover" }}
                     className="group-hover:scale-110 transition-transform duration-500"
                   />
+                  {product.soldOut && (
+                    <div className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-lg font-bold text-sm shadow-lg">
+                      SOLD OUT
+                    </div>
+                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{product.name}</h3>
                   <p className="text-md font-semibold text-green-600 dark:text-green-400 mt-1">{product.category}</p>
                   <p className="text-gray-700 dark:text-gray-300 mt-3">{product.description.substring(0, 100)}...</p>
+                  {product.category === "Flower" && product.pricing && !product.soldOut && (
+                    <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-2">
+                      Starting at ${product.pricing[0].price}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
