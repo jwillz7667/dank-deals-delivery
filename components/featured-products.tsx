@@ -16,14 +16,16 @@ export default function FeaturedProducts({ products, onProductClick }: FeaturedP
   return (
     <Swiper
       modules={[Autoplay, Pagination]}
-      spaceBetween={30}
-      slidesPerView={1}
+      spaceBetween={16}
+      slidesPerView={1.2}
       pagination={{ clickable: true }}
       autoplay={{ delay: 4000, disableOnInteraction: false }}
       breakpoints={{
-        640: { slidesPerView: 2 },
-        1024: { slidesPerView: 3 },
-        1280: { slidesPerView: 4 },
+        480: { slidesPerView: 1.5, spaceBetween: 20 },
+        640: { slidesPerView: 2, spaceBetween: 20 },
+        768: { slidesPerView: 2.5, spaceBetween: 24 },
+        1024: { slidesPerView: 3, spaceBetween: 24 },
+        1280: { slidesPerView: 4, spaceBetween: 30 },
       }}
       className="!pb-12"
     >
@@ -34,7 +36,7 @@ export default function FeaturedProducts({ products, onProductClick }: FeaturedP
             onClick={() => onProductClick(product)}
           >
             <CardContent className="p-0">
-              <div className="relative h-56 w-full">
+              <div className="relative h-40 sm:h-48 md:h-56 w-full">
                 <Image
                   src={product.imageUrl || "/placeholder.svg"}
                   alt={product.name}
@@ -48,9 +50,9 @@ export default function FeaturedProducts({ products, onProductClick }: FeaturedP
                   </div>
                 )}
               </div>
-              <div className="p-4">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white">{product.name}</h4>
-                <p className="text-sm text-green-700 dark:text-green-400 font-medium">{product.category}</p>
+              <div className="p-3 sm:p-4">
+                <h4 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">{product.name}</h4>
+                <p className="text-xs sm:text-sm text-green-700 dark:text-green-400 font-medium">{product.category}</p>
                 {product.category === "Flower" && product.pricing && !product.soldOut && (
                   <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
                     From ${product.pricing[0].price}

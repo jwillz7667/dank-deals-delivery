@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, List, HelpCircle, ShieldCheck, MessageCircle } from "lucide-react"
+import { Home, List, HelpCircle, ShieldCheck, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -15,9 +15,8 @@ const navItems = [
 export default function BottomNavigation() {
   const pathname = usePathname()
 
-  // Generic pre-filled message for the "Text Us" link
-  const prefilledMessage = "Hi DankDeals, I have a question."
-  const encodedMessage = encodeURIComponent(prefilledMessage)
+  const orderMessage = "Hi! I'd like to place an order."
+  const encodedMessage = encodeURIComponent(orderMessage)
   const smsLink = `sms:+16129301390?&body=${encodedMessage}`
 
   return (
@@ -34,18 +33,18 @@ export default function BottomNavigation() {
                 isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <item.icon className={cn("h-6 w-6 mb-0.5", isActive ? "text-primary" : "")} />
+              <item.icon className={cn("h-5 w-5 mb-0.5", isActive ? "text-primary" : "")} />
               {item.name}
             </Link>
           )
         })}
         <a
-          href={smsLink} // Updated href with pre-filled message
-          className="flex flex-col items-center justify-center w-full h-full text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Text us your inquiry" // Added aria-label for better accessibility
+          href={smsLink}
+          className="flex flex-col items-center justify-center w-full h-full text-xs font-bold text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors bg-green-50 dark:bg-green-900/20"
+          aria-label="Order now via text message"
         >
-          <MessageCircle className="h-6 w-6 mb-0.5" />
-          Text Us
+          <MessageSquare className="h-5 w-5 mb-0.5 text-green-600 dark:text-green-400" />
+          Order Now
         </a>
       </div>
     </nav>

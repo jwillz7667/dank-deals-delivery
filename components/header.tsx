@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { MessageCircle } from "lucide-react"
+import { MessageSquare } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 export default function Header() {
@@ -35,24 +35,24 @@ export default function Header() {
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           <Link href="/" className="flex items-center">
             <Image
               src="/dankdeals-logo.png"
               alt="DankDeals.org Logo"
-              width={144} // Adjusted width (180 * 0.8)
-              height={32} // Adjusted height (40 * 0.8)
+              width={120}
+              height={27}
               priority
-              className="object-contain"
+              className="object-contain sm:w-36 sm:h-8"
             />
           </Link>
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 className={cn(
-                  "text-lg font-medium text-muted-foreground hover:text-primary transition-colors",
+                  "text-base lg:text-lg font-medium text-muted-foreground hover:text-primary transition-colors",
                   pathname === link.href && "text-primary",
                 )}
               >
@@ -60,10 +60,14 @@ export default function Header() {
               </Link>
             ))}
           </nav>
-          <a href="sms:+16129301390">
-            <Button className="neumorphic-outset">
-              <MessageCircle className="mr-2 h-5 w-5" />
-              Text Us Now
+          <a href="sms:+16129301390?&body=Hi! I'd like to place an order.">
+            <Button 
+              className="neumorphic-outset bg-green-600 hover:bg-green-700 text-white border-green-700 text-sm sm:text-base"
+              size="default"
+            >
+              <MessageSquare className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Order Now</span>
+              <span className="sm:hidden">Order</span>
             </Button>
           </a>
         </div>
