@@ -14,49 +14,100 @@ const videos = [
 
 export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
-  const [nextVideoIndex, setNextVideoIndex] = useState(1)
-  const [videoOpacities, setVideoOpacities] = useState<number[]>(
-    videos.map((_, index) => (index === 0 ? 1 : 0))
-  )
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Handle video transitions with crossfade
-  useEffect(() => {
-    const handleVideoTransition = () => {
-      const next = (currentVideoIndex + 1) % videos.length
-      setNextVideoIndex(next)
-      
-      // All videos are already playing continuously, just update opacity
-      // Create new opacity array with crossfade effect
-      const newOpacities = videos.map((_, index) => {
-        if (index === next) return 1 // Fade in next video
-        if (index === currentVideoIndex) return 0 // Fade out current video
-        return 0 // Keep others at 0
+  // Transition to next video
+  const transitionToNextVideo = () => {
+    const nextIndex = (currentVideoIndex + 1) % videos.length
+    const nextVideo = videoRefs.current[nextIndex]
+    
+    if (nextVideo) {
+      // Reset and prepare next video
+      nextVideo.currentTime = 0
+      // Play next video
+      nextVideo.play().catch(err => {
+        console.error('Error playing video:', err)
       })
-      setVideoOpacities(newOpacities)
+    }
+    
+    // Update the current index
+    setCurrentVideoIndex(nextIndex)
+  }
 
-      // Update current index after transition completes
-      setTimeout(() => {
-        setCurrentVideoIndex(next)
-      }, 1500) // Match transition duration
+  // Monitor current video and handle transitions
+  useEffect(() => {
+    const currentVideo = videoRefs.current[currentVideoIndex]
+    if (!currentVideo) return
+
+    // Ensure video settings
+    currentVideo.muted = true
+    currentVideo.playbackRate = 0.85
+    
+    // Play current video
+    const playCurrentVideo = async () => {
+      try {
+        await currentVideo.play()
+      } catch (err) {
+        console.error('Error playing current video:', err)
+        // Retry after a short delay
+        setTimeout(playCurrentVideo, 100)
+      }
+    }
+    
+    playCurrentVideo()
+
+    // Check video progress for transition
+    const checkProgress = () => {
+      if (currentVideo.duration && !isNaN(currentVideo.duration)) {
+        const timeLeft = currentVideo.duration - currentVideo.currentTime
+        // Transition 1.5 seconds before end for smooth effect
+        if (timeLeft <= 1.5 && timeLeft > 0) {
+          transitionToNextVideo()
+          // Clear interval to prevent multiple transitions
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current)
+            intervalRef.current = null
+          }
+        }
+      }
     }
 
-    // Start the video rotation
-    intervalRef.current = setInterval(handleVideoTransition, 9400) // Change every 9.4 seconds (8s / 0.85)
+    // Set up interval to check progress
+    intervalRef.current = setInterval(checkProgress, 100)
 
+    // Also add ended listener as backup
+    const handleEnded = () => {
+      transitionToNextVideo()
+    }
+    currentVideo.addEventListener('ended', handleEnded)
+
+    // Preload next video
+    const nextIndex = (currentVideoIndex + 1) % videos.length
+    const nextVideo = videoRefs.current[nextIndex]
+    if (nextVideo) {
+      nextVideo.load()
+    }
+
+    // Cleanup
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+      currentVideo.removeEventListener('ended', handleEnded)
     }
   }, [currentVideoIndex])
 
-  // Set playback rate and stagger video start times
+  // Initial setup
   useEffect(() => {
-    videoRefs.current.forEach((video, index) => {
-      if (video && video.readyState >= 2) { // Check if video has loaded metadata
-        video.playbackRate = 0.85
-        // Stagger video start times to prevent simultaneous looping
-        video.currentTime = (index * 2) % 8 // Offset each video by 2 seconds
+    // Configure all videos on mount
+    videoRefs.current.forEach((video) => {
+      if (video) {
+        video.muted = true
+        video.playsInline = true
+        video.setAttribute('webkit-playsinline', 'true')
+        video.setAttribute('x-webkit-airplay', 'allow')
       }
     })
   }, [])
@@ -67,14 +118,15 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
       <div className="absolute inset-0 bg-gradient-to-br from-green-900/30 via-black to-green-800/30" />
       
       {/* Videos - render all with individual opacity control */}
-      {videos.map((video, index) => (
+      {videos.map((videoSrc, index) => (
         <div
           key={`video-wrapper-${index}`}
           className="absolute inset-0 w-full h-full"
           style={{
-            opacity: videoOpacities[index],
-            transition: 'opacity 1.5s ease-in-out', // Smooth 1.5s crossfade
-            zIndex: index === currentVideoIndex || index === nextVideoIndex ? 2 : 1
+            opacity: index === currentVideoIndex ? 1 : 0,
+            transition: 'opacity 1.5s ease-in-out',
+            zIndex: index === currentVideoIndex ? 2 : 1,
+            pointerEvents: 'none'
           }}
         >
           <video
@@ -82,26 +134,12 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
               videoRefs.current[index] = el
             }}
             muted
-            loop
             playsInline
-            webkit-playsinline="true"
-            x-webkit-airplay="allow"
-            preload="auto"
-            autoPlay
+            preload={index === 0 || index === 1 ? "auto" : "metadata"}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity }}
-            onLoadedMetadata={(e) => {
-              const video = e.target as HTMLVideoElement
-              if (video.playbackRate !== 0.85) {
-                video.playbackRate = 0.85 // Set playback rate only if not already set
-              }
-              // Ensure video is playing
-              if (video.paused) {
-                video.play().catch(() => {})
-              }
-            }}
           >
-            <source src={video} type="video/mp4" />
+            <source src={videoSrc} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
@@ -111,4 +149,4 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
       <div className="absolute inset-0 bg-black/25 z-10" />
     </div>
   )
-} 
+}
