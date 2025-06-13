@@ -13,9 +13,9 @@ export default function Footer() {
               <Image
                 src="/dankdeals-logo.png"
                 alt="DankDeals.org Logo"
-                width={160}
-                height={36}
-                className="object-contain"
+                width={200}
+                height={45}
+                className="object-contain w-40 h-9 sm:w-44 sm:h-10 md:w-48 md:h-11 lg:w-52 lg:h-12"
               />
             </Link>
             <p className="text-muted-foreground text-sm">40 years experience, 'legally' since 2022.</p>

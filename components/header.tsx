@@ -40,10 +40,10 @@ export default function Header() {
             <Image
               src="/dankdeals-logo.png"
               alt="DankDeals.org Logo"
-              width={120}
-              height={27}
+              width={160}
+              height={36}
               priority
-              className="object-contain sm:w-36 sm:h-8"
+              className="object-contain w-32 h-7 sm:w-40 sm:h-9 md:w-48 md:h-11 lg:w-56 lg:h-12 xl:w-64 xl:h-14"
             />
           </Link>
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
