@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
+import VideoHeroBackground from "@/components/video-hero-background"
 
 interface HeroSectionProps {
   onCtaClick: () => void
@@ -11,8 +12,11 @@ export default function HeroSection({ onCtaClick }: HeroSectionProps) {
   return (
     <section
       id="home"
-      className="relative h-screen w-full flex items-center justify-center text-center text-white aurora-bg"
+      className="relative h-screen w-full flex items-center justify-center text-center text-white overflow-hidden"
     >
+      {/* Video Background */}
+      <VideoHeroBackground opacity={0.75} />
+      
       <div className="z-10 flex flex-col items-center px-4">
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
