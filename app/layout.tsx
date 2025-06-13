@@ -1,4 +1,6 @@
 import type React from "react"
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackServerApp } from "../stack";
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
@@ -8,6 +10,7 @@ import JsonLd from "@/components/json-ld"
 import { siteConfig } from "@/config/site"
 import BottomNavigation from "@/components/bottom-navigation"
 import { products } from "@/lib/products"
+import { CartProvider } from "@/hooks/use-cart"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -158,11 +161,13 @@ export default function RootLayout({
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", "pb-16 md:pb-0", inter.variable)}>
-        {children}
-        <Toaster />
-        <BottomNavigation />
-      </body>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", "pb-16 md:pb-0", inter.variable)}><StackProvider app={stackServerApp}><StackTheme>
+        <CartProvider>
+          {children}
+          <Toaster />
+          <BottomNavigation />
+        </CartProvider>
+      </StackTheme></StackProvider></body>
     </html>
   )
 }
