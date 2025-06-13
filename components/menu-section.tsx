@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { MessageSquare } from "lucide-react"
+import Link from "next/link"
+import { createProductSlug } from "@/app/product/[slug]/page"
 
 interface MenuSectionProps {
   onProductClick: (product: Product) => void
@@ -49,30 +51,29 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
               className="glassmorphic-card cursor-pointer group overflow-hidden hover:shadow-xl transition-shadow duration-300"
             >
               <CardContent className="p-0">
-                <div 
-                  onClick={() => onProductClick(product)}
-                  className="relative h-48 sm:h-56 lg:h-64 w-full"
-                >
-                  <Image
-                    src={product.imageUrl || "/placeholder.svg"}
-                    alt={product.name}
-                    fill
-                    style={{ objectFit: "cover" }}
-                    className="group-hover:scale-110 transition-transform duration-500"
-                  />
-                  {product.soldOut && (
-                    <div className="absolute top-2 right-2 bg-red-600 text-white px-2 sm:px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg">
-                      SOLD OUT
-                    </div>
-                  )}
-                </div>
+                <Link href={`/product/${createProductSlug(product.name)}`}>
+                  <div className="relative h-48 sm:h-56 lg:h-64 w-full">
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.imageAlt || product.name}
+                      fill
+                      style={{ objectFit: "cover" }}
+                      className="group-hover:scale-110 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    />
+                    {product.soldOut && (
+                      <div className="absolute top-2 right-2 bg-red-600 text-white px-2 sm:px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg">
+                        SOLD OUT
+                      </div>
+                    )}
+                  </div>
+                </Link>
                 <div className="p-4 sm:p-5 lg:p-6">
-                  <h3 
-                    onClick={() => onProductClick(product)}
-                    className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-pointer"
-                  >
-                    {product.name}
-                  </h3>
+                  <Link href={`/product/${createProductSlug(product.name)}`}>
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                      {product.name}
+                    </h3>
+                  </Link>
                   <p className="text-sm sm:text-md font-semibold text-green-600 dark:text-green-400 mt-1">{product.category}</p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 line-clamp-2">
                     {product.description}
@@ -82,19 +83,29 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
                       Starting at ${product.pricing[0].price}
                     </p>
                   )}
-                  <a 
-                    href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}
-                    className="block mt-3"
-                  >
+                  <div className="flex gap-2 mt-3">
                     <Button 
-                      className="w-full neumorphic-outset dark:neumorphic-outset-dark text-xs sm:text-sm" 
+                      onClick={() => onProductClick(product)}
+                      className="flex-1 neumorphic-outset dark:neumorphic-outset-dark text-xs sm:text-sm" 
                       size="sm"
-                      disabled={product.soldOut}
+                      variant="secondary"
                     >
-                      <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
-                      Order Now
+                      Quick View
                     </Button>
-                  </a>
+                    <a 
+                      href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}
+                      className="flex-1"
+                    >
+                      <Button 
+                        className="w-full neumorphic-outset dark:neumorphic-outset-dark text-xs sm:text-sm" 
+                        size="sm"
+                        disabled={product.soldOut}
+                      >
+                        <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
+                        Order
+                      </Button>
+                    </a>
+                  </div>
                 </div>
               </CardContent>
             </Card>

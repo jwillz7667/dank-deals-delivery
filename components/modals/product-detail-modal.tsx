@@ -22,6 +22,11 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
   
   if (!product) return null
 
+  // Use images array if available, otherwise fallback to single image
+  const productImages = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.imageUrl]
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="glassmorphic-card max-w-[95vw] sm:max-w-3xl p-0 max-h-[90vh] overflow-y-auto">
@@ -36,31 +41,24 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
               modules={[Pagination, Navigation]}
               pagination={{ clickable: true }}
               navigation
-              loop
+              loop={productImages.length > 1}
               className="h-full w-full rounded-lg"
             >
-              <SwiperSlide>
-                <div className="relative h-64 sm:h-80 md:h-96 w-full">
-                  <Image
-                    src={product.imageUrl || "/placeholder.svg"}
-                    alt={product.name}
-                    fill
-                    style={{ objectFit: "cover" }}
-                    className="rounded-lg"
-                  />
-                </div>
-              </SwiperSlide>
-              <SwiperSlide>
-                <div className="relative h-64 sm:h-80 md:h-96 w-full">
-                  <Image
-                    src={product.imageUrl.replace(".jpg", "-2.jpg") || "/placeholder.svg"}
-                    alt={`${product.name} alternate view`}
-                    fill
-                    style={{ objectFit: "cover" }}
-                    className="rounded-lg"
-                  />
-                </div>
-              </SwiperSlide>
+              {productImages.map((image, index) => (
+                <SwiperSlide key={index}>
+                  <div className="relative h-64 sm:h-80 md:h-96 w-full">
+                    <Image
+                      src={image}
+                      alt={product.imageAlt || `${product.name} - View ${index + 1}`}
+                      fill
+                      style={{ objectFit: "cover" }}
+                      className="rounded-lg"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      priority={index === 0}
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
             </Swiper>
           </div>
           <div className="p-4 sm:p-6 md:p-8 flex flex-col">
@@ -68,7 +66,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
               <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{product.name}</DialogTitle>
               <p className="text-base sm:text-lg font-semibold text-green-600 dark:text-green-400">{product.category}</p>
               <DialogDescription className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mt-2 sm:mt-4">
-                {product.description}
+                {product.metaDescription || product.description}
               </DialogDescription>
             </DialogHeader>
             <div className="mt-4 sm:mt-6 flex-grow">

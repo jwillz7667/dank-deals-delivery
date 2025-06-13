@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next"
 import { cities } from "@/lib/cities"
+import { products } from "@/lib/products"
+import { createProductSlug } from "@/lib/utils"
 
 // Use environment variable for production URL or fallback to default
 const URL = process.env.NEXT_PUBLIC_SITE_URL || "https://dankdeals.org"
@@ -23,6 +25,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "daily",
     priority: 0.95,
   }]
+
+  // Product pages - Very high priority for SEO
+  const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
+    url: `${URL}/product/${createProductSlug(product.name)}`,
+    lastModified: currentDate,
+    changeFrequency: "weekly",
+    priority: product.soldOut ? 0.7 : 0.85, // Lower priority for sold out products
+  }))
 
   // City delivery pages - Very high priority for local SEO
   // Each city page is crucial for local search rankings
@@ -53,6 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...homepage,
     ...menuPage,
+    ...productRoutes,
     ...cityRoutes,
     ...staticPages,
   ]

@@ -10,6 +10,9 @@ export interface Product {
   description: string
   effects: string
   imageUrl: string
+  images?: string[] // Array of additional images for gallery
+  imageAlt?: string // Alt text for SEO
+  metaDescription?: string // Meta description for SEO
   pricing?: WeightPrice[]
   soldOut?: boolean
 }
@@ -22,7 +25,16 @@ export const products: Product[] = [
     description:
       "An exotic hybrid strain with a sweet candy and creamy gelato flavor profile. This premium flower offers a perfect balance of relaxation and euphoria.",
     effects: "Euphoric, Relaxed, Happy, Creative",
-    imageUrl: "/king-bud-default.png",
+    imageUrl: "/blue-nerds-gelato.jpg",
+    images: [
+      "/blue-nerds-gelato.jpg",
+      "/blue-nerds-gelato-33.jpg",
+      "/blue-nerds-gelato-33-2.jpg",
+      "/blue-nerds-gelato-33-3.jpg",
+      "/blue-nerds-gelato-33-4.jpg"
+    ],
+    imageAlt: "Blue Candy Gelato Nerdz premium cannabis flower - exotic hybrid strain with purple hues",
+    metaDescription: "Premium Blue Candy Gelato Nerdz flower - An exotic hybrid cannabis strain with sweet candy and creamy gelato flavors. Available for delivery in Minneapolis & St. Paul.",
     pricing: [
       { weight: "1.75g", price: 25 },
       { weight: "3.5g", price: 45 },

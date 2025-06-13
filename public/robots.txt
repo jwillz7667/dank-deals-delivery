@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
+Allow: /product/
+Allow: /delivery/
+Allow: /menu
+Allow: /faq
+Allow: /mission
+
+# Block development files
+Disallow: /_next/
+Disallow: /api/
+
+# Allow crawling of images
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.svg$
 
 Sitemap: https://dankdeals.org/sitemap.xml
