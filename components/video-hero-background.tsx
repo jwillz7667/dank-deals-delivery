@@ -31,6 +31,7 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
       const nextVideo = videoRefs.current[next]
       if (nextVideo) {
         nextVideo.currentTime = 0 // Reset to start
+        nextVideo.playbackRate = 0.85 // Ensure playback speed is set
         nextVideo.play().catch(() => {
           // Handle autoplay restrictions silently
         })
@@ -54,7 +55,7 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
     }
 
     // Start the video rotation
-    intervalRef.current = setInterval(handleVideoTransition, 8000) // Change every 8 seconds
+    intervalRef.current = setInterval(handleVideoTransition, 9400) // Change every 9.4 seconds (8s / 0.85)
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
@@ -65,6 +66,7 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
       if (video) {
+        video.playbackRate = 0.85 // Set playback speed to 0.85x
         if (index === 0) {
           // Start playing the first video
           video.play().catch(() => {
@@ -95,13 +97,20 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
           }}
         >
           <video
-            ref={(el) => { videoRefs.current[index] = el }}
+            ref={(el) => { 
+              videoRefs.current[index] = el
+              if (el) el.playbackRate = 0.85 // Set playback rate on mount
+            }}
             muted
             loop
             playsInline
             preload="auto" // Changed to auto for better preloading
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity }}
+            onLoadedMetadata={(e) => {
+              const video = e.target as HTMLVideoElement
+              video.playbackRate = 0.85 // Ensure playback rate is set when metadata loads
+            }}
           >
             <source src={video} type="video/mp4" />
             Your browser does not support the video tag.
