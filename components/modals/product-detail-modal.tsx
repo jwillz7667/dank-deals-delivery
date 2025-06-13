@@ -10,6 +10,7 @@ import "swiper/css/navigation"
 import { MessageSquare } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import ProductReviews from "@/components/product-reviews"
 
 interface ProductDetailModalProps {
   product: Product | null
@@ -101,6 +102,12 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 </div>
               )}
             </div>
+            
+            {product.reviews && product.reviews.length > 0 && (
+              <div className="mt-4 sm:mt-6 border-t pt-4">
+                <ProductReviews reviews={product.reviews} />
+              </div>
+            )}
             
             <div className="mt-4 sm:mt-6 bg-green-100 dark:bg-green-900/50 p-3 sm:p-4 rounded-lg text-center">
               {product.soldOut ? (

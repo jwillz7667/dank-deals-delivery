@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { MessageSquare } from "lucide-react"
 import JsonLd from "@/components/json-ld"
 import { createProductSlug } from "@/lib/utils"
+import ProductReviews from "@/components/product-reviews"
 
 interface ProductPageProps {
   params: Promise<{
@@ -185,33 +186,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
               )}
 
-              <div className="bg-green-100 dark:bg-green-900/50 p-6 rounded-lg">
-                {product.soldOut ? (
-                  <>
-                    <p className="font-semibold text-red-800 dark:text-red-200 text-lg">Currently Sold Out</p>
-                    <p className="text-red-700 dark:text-red-300 mt-1">Check back soon or contact us for availability.</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="font-semibold text-green-800 dark:text-green-200 text-lg">Ready to order?</p>
-                    <p className="text-green-700 dark:text-green-300 mt-1">
-                      Text us to place your order for {product.name}.
-                    </p>
-                  </>
-                )}
+              <div className="bg-green-100 dark:bg-green-900/50 rounded-lg p-4 sm:p-6 mt-6">
                 <a href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}>
-                  <Button 
-                    className="w-full mt-4 neumorphic-outset dark:neumorphic-outset-dark" 
-                    size="lg"
-                    disabled={product.soldOut}
-                  >
+                  <Button className="w-full neumorphic-outset dark:neumorphic-outset-dark" size="lg" disabled={product.soldOut}>
                     <MessageSquare className="mr-2 h-5 w-5" />
-                    Order Now via Text
+                    {product.soldOut ? "Currently Unavailable" : "Order Now via Text"}
                   </Button>
                 </a>
               </div>
             </div>
           </div>
+
+          {/* Reviews Section */}
+          {product.reviews && product.reviews.length > 0 && (
+            <div className="mt-8 sm:mt-12 glassmorphic-card p-6 sm:p-8">
+              <ProductReviews reviews={product.reviews} />
+            </div>
+          )}
         </div>
       </main>
       <Footer />

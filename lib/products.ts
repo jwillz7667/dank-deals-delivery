@@ -3,6 +3,14 @@ export interface WeightPrice {
   price: number
 }
 
+export interface Review {
+  id: number
+  author: string
+  rating: number
+  comment: string
+  date: string
+}
+
 export interface Product {
   id: number
   name: string
@@ -15,6 +23,7 @@ export interface Product {
   metaDescription?: string // Meta description for SEO
   pricing?: WeightPrice[]
   soldOut?: boolean
+  reviews?: Review[]
 }
 
 export const products: Product[] = [
@@ -44,7 +53,37 @@ export const products: Product[] = [
       { weight: "42g", price: 440 },
       { weight: "56g", price: 560 }
     ],
-    soldOut: false
+    soldOut: false,
+    reviews: [
+      {
+        id: 1,
+        author: "Jake S.",
+        rating: 5,
+        comment: "bro,im so high right now. this shit is fire",
+        date: "2025-06-22"
+      },
+      {
+        id: 2,
+        author: "Mia R.",
+        rating: 5,
+        comment: "This strain hits different 🔥 Perfect balance and the taste is unreal. Got me feeling creative and relaxed at the same time",
+        date: "2025-06-19"
+      },
+      {
+        id: 3,
+        author: "Tyler D.",
+        rating: 5,
+        comment: "No cap this is the best flower I've had in MN. Smooth af and the high lasts forever. Definitely copping more",
+        date: "2025-06-15"
+      },
+      {
+        id: 4,
+        author: "Ashley M.",
+        rating: 4,
+        comment: "Really good strain! The candy flavor is legit and it helped with my anxiety. Only giving 4 stars cuz I wish they had bigger bags available",
+        date: "2025-06-12"
+      }
+    ]
   },
   {
     id: 2,
