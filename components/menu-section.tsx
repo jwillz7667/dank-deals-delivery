@@ -8,7 +8,7 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { MessageSquare } from "lucide-react"
 import Link from "next/link"
-import { createProductSlug } from "@/app/product/[slug]/page"
+import { createProductSlug } from "@/lib/utils"
 
 interface MenuSectionProps {
   onProductClick: (product: Product) => void
