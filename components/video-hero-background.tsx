@@ -14,21 +14,43 @@ const videos = [
 
 export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [nextVideoIndex, setNextVideoIndex] = useState(1)
+  const [videoOpacities, setVideoOpacities] = useState<number[]>(
+    videos.map((_, index) => (index === 0 ? 1 : 0))
+  )
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
-  const transitionTimeoutRef = useRef<NodeJS.Timeout>()
   const intervalRef = useRef<NodeJS.Timeout>()
 
-  // Handle video transitions
+  // Handle video transitions with crossfade
   useEffect(() => {
     const handleVideoTransition = () => {
-      setIsTransitioning(true)
+      const next = (currentVideoIndex + 1) % videos.length
+      setNextVideoIndex(next)
       
-      // Wait for fade out, then switch videos
-      transitionTimeoutRef.current = setTimeout(() => {
-        setCurrentVideoIndex((prev) => (prev + 1) % videos.length)
-        setIsTransitioning(false)
-      }, 1000) // 1 second for smooth fade
+      // Start playing the next video before transition
+      const nextVideo = videoRefs.current[next]
+      if (nextVideo) {
+        nextVideo.currentTime = 0 // Reset to start
+        nextVideo.play().catch(() => {
+          // Handle autoplay restrictions silently
+        })
+      }
+
+      // Start crossfade after a small delay to ensure next video is ready
+      setTimeout(() => {
+        // Create new opacity array with crossfade effect
+        const newOpacities = videos.map((_, index) => {
+          if (index === next) return 1 // Fade in next video
+          if (index === currentVideoIndex) return 0 // Fade out current video
+          return 0 // Keep others at 0
+        })
+        setVideoOpacities(newOpacities)
+
+        // Update current index after transition completes
+        setTimeout(() => {
+          setCurrentVideoIndex(next)
+        }, 1000) // Match transition duration
+      }, 100)
     }
 
     // Start the video rotation
@@ -36,37 +58,40 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
-      if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current)
     }
-  }, [])
+  }, [currentVideoIndex])
 
-  // Play video when it becomes current
+  // Preload and prepare videos
   useEffect(() => {
-    const currentVideo = videoRefs.current[currentVideoIndex]
-    if (currentVideo && !isTransitioning) {
-      // Small delay to ensure smooth transition
-      setTimeout(() => {
-        currentVideo.play().catch(() => {
-          // Autoplay might be blocked, handle silently
-        })
-      }, 100)
-    }
-  }, [currentVideoIndex, isTransitioning])
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        if (index === 0) {
+          // Start playing the first video
+          video.play().catch(() => {
+            // Handle autoplay restrictions silently
+          })
+        } else {
+          // Preload other videos
+          video.load()
+        }
+      }
+    })
+  }, [])
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden bg-black">
       {/* Fallback gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-green-900/30 via-black to-green-800/30" />
       
-      {/* Videos - render all but only show current */}
+      {/* Videos - render all with individual opacity control */}
       {videos.map((video, index) => (
         <div
           key={`video-wrapper-${index}`}
           className="absolute inset-0 w-full h-full"
           style={{
-            opacity: index === currentVideoIndex && !isTransitioning ? 1 : 0,
-            transition: 'opacity 1s ease-in-out',
-            zIndex: index === currentVideoIndex ? 2 : 1
+            opacity: videoOpacities[index],
+            transition: 'opacity 1.5s ease-in-out', // Smooth 1.5s crossfade
+            zIndex: index === currentVideoIndex || index === nextVideoIndex ? 2 : 1
           }}
         >
           <video
@@ -74,7 +99,7 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto" // Changed to auto for better preloading
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity }}
           >
