@@ -27,31 +27,19 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
       const next = (currentVideoIndex + 1) % videos.length
       setNextVideoIndex(next)
       
-      // Start playing the next video before transition
-      const nextVideo = videoRefs.current[next]
-      if (nextVideo) {
-        nextVideo.currentTime = 0 // Reset to start
-        nextVideo.playbackRate = 0.85 // Ensure playback speed is set
-        nextVideo.play().catch(() => {
-          // Handle autoplay restrictions silently
-        })
-      }
+      // All videos are already playing continuously, just update opacity
+      // Create new opacity array with crossfade effect
+      const newOpacities = videos.map((_, index) => {
+        if (index === next) return 1 // Fade in next video
+        if (index === currentVideoIndex) return 0 // Fade out current video
+        return 0 // Keep others at 0
+      })
+      setVideoOpacities(newOpacities)
 
-      // Start crossfade after a small delay to ensure next video is ready
+      // Update current index after transition completes
       setTimeout(() => {
-        // Create new opacity array with crossfade effect
-        const newOpacities = videos.map((_, index) => {
-          if (index === next) return 1 // Fade in next video
-          if (index === currentVideoIndex) return 0 // Fade out current video
-          return 0 // Keep others at 0
-        })
-        setVideoOpacities(newOpacities)
-
-        // Update current index after transition completes
-        setTimeout(() => {
-          setCurrentVideoIndex(next)
-        }, 1000) // Match transition duration
-      }, 100)
+        setCurrentVideoIndex(next)
+      }, 1500) // Match transition duration
     }
 
     // Start the video rotation
@@ -62,20 +50,16 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
     }
   }, [currentVideoIndex])
 
-  // Preload and prepare videos
+  // Preload and prepare videos - start all videos playing
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
       if (video) {
         video.playbackRate = 0.85 // Set playback speed to 0.85x
-        if (index === 0) {
-          // Start playing the first video
-          video.play().catch(() => {
-            // Handle autoplay restrictions silently
-          })
-        } else {
-          // Preload other videos
-          video.load()
-        }
+        // Start playing all videos (they'll be hidden by opacity)
+        // Let them start naturally without resetting currentTime
+        video.play().catch(() => {
+          // Handle autoplay restrictions silently
+        })
       }
     })
   }, [])
