@@ -50,16 +50,13 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
     }
   }, [currentVideoIndex])
 
-  // Preload and prepare videos - start all videos playing
+  // Set playback rate and stagger video start times
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
-      if (video) {
-        video.playbackRate = 0.85 // Set playback speed to 0.85x
-        // Start playing all videos (they'll be hidden by opacity)
-        // Let them start naturally without resetting currentTime
-        video.play().catch(() => {
-          // Handle autoplay restrictions silently
-        })
+      if (video && video.readyState >= 2) { // Check if video has loaded metadata
+        video.playbackRate = 0.85
+        // Stagger video start times to prevent simultaneous looping
+        video.currentTime = (index * 2) % 8 // Offset each video by 2 seconds
       }
     })
   }, [])
@@ -83,17 +80,25 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
           <video
             ref={(el) => { 
               videoRefs.current[index] = el
-              if (el) el.playbackRate = 0.85 // Set playback rate on mount
             }}
             muted
             loop
             playsInline
-            preload="auto" // Changed to auto for better preloading
+            webkit-playsinline="true"
+            x-webkit-airplay="allow"
+            preload="auto"
+            autoPlay
             className="absolute inset-0 w-full h-full object-cover"
             style={{ opacity }}
             onLoadedMetadata={(e) => {
               const video = e.target as HTMLVideoElement
-              video.playbackRate = 0.85 // Ensure playback rate is set when metadata loads
+              if (video.playbackRate !== 0.85) {
+                video.playbackRate = 0.85 // Set playback rate only if not already set
+              }
+              // Ensure video is playing
+              if (video.paused) {
+                video.play().catch(() => {})
+              }
             }}
           >
             <source src={video} type="video/mp4" />
