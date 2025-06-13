@@ -19,10 +19,18 @@ import JsonLd from "@/components/json-ld"
 export default function HomePage() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [initialBudtenderMessage, setInitialBudtenderMessage] = useState<string>("")
   const router = useRouter()
 
   const bentoGridRef = useRef<HTMLDivElement>(null)
   useIntersectionObserver([bentoGridRef])
+
+  const handleAiBudtenderClick = (initialMessage?: string) => {
+    if (initialMessage) {
+      setInitialBudtenderMessage(initialMessage)
+    }
+    setIsAiModalOpen(true)
+  }
 
   const homePageSchema = {
     "@context": "https://schema.org",
@@ -45,14 +53,18 @@ export default function HomePage() {
       <main>
         <HeroSection onCtaClick={() => router.push("/menu")} />
         <div ref={bentoGridRef} className="fade-in-section">
-          <BentoGridSection onAiBudtenderClick={() => setIsAiModalOpen(true)} onProductClick={setSelectedProduct} />
+          <BentoGridSection onAiBudtenderClick={handleAiBudtenderClick} onProductClick={setSelectedProduct} />
         </div>
       </main>
       <Footer />
       <AiBudtenderModal
         isOpen={isAiModalOpen}
-        onClose={() => setIsAiModalOpen(false)}
+        onClose={() => {
+          setIsAiModalOpen(false)
+          setInitialBudtenderMessage("")
+        }}
         onProductSelect={setSelectedProduct}
+        initialMessage={initialBudtenderMessage}
       />
       <ProductDetailModal
         product={selectedProduct}

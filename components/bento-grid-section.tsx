@@ -1,9 +1,11 @@
 "use client"
 
 import type React from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Bot, Truck } from "lucide-react" // Changed Gift to Truck
+import { Input } from "@/components/ui/input"
+import { Bot, Truck, Send } from "lucide-react"
 import { products, type Product } from "@/lib/products"
 import FeaturedProducts from "./featured-products"
 import { Swiper, SwiperSlide } from "swiper/react"
@@ -12,7 +14,7 @@ import "swiper/css"
 import "swiper/css/pagination"
 
 interface BentoGridSectionProps {
-  onAiBudtenderClick: () => void
+  onAiBudtenderClick: (initialMessage?: string) => void
   onProductClick: (product: Product) => void
 }
 
@@ -44,6 +46,12 @@ const testimonials = [
 
 export default function BentoGridSection({ onAiBudtenderClick, onProductClick }: BentoGridSectionProps) {
   const featuredProducts = products.slice(0, 5)
+  const [budtenderInput, setBudtenderInput] = useState("")
+
+  const handleBudtenderSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onAiBudtenderClick(budtenderInput || undefined)
+  }
 
   return (
     <section className="py-12 sm:py-16 md:py-24 bg-secondary/30">
@@ -51,7 +59,7 @@ export default function BentoGridSection({ onAiBudtenderClick, onProductClick }:
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* AI Budtender CTA - Full width on mobile */}
           <GlassmorphicCard className="md:col-span-2 lg:col-span-2 md:row-span-2 flex flex-col items-center text-center justify-between p-6 sm:p-8">
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center w-full">
               <Image
                 src="/king-bud-default.png"
                 alt="King Bud - AI Budtender Mascot"
@@ -63,9 +71,36 @@ export default function BentoGridSection({ onAiBudtenderClick, onProductClick }:
               <p className="mt-2 text-base sm:text-lg text-muted-foreground max-w-md">
                 Describe your desired mood or occasion, and get personalized recommendations from our menu in seconds.
               </p>
+              
+              {/* Chat Input Form */}
+              <form onSubmit={handleBudtenderSubmit} className="w-full max-w-md mt-6 space-y-3">
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="e.g., 'I need something to help me relax after work'"
+                    value={budtenderInput}
+                    onChange={(e) => setBudtenderInput(e.target.value)}
+                    className="pr-10 bg-white/70 dark:bg-black/50 border-green-200 dark:border-green-800 focus:border-green-500 dark:focus:border-green-400"
+                  />
+                  <Button
+                    type="submit"
+                    size="icon"
+                    className="absolute right-1 top-1 h-8 w-8 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Type your request above or click below for the full experience
+                </p>
+              </form>
             </div>
-            <Button onClick={onAiBudtenderClick} size="lg" className="mt-4 sm:mt-6 w-full sm:w-auto neumorphic-outset">
-              <Bot className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> Find Your Perfect Strain
+            <Button 
+              onClick={() => onAiBudtenderClick()} 
+              size="lg" 
+              className="mt-4 sm:mt-6 w-full sm:w-auto neumorphic-outset"
+            >
+              <Bot className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> Open AI Budtender
             </Button>
           </GlassmorphicCard>
 
