@@ -54,7 +54,7 @@ export default function VideoHeroBackground({ opacity = 0.75 }: VideoBackgroundP
     }
 
     // Start the video rotation
-    intervalRef.current = setInterval(handleVideoTransition, 10000) // Change every 10 seconds
+    intervalRef.current = setInterval(handleVideoTransition, 8000) // Change every 8 seconds
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
