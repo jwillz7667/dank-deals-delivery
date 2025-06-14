@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export function AuthButton() {
-  const user = useUser({ or: 'redirect' });
+  const user = useUser(); // Don't force authentication for the auth button
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

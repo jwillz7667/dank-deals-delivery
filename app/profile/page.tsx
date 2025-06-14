@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/use-auth';
+import { useRequiredAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -51,7 +51,7 @@ interface Order {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { isAuthenticated, email, displayName, signOut } = useAuth();
+  const { isAuthenticated, email, displayName, signOut } = useRequiredAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);

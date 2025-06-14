@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/use-auth';
 
 interface CartItem {
   id: number;
@@ -39,8 +40,15 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated, requireAuth } = useAuth();
 
   const fetchCart = useCallback(async () => {
+    // Only fetch cart if authenticated
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/cart');
       const data = await response.json();
@@ -53,7 +61,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     fetchCart();
@@ -65,6 +73,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     productPrice: number,
     quantity: number = 1
   ) => {
+    // Require authentication before adding to cart
+    if (!requireAuth()) {
+      return;
+    }
+
     try {
       const response = await fetch('/api/cart/add', {
         method: 'POST',
@@ -92,6 +105,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeFromCart = async (productId: string) => {
+    // Require authentication for cart operations
+    if (!requireAuth()) {
+      return;
+    }
+
     try {
       const response = await fetch(`/api/cart/remove/${productId}`, {
         method: 'DELETE',
@@ -113,6 +131,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateQuantity = async (productId: string, quantity: number) => {
     if (quantity < 1) return;
+
+    // Require authentication for cart operations
+    if (!requireAuth()) {
+      return;
+    }
 
     try {
       const response = await fetch('/api/cart/update', {
@@ -138,6 +161,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const clearCart = async () => {
+    // Require authentication for cart operations
+    if (!requireAuth()) {
+      return;
+    }
+
     try {
       const response = await fetch('/api/cart/clear', {
         method: 'DELETE',
@@ -158,6 +186,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshCart = async () => {
+    // Only refresh if authenticated
+    if (!isAuthenticated) {
+      return;
+    }
     await fetchCart();
   };
 

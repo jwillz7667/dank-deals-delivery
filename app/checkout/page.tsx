@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useCart } from '@/hooks/use-cart';
-import { useAuth } from '@/hooks/use-auth';
+import { useRequiredAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -57,7 +57,7 @@ const US_STATES = [
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, refreshCart } = useCart();
-  const { isAuthenticated, userId } = useAuth();
+  const { isAuthenticated, userId } = useRequiredAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
   const [customTip, setCustomTip] = useState('');

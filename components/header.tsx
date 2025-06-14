@@ -19,7 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 function UserSection() {
-  const user = useUser({ or: 'redirect' })
+  const user = useUser() // Don't force authentication in header
   const router = useRouter()
 
   const handleSignOut = async () => {
