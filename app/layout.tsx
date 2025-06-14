@@ -11,6 +11,7 @@ import { siteConfig } from "@/config/site"
 import BottomNavigation from "@/components/bottom-navigation"
 import { products } from "@/lib/products"
 import { CartProvider } from "@/hooks/use-cart"
+import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -162,11 +163,13 @@ export default function RootLayout({
         <JsonLd data={localBusinessSchema} />
       </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased", "pb-16 md:pb-0", inter.variable)}><StackProvider app={stackServerApp}><StackTheme>
-        <CartProvider>
-          {children}
-          <Toaster />
-          <BottomNavigation />
-        </CartProvider>
+        <Suspense fallback={<div className="min-h-screen bg-background" />}>
+          <CartProvider>
+            {children}
+            <Toaster />
+            <BottomNavigation />
+          </CartProvider>
+        </Suspense>
       </StackTheme></StackProvider></body>
     </html>
   )

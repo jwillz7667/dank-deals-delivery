@@ -93,7 +93,19 @@ export class UserProfileService {
         return profile;
       }
       
-      return await this.createProfile(userId);
+      try {
+        return await this.createProfile(userId);
+      } catch (createError: any) {
+        // If we get a duplicate key error, try to fetch the profile again
+        // This handles race conditions where another request created the profile
+        if (createError?.cause?.code === '23505') {
+          const existingProfile = await this.getProfile(userId);
+          if (existingProfile) {
+            return existingProfile;
+          }
+        }
+        throw createError;
+      }
     } catch (error) {
       console.error('Error getting or creating user profile:', error);
       throw new Error('Failed to get or create user profile');
