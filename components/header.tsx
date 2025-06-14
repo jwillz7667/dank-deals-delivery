@@ -5,12 +5,25 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { MessageSquare } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { MessageSquare, ShoppingCart, User, LogOut, Package, UserCircle } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { useCart } from "@/hooks/use-cart"
+import { useUser } from "@stackframe/stack"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const { cart } = useCart()
+  const user = useUser()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +39,11 @@ export default function Header() {
     { name: "FAQ", href: "/faq" },
     { name: "Our Mission", href: "/mission" },
   ]
+
+  const handleSignOut = async () => {
+    await user?.signOut()
+    router.push('/')
+  }
 
   return (
     <header
@@ -60,16 +78,92 @@ export default function Header() {
               </Link>
             ))}
           </nav>
-          <a href="sms:+16129301390?&body=Hi! I'd like to place an order.">
-            <Button 
-              className="neumorphic-outset bg-green-600 hover:bg-green-700 text-white border-green-700 text-sm sm:text-base"
-              size="default"
-            >
-              <MessageSquare className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline">Order Now</span>
-              <span className="sm:hidden">Order</span>
-            </Button>
-          </a>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Cart Button */}
+            <Link href="/cart">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="relative"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cart && cart.itemCount > 0 && (
+                  <Badge 
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    variant="destructive"
+                  >
+                    {cart.itemCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+
+            {/* Auth Button */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      {user.displayName && (
+                        <p className="font-medium">{user.displayName}</p>
+                      )}
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user.primaryEmail}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => router.push('/profile')}>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/profile?tab=orders')}>
+                    <Package className="mr-2 h-4 w-4" />
+                    My Orders
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Button 
+                  variant="ghost"
+                  onClick={() => router.push('/handler/sign-in')}
+                  className="hidden sm:flex"
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  variant="default"
+                  onClick={() => router.push('/handler/sign-up')}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Sign Up
+                </Button>
+              </div>
+            )}
+
+            {/* Order Now Button */}
+            <a href="sms:+16129301390?&body=Hi! I'd like to place an order.">
+              <Button 
+                className="neumorphic-outset bg-green-600 hover:bg-green-700 text-white border-green-700 text-sm sm:text-base"
+                size="default"
+              >
+                <MessageSquare className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Order Now</span>
+                <span className="sm:hidden">Order</span>
+              </Button>
+            </a>
+          </div>
         </div>
       </div>
     </header>

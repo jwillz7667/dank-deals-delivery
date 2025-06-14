@@ -9,9 +9,9 @@ export interface AuthenticatedRequest extends NextRequest {
 /**
  * Middleware to verify authentication for API routes
  */
-export async function withAuth<T extends any[]>(
+export function withAuth<T extends any[]>(
   handler: (req: AuthenticatedRequest, ...args: T) => Promise<NextResponse>
-): Promise<(req: NextRequest, ...args: T) => Promise<NextResponse>> {
+): (req: NextRequest, ...args: T) => Promise<NextResponse> {
   return async (req: NextRequest, ...args: T) => {
     try {
       const user = await stackServerApp.getUser();
@@ -59,9 +59,9 @@ export async function withAuth<T extends any[]>(
 /**
  * Optional auth middleware - continues even if user is not authenticated
  */
-export async function withOptionalAuth<T extends any[]>(
+export function withOptionalAuth<T extends any[]>(
   handler: (req: AuthenticatedRequest, ...args: T) => Promise<NextResponse>
-): Promise<(req: NextRequest, ...args: T) => Promise<NextResponse>> {
+): (req: NextRequest, ...args: T) => Promise<NextResponse> {
   return async (req: NextRequest, ...args: T) => {
     try {
       const user = await stackServerApp.getUser();

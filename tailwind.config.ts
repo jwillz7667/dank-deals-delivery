@@ -44,6 +44,11 @@ const config: Config = {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
+  			neumorphic: {
+  				bg: 'var(--neumorphic-bg)',
+  				'shadow-light': 'var(--neumorphic-shadow-light)',
+  				'shadow-dark': 'var(--neumorphic-shadow-dark)',
+  			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',
