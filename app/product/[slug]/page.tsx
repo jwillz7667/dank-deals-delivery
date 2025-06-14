@@ -73,6 +73,24 @@ export default function ProductPage() {
     window.open(`sms:+16129301390?&body=${encodeURIComponent(message)}`, '_self')
   }
 
+  // Calculate actual aggregate rating from reviews
+  const calculateAggregateRating = () => {
+    if (!product.reviews || product.reviews.length === 0) {
+      return null
+    }
+    
+    const totalRating = product.reviews.reduce((sum, review) => sum + review.rating, 0)
+    const averageRating = totalRating / product.reviews.length
+    
+    return {
+      "@type": "AggregateRating",
+      ratingValue: averageRating.toFixed(1),
+      reviewCount: product.reviews.length.toString(),
+      bestRating: "5",
+      worstRating: "1"
+    }
+  }
+
   // Product structured data for SEO
   const productSchema = {
     "@context": "https://schema.org",
@@ -103,11 +121,25 @@ export default function ProductPage() {
       }
     }],
     category: product.category,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      reviewCount: "127"
-    }
+    // Add actual reviews if they exist
+    ...(product.reviews && product.reviews.length > 0 && {
+      review: product.reviews.map(review => ({
+        "@type": "Review",
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: review.rating.toString(),
+          bestRating: "5",
+          worstRating: "1"
+        },
+        author: {
+          "@type": "Person",
+          name: review.author
+        },
+        datePublished: review.date,
+        reviewBody: review.comment
+      })),
+      aggregateRating: calculateAggregateRating()
+    })
   }
 
   return (
