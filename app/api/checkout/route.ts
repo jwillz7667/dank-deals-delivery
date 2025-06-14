@@ -8,10 +8,17 @@ import { z } from 'zod';
 
 // Validation schema for checkout
 const checkoutSchema = z.object({
-  deliveryAddress: z.string().min(10, 'Delivery address is too short'),
-  deliveryInstructions: z.string().optional(),
-  paymentMethod: z.enum(['cash', 'card', 'apple_pay', 'google_pay']),
   phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
+  houseType: z.string().min(1, 'House type is required'),
+  houseNumber: z.string().min(1, 'House number is required'),
+  streetName: z.string().min(1, 'Street name is required'),
+  aptNumber: z.string().optional(),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(2, 'State is required'),
+  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
+  deliveryInstructions: z.string().optional(),
+  paymentMethod: z.enum(['card', 'apple_pay', 'google_pay']),
+  tip: z.number().min(0, 'Tip cannot be negative').default(0),
   saveProfile: z.boolean().default(false),
 });
 
@@ -50,7 +57,13 @@ async function checkout(req: AuthenticatedRequest): Promise<NextResponse> {
     if (validatedData.saveProfile) {
       await UserProfileService.updateProfile(userId, {
         phoneNumber: validatedData.phoneNumber,
-        deliveryAddress: validatedData.deliveryAddress,
+        houseType: validatedData.houseType,
+        houseNumber: validatedData.houseNumber,
+        streetName: validatedData.streetName,
+        aptNumber: validatedData.aptNumber,
+        city: validatedData.city,
+        state: validatedData.state,
+        zipCode: validatedData.zipCode,
         deliveryInstructions: validatedData.deliveryInstructions,
         preferredPaymentMethod: validatedData.paymentMethod,
       });
@@ -59,17 +72,21 @@ async function checkout(req: AuthenticatedRequest): Promise<NextResponse> {
     // Create order
     const order = await OrderService.createOrder({
       userId,
-      deliveryAddress: validatedData.deliveryAddress,
+      deliveryHouseType: validatedData.houseType,
+      deliveryHouseNumber: validatedData.houseNumber,
+      deliveryStreetName: validatedData.streetName,
+      deliveryAptNumber: validatedData.aptNumber,
+      deliveryCity: validatedData.city,
+      deliveryState: validatedData.state,
+      deliveryZipCode: validatedData.zipCode,
       deliveryInstructions: validatedData.deliveryInstructions,
       paymentMethod: validatedData.paymentMethod,
+      tip: validatedData.tip,
     });
     
     // TODO: Process payment based on payment method
-    // For now, we'll assume payment is successful for cash on delivery
-    if (validatedData.paymentMethod !== 'cash') {
-      // In production, integrate with payment gateway
-      // await PaymentService.processPayment(order, validatedData.paymentMethod);
-    }
+    // In production, integrate with payment gateway
+    // await PaymentService.processPayment(order, validatedData.paymentMethod);
     
     // TODO: Send order confirmation email
     // await EmailService.sendOrderConfirmation(userId, order);

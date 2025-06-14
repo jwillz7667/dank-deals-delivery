@@ -5,7 +5,14 @@ export const userProfiles = pgTable('user_profiles', {
   id: serial('id').primaryKey(),
   userId: text('user_id').notNull().unique(),
   phoneNumber: text('phone_number'),
-  deliveryAddress: text('delivery_address'),
+  // Structured address fields
+  houseType: text('house_type'), // house, townhouse, apartment, condo, etc.
+  houseNumber: text('house_number'),
+  streetName: text('street_name'),
+  aptNumber: text('apt_number'), // apartment/unit number if applicable
+  city: text('city'),
+  state: text('state'),
+  zipCode: text('zip_code'),
   deliveryInstructions: text('delivery_instructions'),
   preferredPaymentMethod: text('preferred_payment_method'),
   createdAt: timestamp('created_at').defaultNow(),
@@ -46,8 +53,16 @@ export const orders = pgTable('orders', {
   subtotal: decimal('subtotal', { precision: 10, scale: 2 }).notNull(),
   tax: decimal('tax', { precision: 10, scale: 2 }).notNull(),
   deliveryFee: decimal('delivery_fee', { precision: 10, scale: 2 }).notNull(),
+  tip: decimal('tip', { precision: 10, scale: 2 }).notNull().default('0.00'),
   total: decimal('total', { precision: 10, scale: 2 }).notNull(),
-  deliveryAddress: text('delivery_address').notNull(),
+  // Structured delivery address fields
+  deliveryHouseType: text('delivery_house_type'),
+  deliveryHouseNumber: text('delivery_house_number'),
+  deliveryStreetName: text('delivery_street_name'),
+  deliveryAptNumber: text('delivery_apt_number'),
+  deliveryCity: text('delivery_city'),
+  deliveryState: text('delivery_state'),
+  deliveryZipCode: text('delivery_zip_code'),
   deliveryInstructions: text('delivery_instructions'),
   paymentMethod: text('payment_method'),
   createdAt: timestamp('created_at').defaultNow(),

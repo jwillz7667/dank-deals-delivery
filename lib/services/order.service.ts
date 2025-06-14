@@ -5,9 +5,16 @@ import { CartService } from './cart.service';
 
 export interface CreateOrderInput {
   userId: string;
-  deliveryAddress: string;
+  deliveryHouseType: string;
+  deliveryHouseNumber: string;
+  deliveryStreetName: string;
+  deliveryAptNumber?: string;
+  deliveryCity: string;
+  deliveryState: string;
+  deliveryZipCode: string;
   deliveryInstructions?: string;
   paymentMethod: string;
+  tip: number;
 }
 
 export interface OrderWithItems extends Order {
@@ -25,7 +32,19 @@ export class OrderService {
    * Create a new order from the user's cart
    */
   static async createOrder(input: CreateOrderInput): Promise<OrderWithItems> {
-    const { userId, deliveryAddress, deliveryInstructions, paymentMethod } = input;
+    const { 
+      userId, 
+      deliveryHouseType,
+      deliveryHouseNumber,
+      deliveryStreetName,
+      deliveryAptNumber,
+      deliveryCity,
+      deliveryState,
+      deliveryZipCode,
+      deliveryInstructions, 
+      paymentMethod,
+      tip 
+    } = input;
     
     // Get user's cart
     const cart = await CartService.getCart(userId);
@@ -37,7 +56,7 @@ export class OrderService {
     const subtotal = cart.subtotal;
     const tax = cart.estimatedTax;
     const deliveryFee = cart.deliveryFee;
-    const total = cart.total;
+    const total = cart.total + tip;
     
     // Generate order number
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
@@ -51,8 +70,15 @@ export class OrderService {
         subtotal: subtotal.toString(),
         tax: tax.toString(),
         deliveryFee: deliveryFee.toString(),
+        tip: tip.toString(),
         total: total.toString(),
-        deliveryAddress,
+        deliveryHouseType,
+        deliveryHouseNumber,
+        deliveryStreetName,
+        deliveryAptNumber,
+        deliveryCity,
+        deliveryState,
+        deliveryZipCode,
         deliveryInstructions,
         paymentMethod,
       }).returning();

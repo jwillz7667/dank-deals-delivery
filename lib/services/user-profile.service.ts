@@ -4,7 +4,13 @@ import { eq } from 'drizzle-orm';
 
 export interface UpdateProfileInput {
   phoneNumber?: string;
-  deliveryAddress?: string;
+  houseType?: string;
+  houseNumber?: string;
+  streetName?: string;
+  aptNumber?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
   deliveryInstructions?: string;
   preferredPaymentMethod?: string;
 }
@@ -35,7 +41,13 @@ export class UserProfileService {
       const profileData: NewUserProfile = {
         userId,
         phoneNumber: data?.phoneNumber,
-        deliveryAddress: data?.deliveryAddress,
+        houseType: data?.houseType,
+        houseNumber: data?.houseNumber,
+        streetName: data?.streetName,
+        aptNumber: data?.aptNumber,
+        city: data?.city,
+        state: data?.state,
+        zipCode: data?.zipCode,
         deliveryInstructions: data?.deliveryInstructions,
         preferredPaymentMethod: data?.preferredPaymentMethod,
       };
@@ -139,7 +151,7 @@ export class UserProfileService {
         return false;
       }
       
-      return !!(profile.phoneNumber && profile.deliveryAddress);
+      return !!(profile.phoneNumber && profile.houseNumber && profile.streetName && profile.city && profile.state && profile.zipCode);
     } catch (error) {
       console.error('Error checking delivery info:', error);
       throw new Error('Failed to check delivery info');
