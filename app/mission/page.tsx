@@ -6,9 +6,9 @@ import JsonLd from "@/components/json-ld"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Our Mission - DankDeals.org | Community & Quality Cannabis",
+  title: "Our Mission - DankDealsMN.com | Community & Quality Cannabis",
   description:
-    "Learn about the mission and values of DankDeals.org. We're committed to quality, community, and innovation in cannabis gifting for Minneapolis & St. Paul.",
+    "Learn about the mission and values of DankDealsMN.com. We're committed to quality, community, and innovation in cannabis delivery for Minneapolis & St. Paul.",
   alternates: {
     canonical: "/mission",
   },
@@ -20,11 +20,11 @@ export default function MissionPage() {
     "@type": "WebPage",
     name: metadata.title as string,
     description: metadata.description as string,
-    url: "https://dankdeals.org/mission",
+    url: "https://dankdealsmn.com/mission",
     isPartOf: {
       "@type": "WebSite",
-      url: "https://dankdeals.org/",
-      name: "DankDeals.org",
+              url: "https://dankdealsmn.com/",
+        name: "DankDealsMN.com",
     },
   }
 

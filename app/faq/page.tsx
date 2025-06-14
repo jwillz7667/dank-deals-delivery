@@ -5,9 +5,9 @@ import type { Metadata } from "next"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 export const metadata: Metadata = {
-  title: "FAQ - DankDeals.org | Cannabis Delivery Questions",
+  title: "FAQ - DankDealsMN.com | Cannabis Delivery Questions",
   description:
-    "Find answers to frequently asked questions about cannabis delivery, payment, ID verification, and our services at DankDeals.org in Minneapolis & St. Paul.",
+    "Find answers to frequently asked questions about cannabis delivery, payment, ID verification, and our services at DankDealsMN.com in Minneapolis & St. Paul.",
   alternates: {
     canonical: "/faq",
   },

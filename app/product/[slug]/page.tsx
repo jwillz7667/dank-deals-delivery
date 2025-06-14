@@ -119,14 +119,14 @@ export default function ProductPage() {
       name: `${product.name} - ${price.weight}`,
       seller: {
         "@type": "Organization",
-        name: "DankDeals.org"
+        name: "DankDealsMN.com"
       }
     })) : [{
       "@type": "Offer",
       availability: "https://schema.org/OutOfStock",
       seller: {
         "@type": "Organization",
-        name: "DankDeals.org"
+        name: "DankDealsMN.com"
       }
     }],
     category: product.category,

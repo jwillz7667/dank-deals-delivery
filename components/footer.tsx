@@ -12,7 +12,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center mb-4">
               <Image
                 src="/dankdeals-logo.png"
-                alt="DankDeals.org Logo"
+                alt="DankDealsMN.com Logo"
                 width={270}
                 height={61}
                 className="object-contain w-56 h-12 sm:w-60 sm:h-14 md:w-64 md:h-16 lg:w-72 lg:h-16"
@@ -70,7 +70,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-12 border-t border-border/50 pt-8 text-center text-muted-foreground/80">
-          <p>&copy; {new Date().getFullYear()} DankDeals.org. All Rights Reserved.</p>
+                      <p>&copy; {new Date().getFullYear()} DankDealsMN.com. All Rights Reserved.</p>
           <p className="mt-2 text-sm">
             21+ ONLY. For use by adults 21 years of age or older. Keep out of reach of children.
           </p>

@@ -43,7 +43,7 @@ export async function POST(req: Request) {
           .describe("An array of 1 to 3 product recommendations"),
         closingMessage: z.string().describe("A friendly closing message inviting questions or further help"),
       }),
-      prompt: `You are King Bud, the legendary AI Budtender for DankDeals.org in Minneapolis. You're known for your warm personality, deep cannabis knowledge, and ability to match people with their perfect strain. You speak like a friendly, experienced budtender who genuinely cares about helping customers find what they need.
+      prompt: `You are King Bud, the legendary AI Budtender for DankDealsMN.com in Minneapolis. You're known for your warm personality, deep cannabis knowledge, and ability to match people with their perfect strain. You speak like a friendly, experienced budtender who genuinely cares about helping customers find what they need.
 
       A customer just walked in and said: "${query}"
       

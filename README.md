@@ -1,4 +1,4 @@
-# DankDeals.org - Performance Optimized Cannabis Delivery Platform
+# DankDealsMN.com - Performance Optimized Cannabis Delivery Platform
 
 This is a Next.js 15 application for cannabis delivery service in the Twin Cities area.
 
