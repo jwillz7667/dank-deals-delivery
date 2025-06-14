@@ -99,23 +99,34 @@ export class UserProfileService {
    */
   static async getOrCreateProfile(userId: string): Promise<UserProfile> {
     try {
-      const profile = await this.getProfile(userId);
-      
-      if (profile) {
-        return profile;
+      // First, try to get existing profile
+      const existingProfile = await this.getProfile(userId);
+      if (existingProfile) {
+        return existingProfile;
       }
-      
+
+      // If no profile exists, try to create one
       try {
         return await this.createProfile(userId);
       } catch (createError: any) {
-        // If we get a duplicate key error, try to fetch the profile again
-        // This handles race conditions where another request created the profile
-        if (createError?.cause?.code === '23505') {
-          const existingProfile = await this.getProfile(userId);
-          if (existingProfile) {
-            return existingProfile;
+        // If we get a duplicate key error, it means another request created the profile
+        // between our check and our insert. Try to fetch it again.
+        if (createError?.cause?.code === '23505' || createError?.message?.includes('duplicate key')) {
+          console.log('Duplicate key error detected, attempting to fetch existing profile');
+          
+          // Wait a small amount to ensure the other transaction completes
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          const retryProfile = await this.getProfile(userId);
+          if (retryProfile) {
+            return retryProfile;
           }
+          
+          // If we still can't find it, something is wrong
+          console.error('Profile should exist after duplicate key error but was not found');
         }
+        
+        // Re-throw the original error if it's not a duplicate key issue
         throw createError;
       }
     } catch (error) {

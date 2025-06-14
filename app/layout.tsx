@@ -72,6 +72,15 @@ export const metadata: Metadata = {
     generator: 'v0.dev'
 }
 
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  )
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -162,15 +171,21 @@ export default function RootLayout({
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", "pb-16 md:pb-0", inter.variable)}><StackProvider app={stackServerApp}><StackTheme>
-        <Suspense fallback={<div className="min-h-screen bg-background" />}>
-          <CartProvider>
-            {children}
-            <Toaster />
-            <BottomNavigation />
-          </CartProvider>
-        </Suspense>
-      </StackTheme></StackProvider></body>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", "pb-16 md:pb-0", inter.variable)}>
+        <StackProvider app={stackServerApp}>
+          <StackTheme>
+            <Suspense fallback={<LoadingFallback />}>
+              <CartProvider>
+                <Suspense fallback={<LoadingFallback />}>
+                  {children}
+                </Suspense>
+                <Toaster />
+                <BottomNavigation />
+              </CartProvider>
+            </Suspense>
+          </StackTheme>
+        </StackProvider>
+      </body>
     </html>
   )
 }

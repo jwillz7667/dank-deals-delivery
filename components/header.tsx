@@ -18,12 +18,77 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 
+function UserSection() {
+  const user = useUser({ or: 'redirect' })
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    await user?.signOut()
+    router.push('/')
+  }
+
+  if (user) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative">
+            <User className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <div className="flex items-center justify-start gap-2 p-2">
+            <div className="flex flex-col space-y-1 leading-none">
+              {user.displayName && (
+                <p className="font-medium">{user.displayName}</p>
+              )}
+              <p className="w-[200px] truncate text-sm text-muted-foreground">
+                {user.primaryEmail}
+              </p>
+            </div>
+          </div>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => router.push('/profile')}>
+            <UserCircle className="mr-2 h-4 w-4" />
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push('/profile?tab=orders')}>
+            <Package className="mr-2 h-4 w-4" />
+            My Orders
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+
+  return (
+    <div className="flex items-center space-x-2">
+      <Button 
+        variant="ghost"
+        onClick={() => router.push('/handler/sign-in')}
+        className="hidden sm:flex"
+      >
+        Sign In
+      </Button>
+      <Button 
+        variant="default"
+        onClick={() => router.push('/handler/sign-up')}
+        className="bg-primary hover:bg-primary/90"
+      >
+        Sign Up
+      </Button>
+    </div>
+  )
+}
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
-  const router = useRouter()
   const { cart } = useCart()
-  const user = useUser()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,11 +104,6 @@ export default function Header() {
     { name: "FAQ", href: "/faq" },
     { name: "Our Mission", href: "/mission" },
   ]
-
-  const handleSignOut = async () => {
-    await user?.signOut()
-    router.push('/')
-  }
 
   return (
     <header
@@ -99,58 +159,7 @@ export default function Header() {
             </Link>
 
             {/* Auth Button */}
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      {user.displayName && (
-                        <p className="font-medium">{user.displayName}</p>
-                      )}
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user.primaryEmail}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push('/profile')}>
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/profile?tab=orders')}>
-                    <Package className="mr-2 h-4 w-4" />
-                    My Orders
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Button 
-                  variant="ghost"
-                  onClick={() => router.push('/handler/sign-in')}
-                  className="hidden sm:flex"
-                >
-                  Sign In
-                </Button>
-                <Button 
-                  variant="default"
-                  onClick={() => router.push('/handler/sign-up')}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  Sign Up
-                </Button>
-              </div>
-            )}
+            <UserSection />
 
             {/* Order Now Button */}
             <a href="sms:+16129301390?&body=Hi! I'd like to place an order.">

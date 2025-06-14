@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export function AuthButton() {
-  const user = useUser();
+  const user = useUser({ or: 'redirect' });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
