@@ -17,8 +17,15 @@ interface OrderDetails {
   subtotal: string;
   tax: string;
   deliveryFee: string;
+  tip: string;
   total: string;
-  deliveryAddress: string;
+  deliveryHouseType?: string;
+  deliveryHouseNumber?: string;
+  deliveryStreetName?: string;
+  deliveryAptNumber?: string;
+  deliveryCity?: string;
+  deliveryState?: string;
+  deliveryZipCode?: string;
   deliveryInstructions?: string;
   paymentMethod: string;
   createdAt: string;
@@ -124,6 +131,11 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
               <p className="text-green-700 dark:text-green-300">
                 Thank you for your order. We'll send you updates about your delivery.
               </p>
+              {parseFloat(order.tip) > 0 && (
+                <p className="text-green-700 dark:text-green-300 mt-2 font-medium">
+                  🙏 Thank you for the ${parseFloat(order.tip).toFixed(2)} tip! Your driver will appreciate your generosity.
+                </p>
+              )}
             </div>
           </div>
           <div className="mt-4">
@@ -223,12 +235,29 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
                 <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="flex-1">
                   <p className="font-medium mb-1">Delivery Address</p>
-                  <p className="text-sm text-muted-foreground">{order.deliveryAddress}</p>
-                  {order.deliveryInstructions && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Instructions: {order.deliveryInstructions}
-                    </p>
-                  )}
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    {order.deliveryHouseType && order.deliveryHouseNumber && order.deliveryStreetName ? (
+                      <>
+                        <p>
+                          {order.deliveryHouseNumber} {order.deliveryStreetName}
+                          {order.deliveryAptNumber && `, ${order.deliveryAptNumber}`}
+                        </p>
+                        <p>
+                          {order.deliveryCity}, {order.deliveryState} {order.deliveryZipCode}
+                        </p>
+                        <p className="text-xs text-muted-foreground/80 capitalize">
+                          {order.deliveryHouseType}
+                        </p>
+                      </>
+                    ) : (
+                      <p>Address information not available</p>
+                    )}
+                    {order.deliveryInstructions && (
+                      <p className="mt-2 pt-2 border-t border-muted">
+                        <span className="font-medium">Instructions:</span> {order.deliveryInstructions}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -262,6 +291,12 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
                 <span className="text-muted-foreground">Delivery Fee</span>
                 <span>${parseFloat(order.deliveryFee).toFixed(2)}</span>
               </div>
+              {parseFloat(order.tip) > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Driver Tip</span>
+                  <span>${parseFloat(order.tip).toFixed(2)}</span>
+                </div>
+              )}
               <Separator />
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
