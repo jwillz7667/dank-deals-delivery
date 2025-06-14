@@ -13,7 +13,12 @@ import { products } from "@/lib/products"
 import { CartProvider } from "@/hooks/use-cart"
 import { Suspense } from "react"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const inter = Inter({ 
+  subsets: ["latin"], 
+  variable: "--font-sans",
+  display: 'swap', // Improve font loading performance
+  preload: true
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url), // Important for resolving relative paths in metadata
@@ -69,7 +74,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  // Add performance-related meta tags
+  other: {
+    'theme-color': '#1a202c',
+    'color-scheme': 'dark light',
+  }
 }
 
 // Loading fallback component
@@ -168,6 +178,22 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <head>
+        {/* Critical performance optimizations */}
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://stackframe.cloud" />
+        
+        {/* Preload critical resources - only existing files */}
+        <link rel="preload" href="/dankdeals-logo.png" as="image" type="image/png" />
+        <link rel="preload" href="/king-bud-default.png" as="image" type="image/png" />
+        
+        {/* Viewport meta tag for mobile optimization */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        
+        {/* Performance meta tags */}
+        <meta httpEquiv="x-dns-prefetch-control" content="on" />
+        <meta name="format-detection" content="telephone=no" />
+        
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />
       </head>

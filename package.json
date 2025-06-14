@@ -7,6 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "type-check": "tsc --noEmit",
+
+    "performance-test": "echo 'Run: npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html'",
+    "bundle-analyzer": "ANALYZE=true npm run build",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
@@ -72,6 +76,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.3.3",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

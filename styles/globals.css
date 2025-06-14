@@ -93,7 +93,7 @@ body {
   }
 }
 
-/* Animations */
+/* Performance-optimized animations to replace Framer Motion */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -105,8 +105,48 @@ body {
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero section animations */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out;
+}
+
+/* Optimized loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background-size: 300% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -300% 0; }
+  100% { background-position: 300% 0; }
 }
 
 /* Enhanced glassmorphic effect for AI Budtender */
@@ -122,4 +162,20 @@ body {
   background: rgba(17, 24, 39, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fadeIn {
+    animation: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
