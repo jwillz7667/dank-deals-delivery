@@ -15,6 +15,7 @@ import CartModal from "@/components/modals/cart-modal"
 import { useCart } from "@/hooks/use-cart"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
+import { toast } from "sonner"
 
 export default function ProductPage() {
   const params = useParams()
@@ -49,16 +50,24 @@ export default function ProductPage() {
   }
 
   const handleAddToCart = async () => {
-    if (!selectedPricing) return
+    if (!selectedPricing) {
+      toast.error('Please select a size first');
+      return;
+    }
 
-    await addToCart(
-      `${product.name}-${selectedPricing.weight}`,
-      `${product.name} (${selectedPricing.weight})`,
-      selectedPricing.price,
-      quantity
-    )
-    
-    setQuantity(1) // Reset quantity after adding
+    try {
+      await addToCart(
+        `${product.name}-${selectedPricing.weight}`,
+        `${product.name} (${selectedPricing.weight})`,
+        selectedPricing.price,
+        quantity
+      )
+      
+      setQuantity(1) // Reset quantity after adding
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      // Error handling is done in the addToCart function
+    }
   }
 
   const handleQuickOrder = () => {

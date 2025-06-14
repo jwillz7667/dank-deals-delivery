@@ -93,7 +93,16 @@ export const products: Product[] = [
       "A vibrant, sativa-dominant hybrid known for its uplifting and creative effects. Features a crisp apple aroma with earthy undertones.",
     effects: "Energetic, Creative, Uplifted, Focused",
     imageUrl: "/cannabis-bud.png",
-    soldOut: true
+    imageAlt: "Cosmic Crisp premium cannabis flower - sativa-dominant hybrid with apple aroma",
+    metaDescription: "Premium Cosmic Crisp cannabis flower - A vibrant sativa-dominant hybrid with uplifting effects and crisp apple aroma. Available in Minneapolis & St. Paul.",
+    pricing: [
+      { weight: "1.75g", price: 22 },
+      { weight: "3.5g", price: 40 },
+      { weight: "7g", price: 75 },
+      { weight: "14g", price: 140 },
+      { weight: "28g", price: 260 }
+    ],
+    soldOut: false
   },
   {
     id: 3,
@@ -123,7 +132,16 @@ export const products: Product[] = [
       "A potent indica strain perfect for evening use. Helps with deep relaxation and promotes a restful night's sleep.",
     effects: "Sleepy, Relaxed, Hungry, Euphoric",
     imageUrl: "/dark-purple-cannabis-bud.png",
-    soldOut: true
+    imageAlt: "Midnight Indica premium cannabis flower - potent indica strain for deep relaxation",
+    metaDescription: "Premium Midnight Indica cannabis flower - Potent indica strain perfect for evening use and deep relaxation. Available in Minneapolis & St. Paul.",
+    pricing: [
+      { weight: "1.75g", price: 24 },
+      { weight: "3.5g", price: 42 },
+      { weight: "7g", price: 80 },
+      { weight: "14g", price: 150 },
+      { weight: "28g", price: 280 }
+    ],
+    soldOut: false
   },
   {
     id: 6,
