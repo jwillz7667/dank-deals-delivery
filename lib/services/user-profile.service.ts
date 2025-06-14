@@ -12,12 +12,11 @@ export interface UpdateProfileInput {
   state?: string;
   zipCode?: string;
   deliveryInstructions?: string;
-  preferredPaymentMethod?: string;
 }
 
 export class UserProfileService {
   /**
-   * Get user profile by userId
+   * Get user profile
    */
   static async getProfile(userId: string): Promise<UserProfile | null> {
     try {
@@ -49,7 +48,6 @@ export class UserProfileService {
         state: data?.state,
         zipCode: data?.zipCode,
         deliveryInstructions: data?.deliveryInstructions,
-        preferredPaymentMethod: data?.preferredPaymentMethod,
       };
       
       const [profile] = await db
@@ -69,15 +67,6 @@ export class UserProfileService {
    */
   static async updateProfile(userId: string, data: UpdateProfileInput): Promise<UserProfile> {
     try {
-      // Check if profile exists
-      const existingProfile = await this.getProfile(userId);
-      
-      if (!existingProfile) {
-        // Create profile if it doesn't exist
-        return await this.createProfile(userId, data);
-      }
-      
-      // Update existing profile
       const [updatedProfile] = await db
         .update(userProfiles)
         .set({
@@ -86,6 +75,10 @@ export class UserProfileService {
         })
         .where(eq(userProfiles.userId, userId))
         .returning();
+      
+      if (!updatedProfile) {
+        throw new Error('Profile not found');
+      }
       
       return updatedProfile;
     } catch (error) {
@@ -99,36 +92,13 @@ export class UserProfileService {
    */
   static async getOrCreateProfile(userId: string): Promise<UserProfile> {
     try {
-      // First, try to get existing profile
-      const existingProfile = await this.getProfile(userId);
-      if (existingProfile) {
-        return existingProfile;
+      let profile = await this.getProfile(userId);
+      
+      if (!profile) {
+        profile = await this.createProfile(userId);
       }
-
-      // If no profile exists, try to create one
-      try {
-        return await this.createProfile(userId);
-      } catch (createError: any) {
-        // If we get a duplicate key error, it means another request created the profile
-        // between our check and our insert. Try to fetch it again.
-        if (createError?.cause?.code === '23505' || createError?.message?.includes('duplicate key')) {
-          console.log('Duplicate key error detected, attempting to fetch existing profile');
-          
-          // Wait a small amount to ensure the other transaction completes
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
-          const retryProfile = await this.getProfile(userId);
-          if (retryProfile) {
-            return retryProfile;
-          }
-          
-          // If we still can't find it, something is wrong
-          console.error('Profile should exist after duplicate key error but was not found');
-        }
-        
-        // Re-throw the original error if it's not a duplicate key issue
-        throw createError;
-      }
+      
+      return profile;
     } catch (error) {
       console.error('Error getting or creating user profile:', error);
       throw new Error('Failed to get or create user profile');
@@ -138,13 +108,11 @@ export class UserProfileService {
   /**
    * Delete user profile
    */
-  static async deleteProfile(userId: string): Promise<boolean> {
+  static async deleteProfile(userId: string): Promise<void> {
     try {
-      const result = await db
+      await db
         .delete(userProfiles)
         .where(eq(userProfiles.userId, userId));
-      
-      return true;
     } catch (error) {
       console.error('Error deleting user profile:', error);
       throw new Error('Failed to delete user profile');

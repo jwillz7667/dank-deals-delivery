@@ -13,13 +13,12 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, CreditCard, Smartphone, Loader2, Heart } from 'lucide-react';
+import { ArrowLeft, Loader2, MessageSquare, Phone, MapPin } from 'lucide-react';
 import Link from 'next/link';
 
-const checkoutSchema = z.object({
+const orderSummarySchema = z.object({
   phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
   houseType: z.string().min(1, 'House type is required'),
   houseNumber: z.string().min(1, 'House number is required'),
@@ -29,12 +28,10 @@ const checkoutSchema = z.object({
   state: z.string().min(2, 'State is required'),
   zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
   deliveryInstructions: z.string().optional(),
-  paymentMethod: z.enum(['card', 'apple_pay', 'google_pay']),
-  tip: z.number().min(0, 'Tip cannot be negative').default(0),
   saveProfile: z.boolean().default(false),
 });
 
-type CheckoutFormData = z.infer<typeof checkoutSchema>;
+type OrderSummaryFormData = z.infer<typeof orderSummarySchema>;
 
 const HOUSE_TYPES = [
   'House',
@@ -58,9 +55,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, refreshCart } = useCart();
   const { isAuthenticated, userId } = useRequiredAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [customTip, setCustomTip] = useState('');
 
   const {
     register,
@@ -68,25 +63,12 @@ export default function CheckoutPage() {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<CheckoutFormData>({
-    resolver: zodResolver(checkoutSchema),
+  } = useForm<OrderSummaryFormData>({
+    resolver: zodResolver(orderSummarySchema),
     defaultValues: {
-      paymentMethod: 'card',
-      tip: 0,
       saveProfile: false,
     },
   });
-
-  const paymentMethod = watch('paymentMethod');
-  const tip = watch('tip');
-
-  // Suggested tip amounts based on subtotal
-  const suggestedTips = cart ? [
-    { label: '15%', amount: Math.round(cart.subtotal * 0.15 * 100) / 100 },
-    { label: '18%', amount: Math.round(cart.subtotal * 0.18 * 100) / 100 },
-    { label: '20%', amount: Math.round(cart.subtotal * 0.20 * 100) / 100 },
-    { label: '25%', amount: Math.round(cart.subtotal * 0.25 * 100) / 100 },
-  ] : [];
 
   // Load user profile if authenticated
   useEffect(() => {
@@ -111,9 +93,6 @@ export default function CheckoutPage() {
           if (profile.state) setValue('state', profile.state);
           if (profile.zipCode) setValue('zipCode', profile.zipCode);
           if (profile.deliveryInstructions) setValue('deliveryInstructions', profile.deliveryInstructions);
-          if (profile.preferredPaymentMethod && profile.preferredPaymentMethod !== 'cash') {
-            setValue('paymentMethod', profile.preferredPaymentMethod);
-          }
         }
       } catch (error) {
         console.error('Failed to load profile:', error);
@@ -125,48 +104,85 @@ export default function CheckoutPage() {
     loadProfile();
   }, [isAuthenticated, router, setValue]);
 
-  const handleTipSelect = (amount: number) => {
-    setValue('tip', amount);
-    setCustomTip('');
+  const formatOrderForText = (data: OrderSummaryFormData) => {
+    if (!cart || !cart.items) return '';
+    
+    const itemsList = cart.items.map(item => 
+      `${item.productName} (Qty: ${item.quantity}) - $${(item.productPrice * item.quantity).toFixed(2)}`
+    ).join('\n');
+    
+    const deliveryAddress = [
+      `${data.houseNumber} ${data.streetName}`,
+      data.aptNumber ? `${data.aptNumber}` : '',
+      `${data.city}, ${data.state} ${data.zipCode}`
+    ].filter(Boolean).join(', ');
+    
+    const orderSummary = [
+      'Hi! I\'d like to place an order:',
+      '',
+      '📦 ORDER ITEMS:',
+      itemsList,
+      '',
+      '💰 ORDER TOTAL:',
+      `Subtotal: $${cart.subtotal.toFixed(2)}`,
+      `Estimated Tax: $${cart.estimatedTax.toFixed(2)}`,
+      `Delivery Fee: $${cart.deliveryFee.toFixed(2)}`,
+      `Total: $${cart.total.toFixed(2)}`,
+      '',
+      '📍 DELIVERY ADDRESS:',
+      deliveryAddress,
+      data.deliveryInstructions ? `Instructions: ${data.deliveryInstructions}` : '',
+      '',
+      `📞 CONTACT: ${data.phoneNumber}`,
+      '',
+      'Please confirm this order and let me know the next steps for payment and delivery. Thank you!'
+    ].filter(Boolean).join('\n');
+    
+    return orderSummary;
   };
 
-  const handleCustomTip = (value: string) => {
-    setCustomTip(value);
-    const numValue = parseFloat(value) || 0;
-    setValue('tip', numValue);
+  const handleTextOrder = (data: OrderSummaryFormData) => {
+    const message = formatOrderForText(data);
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`sms:+16129301390?&body=${encodedMessage}`, '_self');
   };
 
-  const onSubmit = async (data: CheckoutFormData) => {
+  const handleCallOrder = () => {
+    window.open('tel:+16129301390', '_self');
+  };
+
+  const onSubmit = async (data: OrderSummaryFormData) => {
     if (!cart || cart.items.length === 0) {
       toast.error('Your cart is empty');
       router.push('/cart');
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success(result.data.message);
-        await refreshCart();
-        router.push(result.data.redirectUrl);
-      } else {
-        toast.error(result.error?.message || 'Failed to place order');
+    // Save profile if requested
+    if (data.saveProfile) {
+      try {
+        await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phoneNumber: data.phoneNumber,
+            houseType: data.houseType,
+            houseNumber: data.houseNumber,
+            streetName: data.streetName,
+            aptNumber: data.aptNumber,
+            city: data.city,
+            state: data.state,
+            zipCode: data.zipCode,
+            deliveryInstructions: data.deliveryInstructions,
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to save profile:', error);
       }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error('Something went wrong. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
+
+    // Send the text message
+    handleTextOrder(data);
   };
 
   if (profileLoading) {
@@ -197,8 +213,6 @@ export default function CheckoutPage() {
     );
   }
 
-  const finalTotal = cart.total + tip;
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-6">
@@ -206,7 +220,10 @@ export default function CheckoutPage() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Cart
         </Link>
-        <h1 className="text-3xl font-bold mt-2">Checkout</h1>
+        <h1 className="text-3xl font-bold mt-2">Order Summary</h1>
+        <p className="text-muted-foreground mt-2">
+          Complete your delivery information and we'll help you place your order
+        </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -345,97 +362,6 @@ export default function CheckoutPage() {
               </CardContent>
             </Card>
 
-            {/* Tip Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-red-500" />
-                  Add a Tip for Your Driver
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  Show your appreciation for great service! Tips help support our delivery drivers.
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {suggestedTips.map((tipOption) => (
-                    <Button
-                      key={tipOption.label}
-                      type="button"
-                      variant={tip === tipOption.amount ? "default" : "outline"}
-                      onClick={() => handleTipSelect(tipOption.amount)}
-                      className="h-12"
-                    >
-                      <div className="text-center">
-                        <div className="font-semibold">{tipOption.label}</div>
-                        <div className="text-xs">${tipOption.amount.toFixed(2)}</div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-                
-                <div>
-                  <Label htmlFor="customTip">Custom Tip Amount</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">$</span>
-                    <Input
-                      id="customTip"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0.00"
-                      className="pl-8"
-                      value={customTip}
-                      onChange={(e) => handleCustomTip(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {tip > 0 && (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      Thank you for adding a ${tip.toFixed(2)} tip! Your driver will appreciate it.
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Payment Method */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Method</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup
-                  value={paymentMethod}
-                  onValueChange={(value) => setValue('paymentMethod', value as any)}
-                >
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-accent">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex items-center flex-1 cursor-pointer">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Credit/Debit Card
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-accent">
-                    <RadioGroupItem value="apple_pay" id="apple_pay" />
-                    <Label htmlFor="apple_pay" className="flex items-center flex-1 cursor-pointer">
-                      <Smartphone className="mr-2 h-4 w-4" />
-                      Apple Pay
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-accent">
-                    <RadioGroupItem value="google_pay" id="google_pay" />
-                    <Label htmlFor="google_pay" className="flex items-center flex-1 cursor-pointer">
-                      <Smartphone className="mr-2 h-4 w-4" />
-                      Google Pay
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
-
             {/* Save Profile */}
             <Card>
               <CardContent className="pt-6">
@@ -486,37 +412,46 @@ export default function CheckoutPage() {
                     <span className="text-muted-foreground">Delivery Fee</span>
                     <span>${cart.deliveryFee.toFixed(2)}</span>
                   </div>
-                  {tip > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Driver Tip</span>
-                      <span>${tip.toFixed(2)}</span>
-                    </div>
-                  )}
                 </div>
                 
                 <Separator />
                 
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>${finalTotal.toFixed(2)}</span>
+                  <span>${cart.total.toFixed(2)}</span>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  size="lg"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Place Order'
-                  )}
-                </Button>
+              <CardFooter className="flex flex-col gap-3">
+                <div className="w-full space-y-2">
+                  <p className="text-sm text-center text-muted-foreground mb-3">
+                    Choose how you'd like to place your order:
+                  </p>
+                  
+                  <Button 
+                    type="submit"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white" 
+                    size="lg"
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Text Complete Order
+                  </Button>
+                  
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    className="w-full" 
+                    size="lg" 
+                    onClick={handleCallOrder}
+                  >
+                    <Phone className="mr-2 h-4 w-4" />
+                    Call to Order
+                  </Button>
+                </div>
+                
+                <div className="text-center text-xs text-muted-foreground">
+                  <p>📞 (612) 930-1390</p>
+                  <p className="mt-1">We'll confirm your order and arrange payment & delivery!</p>
+                </div>
               </CardFooter>
             </Card>
           </div>

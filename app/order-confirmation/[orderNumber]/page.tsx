@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Package, Truck, Home, Clock, MapPin, Phone, CreditCard, Loader2 } from 'lucide-react';
+import { CheckCircle, Package, Truck, Home, Clock, MapPin, Phone, MessageSquare, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface OrderDetails {
@@ -39,6 +39,7 @@ interface OrderDetails {
 }
 
 const statusSteps = [
+  { status: 'pending_contact', label: 'Awaiting Contact', icon: MessageSquare },
   { status: 'pending', label: 'Order Placed', icon: CheckCircle },
   { status: 'confirmed', label: 'Confirmed', icon: Package },
   { status: 'preparing', label: 'Preparing', icon: Clock },
@@ -47,6 +48,7 @@ const statusSteps = [
 ];
 
 const statusColors: Record<string, string> = {
+  pending_contact: 'outline',
   pending: 'secondary',
   confirmed: 'secondary',
   preparing: 'secondary',
@@ -116,22 +118,30 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
   }
 
   const currentStepIndex = statusSteps.findIndex(step => step.status === order.status);
+  const isTextOrder = order.paymentMethod === 'text_call';
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Success Message */}
-      <Card className="mb-8 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+      <Card className={`mb-8 ${isTextOrder ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950' : 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'}`}>
         <CardContent className="pt-6">
           <div className="flex items-center gap-3 mb-3">
-            <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+            {isTextOrder ? (
+              <MessageSquare className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            ) : (
+              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+            )}
             <div>
-              <h1 className="text-2xl font-bold text-green-900 dark:text-green-100">
-                Order Confirmed!
+              <h1 className={`text-2xl font-bold ${isTextOrder ? 'text-blue-900 dark:text-blue-100' : 'text-green-900 dark:text-green-100'}`}>
+                {isTextOrder ? 'Order Information Received!' : 'Order Confirmed!'}
               </h1>
-              <p className="text-green-700 dark:text-green-300">
-                Thank you for your order. We'll send you updates about your delivery.
+              <p className={`${isTextOrder ? 'text-blue-700 dark:text-blue-300' : 'text-green-700 dark:text-green-300'}`}>
+                {isTextOrder 
+                  ? 'Your order details have been saved. Please contact us to complete your purchase.'
+                  : 'Thank you for your order. We\'ll send you updates about your delivery.'
+                }
               </p>
-              {parseFloat(order.tip) > 0 && (
+              {!isTextOrder && parseFloat(order.tip) > 0 && (
                 <p className="text-green-700 dark:text-green-300 mt-2 font-medium">
                   🙏 Thank you for the ${parseFloat(order.tip).toFixed(2)} tip! Your driver will appreciate your generosity.
                 </p>
@@ -139,13 +149,38 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
             </div>
           </div>
           <div className="mt-4">
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <p className={`text-sm ${isTextOrder ? 'text-blue-700 dark:text-blue-300' : 'text-green-700 dark:text-green-300'}`}>
               Order Number: <span className="font-mono font-semibold">{order.orderNumber}</span>
             </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
-              Placed on: {new Date(order.createdAt).toLocaleString()}
+            <p className={`text-sm ${isTextOrder ? 'text-blue-700 dark:text-blue-300' : 'text-green-700 dark:text-green-300'}`}>
+              Created on: {new Date(order.createdAt).toLocaleString()}
             </p>
           </div>
+          
+          {isTextOrder && (
+            <div className="mt-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Next Steps:</h3>
+              <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                <p>1. Contact us at <strong>(612) 930-1390</strong> to complete your order</p>
+                <p>2. We'll confirm availability and arrange payment</p>
+                <p>3. Schedule your delivery time</p>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <a href="sms:+16129301390?&body=Hi! I'd like to complete my order %23{order.orderNumber}. Please let me know the next steps. Thank you!">
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Text Us
+                  </Button>
+                </a>
+                <a href="tel:+16129301390">
+                  <Button size="sm" variant="outline">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Call Us
+                  </Button>
+                </a>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -187,7 +222,10 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
                           </p>
                           {isCurrent && (
                             <p className="text-sm text-muted-foreground">
-                              Your order is currently {step.label.toLowerCase()}
+                              {step.status === 'pending_contact' 
+                                ? 'Please contact us to complete your order'
+                                : `Your order is currently ${step.label.toLowerCase()}`
+                              }
                             </p>
                           )}
                         </div>
@@ -262,12 +300,24 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
               </div>
 
               <div className="flex items-start gap-3">
-                <CreditCard className="h-5 w-5 text-muted-foreground mt-0.5" />
+                {isTextOrder ? (
+                  <MessageSquare className="h-5 w-5 text-muted-foreground mt-0.5" />
+                ) : (
+                  <CheckCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
+                )}
                 <div className="flex-1">
-                  <p className="font-medium mb-1">Payment Method</p>
+                  <p className="font-medium mb-1">Order Type</p>
                   <p className="text-sm text-muted-foreground">
-                    {order.paymentMethod.replace(/_/g, ' ').toUpperCase()}
+                    {isTextOrder 
+                      ? 'Text/Call to Complete'
+                      : order.paymentMethod.replace(/_/g, ' ').toUpperCase()
+                    }
                   </p>
+                  {isTextOrder && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Contact us to arrange payment
+                    </p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -291,7 +341,7 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
                 <span className="text-muted-foreground">Delivery Fee</span>
                 <span>${parseFloat(order.deliveryFee).toFixed(2)}</span>
               </div>
-              {parseFloat(order.tip) > 0 && (
+              {!isTextOrder && parseFloat(order.tip) > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Driver Tip</span>
                   <span>${parseFloat(order.tip).toFixed(2)}</span>
@@ -302,6 +352,11 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
                 <span>Total</span>
                 <span>${parseFloat(order.total).toFixed(2)}</span>
               </div>
+              {isTextOrder && (
+                <p className="text-xs text-muted-foreground text-center pt-2">
+                  * Final total will be confirmed when you contact us
+                </p>
+              )}
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
               <Link href="/menu" className="w-full">

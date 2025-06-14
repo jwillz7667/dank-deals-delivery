@@ -7,9 +7,14 @@ import { z } from 'zod';
 // Validation schema for profile update
 const updateProfileSchema = z.object({
   phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number').optional(),
-  deliveryAddress: z.string().min(10, 'Delivery address is too short').optional(),
+  houseType: z.string().min(1, 'House type is required').optional(),
+  houseNumber: z.string().min(1, 'House number is required').optional(),
+  streetName: z.string().min(1, 'Street name is required').optional(),
+  aptNumber: z.string().optional(),
+  city: z.string().min(1, 'City is required').optional(),
+  state: z.string().min(2, 'State is required').optional(),
+  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code').optional(),
   deliveryInstructions: z.string().optional(),
-  preferredPaymentMethod: z.enum(['cash', 'card', 'apple_pay', 'google_pay']).optional(),
 });
 
 /**
@@ -50,19 +55,10 @@ async function updateProfile(req: AuthenticatedRequest): Promise<NextResponse> {
     // Validate input
     const validatedData = updateProfileSchema.parse(body);
     
-    // Update profile
     const updatedProfile = await UserProfileService.updateProfile(userId, validatedData);
     
-    // Get user info from Stack Auth
-    const { stackServerApp } = await import('@/stack');
-    const user = await stackServerApp.getUser();
-    
     return successResponse({
-      profile: {
-        ...updatedProfile,
-        email: user?.primaryEmail,
-        displayName: user?.displayName,
-      },
+      profile: updatedProfile,
       message: 'Profile updated successfully',
     });
   } catch (error) {

@@ -1,16 +1,15 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+"use client"
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import type { Product } from "@/lib/products"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { X, MessageSquare, Phone, Plus, Minus, ShoppingCart } from "lucide-react"
 import Image from "next/image"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Pagination, Navigation } from "swiper/modules"
-import "swiper/css"
-import "swiper/css/pagination"
-import "swiper/css/navigation"
-import { MessageSquare } from "lucide-react"
 import { useState } from "react"
-import { cn } from "@/lib/utils"
-import ProductReviews from "@/components/product-reviews"
+import { useCart } from "@/hooks/use-cart"
+import type { Product } from "@/lib/products"
 
 interface ProductDetailModalProps {
   product: Product | null
@@ -19,122 +18,372 @@ interface ProductDetailModalProps {
 }
 
 export default function ProductDetailModal({ product, isOpen, onClose }: ProductDetailModalProps) {
-  const [selectedWeight, setSelectedWeight] = useState(0)
-  
+  const [quantity, setQuantity] = useState(1)
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const { addItem } = useCart()
+
   if (!product) return null
 
-  // Use images array if available, otherwise fallback to single image
-  const productImages = product.images && product.images.length > 0 
-    ? product.images 
-    : [product.imageUrl]
+  // Set default size if not selected
+  const defaultSize = product.pricing?.[0]?.size || "1g"
+  const currentSize = selectedSize || defaultSize
+
+  const currentPrice = product.pricing?.find(p => p.size === currentSize)?.price || 
+                      product.pricing?.[0]?.price || 
+                      "25.50"
+
+  const handleAddToCart = () => {
+    if (product) {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: parseFloat(currentPrice),
+        quantity: quantity,
+        size: currentSize,
+        imageUrl: product.imageUrl,
+        category: product.category
+      })
+      onClose()
+    }
+  }
+
+  const increaseQuantity = () => setQuantity(prev => prev + 1)
+  const decreaseQuantity = () => setQuantity(prev => Math.max(1, prev - 1))
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="glassmorphic-card max-w-[95vw] sm:max-w-3xl p-0 max-h-[90vh] overflow-y-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="p-2 relative">
-            {product.soldOut && (
-              <div className="absolute top-2 left-2 z-10 bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold text-sm sm:text-base shadow-lg">
-                SOLD OUT
-              </div>
-            )}
-            <Swiper
-              modules={[Pagination, Navigation]}
-              pagination={{ clickable: true }}
-              navigation
-              loop={productImages.length > 1}
-              className="h-full w-full rounded-lg"
+      <DialogContent className="sm:max-w-2xl lg:max-w-4xl p-0 gap-0 max-h-[90vh] overflow-hidden">
+        {/* Mobile Layout */}
+        <div className="lg:hidden h-full max-h-[90vh] overflow-y-auto">
+          <div className="relative">
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
             >
-              {productImages.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <div className="relative h-64 sm:h-80 md:h-96 w-full">
-                    <Image
-                      src={image}
-                      alt={product.imageAlt || `${product.name} - View ${index + 1}`}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      className="rounded-lg"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      priority={index === 0}
-                    />
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-          <div className="p-4 sm:p-6 md:p-8 flex flex-col">
-            <DialogHeader>
-              <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{product.name}</DialogTitle>
-              <p className="text-base sm:text-lg font-semibold text-green-600 dark:text-green-400">{product.category}</p>
-              <DialogDescription className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mt-2 sm:mt-4">
-                {product.metaDescription || product.description}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="mt-4 sm:mt-6 flex-grow">
-              <h4 className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">Potential Effects:</h4>
-              <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">{product.effects}</p>
-              
-              {product.category === "Flower" && product.pricing && !product.soldOut && (
-                <div className="mt-4 sm:mt-6">
-                  <h4 className="font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 text-sm sm:text-base">Select Weight:</h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
-                    {product.pricing.map((option, index) => (
-                      <button
-                        key={option.weight}
-                        onClick={() => setSelectedWeight(index)}
-                        className={cn(
-                          "p-2 sm:p-3 rounded-lg border-2 transition-all",
-                          "hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20",
-                          selectedWeight === index
-                            ? "border-green-600 bg-green-100 dark:bg-green-900/30"
-                            : "border-gray-300 dark:border-gray-600"
-                        )}
+              <X className="h-4 w-4" />
+            </button>
+
+            {/* Product Image */}
+            <div className="relative h-80 bg-white">
+              <Image
+                src={product.imageUrl}
+                alt={product.imageAlt || product.name}
+                fill
+                className="object-cover"
+                priority
+              />
+              {product.soldOut && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <Badge variant="destructive" className="text-lg px-4 py-2">
+                    SOLD OUT
+                  </Badge>
+                </div>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              <div>
+                <Badge variant="outline" className="mb-2 text-app-green-600 border-app-green-600">
+                  {product.category}
+                </Badge>
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold text-left">
+                    {product.name}
+                  </DialogTitle>
+                </DialogHeader>
+                <p className="text-muted-foreground mt-2">
+                  {product.description}
+                </p>
+              </div>
+
+              {/* Pricing */}
+              {product.pricing && product.pricing.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-3">Available Sizes</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {product.pricing.map((pricing) => (
+                      <Button
+                        key={pricing.size}
+                        variant={currentSize === pricing.size ? "default" : "outline"}
+                        className={`h-auto p-3 ${
+                          currentSize === pricing.size
+                            ? "bg-app-green-600 hover:bg-app-green-700"
+                            : "border-app-green-200 hover:bg-app-green-50"
+                        }`}
+                        onClick={() => setSelectedSize(pricing.size)}
                       >
-                        <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                          {option.weight}
+                        <div className="text-center">
+                          <div className="font-medium">{pricing.size}</div>
+                          <div className="text-sm">${pricing.price}</div>
                         </div>
-                        <div className="text-sm sm:text-lg font-bold text-green-600 dark:text-green-400">
-                          ${option.price}
-                        </div>
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
               )}
-            </div>
-            
-            {product.reviews && product.reviews.length > 0 && (
-              <div className="mt-4 sm:mt-6 border-t pt-4">
-                <ProductReviews reviews={product.reviews} />
-              </div>
-            )}
-            
-            <div className="mt-4 sm:mt-6 bg-green-100 dark:bg-green-900/50 p-3 sm:p-4 rounded-lg text-center">
-              {product.soldOut ? (
-                <>
-                  <p className="font-semibold text-red-800 dark:text-red-200 text-sm sm:text-base">Currently Sold Out</p>
-                  <p className="text-xs sm:text-sm text-red-700 dark:text-red-300">Check back soon or contact us for availability.</p>
-                </>
-              ) : (
-                <>
-                  <p className="font-semibold text-green-800 dark:text-green-200 text-sm sm:text-base">Ready to order?</p>
-                  <p className="text-xs sm:text-sm text-green-700 dark:text-green-300">
-                    {product.pricing && selectedWeight !== undefined 
-                      ? `Selected: ${product.pricing[selectedWeight].weight} - $${product.pricing[selectedWeight].price}`
-                      : "Click below to place your order via text."}
-                  </p>
-                </>
+
+              {/* Strain Info */}
+              {(product.strainType || product.thc || product.cbd) && (
+                <Card className="bg-app-secondary">
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold mb-3">Strain Information</h3>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      {product.strainType && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Type</div>
+                          <div className="font-medium">{product.strainType}</div>
+                        </div>
+                      )}
+                      {product.thc && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">THC</div>
+                          <div className="font-medium">{product.thc}%</div>
+                        </div>
+                      )}
+                      {product.cbd && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">CBD</div>
+                          <div className="font-medium">{product.cbd}%</div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
-              <a href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}${product.pricing && selectedWeight !== undefined ? ` (${product.pricing[selectedWeight].weight})` : ''}.`}>
-                <Button 
-                  className="w-full mt-2 sm:mt-3 neumorphic-outset dark:neumorphic-outset-dark text-sm sm:text-base" 
-                  size="lg"
+
+              {/* Quantity Selector */}
+              <div>
+                <h3 className="font-semibold mb-3">Quantity</h3>
+                <div className="flex items-center space-x-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={decreaseQuantity}
+                    disabled={quantity <= 1}
+                    className="h-10 w-10"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <span className="text-xl font-semibold w-8 text-center">{quantity}</span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={increaseQuantity}
+                    className="h-10 w-10"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Total */}
+              <div className="flex justify-between items-center text-xl font-bold">
+                <span>Total:</span>
+                <span>${(parseFloat(currentPrice) * quantity).toFixed(2)}</span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <Button
+                  onClick={handleAddToCart}
                   disabled={product.soldOut}
+                  className="w-full bg-app-green-600 hover:bg-app-green-700 text-white h-12"
                 >
-                  <MessageSquare className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Order Now via Text
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  Add to Cart
                 </Button>
-              </a>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <a href={`sms:+16129301390?&body=Hi! I'd like to order ${quantity}x ${product.name} (${currentSize}).`}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-app-green-600 text-app-green-600 hover:bg-app-green-50"
+                      disabled={product.soldOut}
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Text Order
+                    </Button>
+                  </a>
+                  <a href="tel:+16129301390">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-app-green-600 text-app-green-600 hover:bg-app-green-50"
+                    >
+                      <Phone className="mr-2 h-4 w-4" />
+                      Call
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:block">
+          <div className="grid grid-cols-2 gap-0 h-[600px]">
+            {/* Left side - Image */}
+            <div className="relative bg-white">
+              <Image
+                src={product.imageUrl}
+                alt={product.imageAlt || product.name}
+                fill
+                className="object-cover"
+                priority
+              />
+              {product.soldOut && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <Badge variant="destructive" className="text-xl px-6 py-3">
+                    SOLD OUT
+                  </Badge>
+                </div>
+              )}
+            </div>
+
+            {/* Right side - Content */}
+            <div className="p-8 overflow-y-auto">
+              <div className="space-y-6">
+                {/* Header */}
+                <div>
+                  <Badge variant="outline" className="mb-3 text-app-green-600 border-app-green-600">
+                    {product.category}
+                  </Badge>
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl font-bold text-left">
+                      {product.name}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <p className="text-muted-foreground mt-3 text-lg">
+                    {product.description}
+                  </p>
+                </div>
+
+                {/* Pricing */}
+                {product.pricing && product.pricing.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-4 text-lg">Available Sizes</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      {product.pricing.map((pricing) => (
+                        <Button
+                          key={pricing.size}
+                          variant={currentSize === pricing.size ? "default" : "outline"}
+                          className={`h-auto p-4 ${
+                            currentSize === pricing.size
+                              ? "bg-app-green-600 hover:bg-app-green-700"
+                              : "border-app-green-200 hover:bg-app-green-50"
+                          }`}
+                          onClick={() => setSelectedSize(pricing.size)}
+                        >
+                          <div className="text-center">
+                            <div className="font-medium text-base">{pricing.size}</div>
+                            <div className="text-sm">${pricing.price}</div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Strain Info */}
+                {(product.strainType || product.thc || product.cbd) && (
+                  <Card className="bg-app-secondary">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-4 text-lg">Strain Information</h3>
+                      <div className="grid grid-cols-3 gap-6 text-center">
+                        {product.strainType && (
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">Type</div>
+                            <div className="font-medium text-lg">{product.strainType}</div>
+                          </div>
+                        )}
+                        {product.thc && (
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">THC</div>
+                            <div className="font-medium text-lg">{product.thc}%</div>
+                          </div>
+                        )}
+                        {product.cbd && (
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">CBD</div>
+                            <div className="font-medium text-lg">{product.cbd}%</div>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Quantity Selector */}
+                <div>
+                  <h3 className="font-semibold mb-4 text-lg">Quantity</h3>
+                  <div className="flex items-center space-x-6">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={decreaseQuantity}
+                      disabled={quantity <= 1}
+                      className="h-12 w-12"
+                    >
+                      <Minus className="h-5 w-5" />
+                    </Button>
+                    <span className="text-2xl font-semibold w-12 text-center">{quantity}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={increaseQuantity}
+                      className="h-12 w-12"
+                    >
+                      <Plus className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Total */}
+                <div className="flex justify-between items-center text-2xl font-bold">
+                  <span>Total:</span>
+                  <span>${(parseFloat(currentPrice) * quantity).toFixed(2)}</span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-4">
+                  <Button
+                    onClick={handleAddToCart}
+                    disabled={product.soldOut}
+                    className="w-full bg-app-green-600 hover:bg-app-green-700 text-white h-14 text-lg"
+                  >
+                    <ShoppingCart className="mr-3 h-6 w-6" />
+                    Add to Cart
+                  </Button>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <a href={`sms:+16129301390?&body=Hi! I'd like to order ${quantity}x ${product.name} (${currentSize}).`}>
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-app-green-600 text-app-green-600 hover:bg-app-green-50 h-12"
+                        disabled={product.soldOut}
+                      >
+                        <MessageSquare className="mr-2 h-5 w-5" />
+                        Text Order
+                      </Button>
+                    </a>
+                    <a href="tel:+16129301390">
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-app-green-600 text-app-green-600 hover:bg-app-green-50 h-12"
+                      >
+                        <Phone className="mr-2 h-5 w-5" />
+                        Call
+                      </Button>
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -16,43 +16,43 @@ import { Suspense } from "react"
 const inter = Inter({ 
   subsets: ["latin"], 
   variable: "--font-sans",
-  display: 'swap', // Improve font loading performance
+  display: 'swap',
   preload: true
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url), // Important for resolving relative paths in metadata
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
-    template: `%s | DankDeals.org`, // Simplified template
+    template: `%s | DankDealsMN`,
   },
   description: siteConfig.description,
   keywords: siteConfig.keywords,
-  authors: [{ name: "DankDeals.org", url: siteConfig.url }],
-  creator: "DankDeals.org",
-  publisher: "DankDeals.org",
+  authors: [{ name: "DankDealsMN", url: siteConfig.url }],
+  creator: "DankDealsMN",
+  publisher: "DankDealsMN",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteConfig.url,
-    title: { default: siteConfig.name, template: `%s | DankDeals.org` },
+    title: { default: siteConfig.name, template: `%s | DankDealsMN` },
     description: siteConfig.description,
-    siteName: "DankDeals.org",
+    siteName: "DankDealsMN",
     images: [
       {
-        url: "/og-image.png", // Relative to metadataBase
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "DankDeals.org - Premier Cannabis Gifting",
+        alt: "DankDealsMN - Premium Cannabis Delivery in Minneapolis",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: { default: siteConfig.name, template: `%s | DankDeals.org` },
+    title: { default: siteConfig.name, template: `%s | DankDealsMN` },
     description: siteConfig.description,
-    images: [`${siteConfig.url}/og-image.png`], // Absolute URL for Twitter
-    creator: "@dankdeals", // Replace with actual Twitter handle if available
+    images: [`${siteConfig.url}/og-image.png`],
+    creator: "@dankdealsmn",
   },
   icons: {
     icon: [
@@ -66,27 +66,26 @@ export const metadata: Metadata = {
       {
         rel: "mask-icon",
         url: "/my-favicon/favicon.svg",
-        color: "#1a202c"
+        color: "#2B5D3F"
       }
     ]
   },
-  manifest: "/my-favicon/site.webmanifest", // Relative to metadataBase
+  manifest: "/my-favicon/site.webmanifest",
   alternates: {
     canonical: "/",
   },
-  generator: 'v0.dev',
-  // Add performance-related meta tags
+  generator: 'Next.js',
   other: {
-    'theme-color': '#1a202c',
-    'color-scheme': 'dark light',
+    'theme-color': '#2B5D3F',
+    'color-scheme': 'light',
   }
 }
 
 // Loading fallback component
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    <div className="min-h-screen bg-app-bg flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-green-600"></div>
     </div>
   )
 }
@@ -99,31 +98,29 @@ export default function RootLayout({
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "DankDeals.org",
+    name: "DankDealsMN",
     url: siteConfig.url,
-    logo: `${siteConfig.url}/logo.png`, // Assuming you have a logo.png in public
+    logo: `${siteConfig.url}/logo.png`,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+1-612-930-1390",
       contactType: "Customer Service",
-      areaServed: "US", // Or more specific like "Minneapolis", "St. Paul"
+      areaServed: "US",
       availableLanguage: "en",
     },
     sameAs: [
       // Add social media links if available
-      // "https://www.facebook.com/dankdeals",
-      // "https://www.instagram.com/dankdeals",
     ],
   }
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    name: "DankDeals.org",
+    name: "DankDealsMN",
     url: siteConfig.url,
     image: `${siteConfig.url}/og-image.png`,
     telephone: "+16129301390",
-    description: "A showcase for premium cannabis products available for gifting in the Twin Cities.",
+    description: "Premium cannabis products available for delivery in the Twin Cities. Text to order at (612) 930-1390.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Minneapolis",
@@ -132,8 +129,8 @@ export default function RootLayout({
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: "44.9778", // Minneapolis latitude
-      longitude: "-93.2650", // Minneapolis longitude
+      latitude: "44.9778",
+      longitude: "-93.2650",
     },
     areaServed: [
       {
@@ -153,7 +150,6 @@ export default function RootLayout({
       "@type": "OfferCatalog",
       name: "Cannabis Product Menu",
       itemListElement: products.slice(0, 5).map((product) => ({
-        // Example: first 5 products
         "@type": "Offer",
         itemOffered: {
           "@type": "Product",
@@ -165,7 +161,6 @@ export default function RootLayout({
       })),
     },
     openingHoursSpecification: [
-      // Example, adjust as needed
       {
         "@type": "OpeningHoursSpecification",
         dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
@@ -176,35 +171,32 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Critical performance optimizations */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
         
-        {/* Preload critical resources - only existing files */}
         <link rel="preload" href="/dankdeals-logo.png" as="image" type="image/png" />
         <link rel="preload" href="/king-bud-default.png" as="image" type="image/png" />
         
-        {/* Viewport meta tag for mobile optimization */}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        
-        {/* Performance meta tags */}
         <meta httpEquiv="x-dns-prefetch-control" content="on" />
         <meta name="format-detection" content="telephone=no" />
         
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", "pb-16 md:pb-0", inter.variable)}>
+      <body className={cn("min-h-screen bg-app-bg font-sans antialiased", "pb-20 md:pb-0", inter.variable)}>
         <StackProvider app={stackServerApp}>
           <StackTheme>
             <Suspense fallback={<LoadingFallback />}>
               <CartProvider>
-                <Suspense fallback={<LoadingFallback />}>
-                  {children}
-                </Suspense>
+                <div className="min-h-screen bg-app-bg">
+                  <Suspense fallback={<LoadingFallback />}>
+                    {children}
+                  </Suspense>
+                </div>
                 <Toaster />
                 <BottomNavigation />
               </CartProvider>

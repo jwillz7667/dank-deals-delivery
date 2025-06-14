@@ -4,9 +4,10 @@ import { useState } from "react"
 import { products, type Product } from "@/lib/products"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import { MessageSquare } from "lucide-react"
+import { MessageSquare, Search, Leaf, Cookie, Cigarette, Heart } from "lucide-react"
 import Link from "next/link"
 import { createProductSlug } from "@/lib/utils"
 
@@ -14,104 +15,434 @@ interface MenuSectionProps {
   onProductClick: (product: Product) => void
 }
 
-const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))]
+const categories = [
+  { name: "All", icon: null },
+  { name: "Flower", icon: Leaf },
+  { name: "Edibles", icon: Cookie },
+  { name: "Prerolls", icon: Cigarette },
+  { name: "Wellness", icon: Heart },
+]
 
 export default function MenuSection({ onProductClick }: MenuSectionProps) {
   const [activeCategory, setActiveCategory] = useState("All")
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredProducts = activeCategory === "All" ? products : products.filter((p) => p.category === activeCategory)
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = activeCategory === "All" || product.category.toLowerCase() === activeCategory.toLowerCase()
+    const matchesSearch = searchQuery === "" || 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
 
   return (
-    <section id="menu" className="py-12 sm:py-16 md:py-24 bg-neumorphic-bg dark:bg-neumorphic-bg">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-3 sm:mb-4 text-gray-800 dark:text-gray-200">Our Menu</h2>
-        <p className="text-base sm:text-lg text-center text-gray-600 dark:text-gray-400 mb-8 sm:mb-12">
-          Explore our curated selection. Text to order!
-        </p>
+    <div className="px-4 bg-gradient-to-br from-app-bg via-app-secondary to-app-accent min-h-screen">
+      {/* Mobile Layout */}
+      <div className="lg:hidden">
+        <div className="max-w-sm mx-auto space-y-6">
+          {/* Search Bar */}
+          <div className="relative animate-fade-in">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="I'm willing to find..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input pl-12 h-12 text-base shadow-lg"
+            />
+          </div>
 
-        <div className="flex justify-center flex-wrap gap-2 sm:gap-4 mb-8 sm:mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={cn(
-                "neumorphic-outset dark:neumorphic-outset-dark text-sm sm:text-lg px-3 sm:px-6 py-2 sm:py-3",
-                activeCategory === category && "neumorphic-inset dark:neumorphic-inset-dark",
-              )}
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-          {filteredProducts.map((product) => (
-            <Card
-              key={product.id}
-              className="glassmorphic-card cursor-pointer group overflow-hidden hover:shadow-xl transition-shadow duration-300"
-            >
-              <CardContent className="p-0">
-                <Link href={`/product/${createProductSlug(product.name)}`}>
-                  <div className="relative h-48 sm:h-56 lg:h-64 w-full">
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.imageAlt || product.name}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      className="group-hover:scale-110 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                    {product.soldOut && (
-                      <div className="absolute top-2 right-2 bg-red-600 text-white px-2 sm:px-3 py-1 rounded-lg font-bold text-xs sm:text-sm shadow-lg">
-                        SOLD OUT
-                      </div>
+          {/* Categories */}
+          <div className="animate-slide-up">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Categories</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {categories.map((category, index) => {
+                const Icon = category.icon
+                const isActive = activeCategory === category.name
+                return (
+                  <Button
+                    key={category.name}
+                    onClick={() => setActiveCategory(category.name)}
+                    className={cn(
+                      "h-20 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 animate-scale-in gpu-accelerated",
+                      isActive 
+                        ? "glass-category text-white shadow-xl scale-105" 
+                        : "glass-category text-white hover:scale-105 floating-effect"
                     )}
-                  </div>
-                </Link>
-                <div className="p-4 sm:p-5 lg:p-6">
-                  <Link href={`/product/${createProductSlug(product.name)}`}>
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white hover:text-green-600 dark:hover:text-green-400 transition-colors">
-                      {product.name}
-                    </h3>
-                  </Link>
-                  <p className="text-sm sm:text-md font-semibold text-green-600 dark:text-green-400 mt-1">{product.category}</p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 line-clamp-2">
-                    {product.description}
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    {Icon && <Icon className="h-6 w-6 mb-1" />}
+                    <span className="text-sm font-medium">{category.name}</span>
+                  </Button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Featured/Banner Product */}
+          {filteredProducts.length > 0 && activeCategory === "All" && !searchQuery && (
+            <Link href={`/product/${createProductSlug(filteredProducts[0].name)}`}>
+              <Card className="relative overflow-hidden bg-gradient-to-r from-app-green-600 to-app-green-700 text-white animate-fade-in floating-effect hover-glow">
+                <CardContent className="p-6 pr-32">
+                  <h3 className="text-2xl font-bold mb-2">{filteredProducts[0].name}</h3>
+                  <p className="text-white/90">
+                    From ${filteredProducts[0].pricing?.[0]?.price || '25.50'}
                   </p>
-                  {product.category === "Flower" && product.pricing && !product.soldOut && (
-                    <p className="text-xs sm:text-sm font-medium text-green-600 dark:text-green-400 mt-2">
-                      Starting at ${product.pricing[0].price}
-                    </p>
-                  )}
-                  <div className="flex gap-2 mt-3">
-                    <Button 
-                      onClick={() => onProductClick(product)}
-                      className="flex-1 neumorphic-outset dark:neumorphic-outset-dark text-xs sm:text-sm" 
-                      size="sm"
-                      variant="secondary"
-                    >
-                      Quick View
-                    </Button>
-                    <a 
-                      href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}
-                      className="flex-1"
-                    >
-                      <Button 
-                        className="w-full neumorphic-outset dark:neumorphic-outset-dark text-xs sm:text-sm" 
-                        size="sm"
-                        disabled={product.soldOut}
-                      >
-                        <MessageSquare className="mr-1.5 h-3.5 w-3.5" />
-                        Order
-                      </Button>
-                    </a>
-                  </div>
+                </CardContent>
+                <div className="absolute right-4 top-4 bottom-4 w-24 opacity-80">
+                  <Image
+                    src={filteredProducts[0].imageUrl}
+                    alt={filteredProducts[0].name}
+                    fill
+                    className="object-cover object-center rounded-xl"
+                    sizes="96px"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </Card>
+            </Link>
+          )}
+
+          {/* Products Grid */}
+          <div className="animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-foreground">
+                {searchQuery ? `Search Results` : activeCategory === "All" ? "Hot right now" : activeCategory}
+              </h2>
+              <span className="text-sm text-muted-foreground">
+                {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              {filteredProducts.slice(activeCategory === "All" && !searchQuery ? 1 : 0).map((product, index) => (
+                <Card 
+                  key={product.id} 
+                  className="product-card animate-slide-up" 
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <CardContent className="p-3">
+                    <Link href={`/product/${createProductSlug(product.name)}`}>
+                      <div className="aspect-square relative mb-3 rounded-xl overflow-hidden bg-white shadow-md">
+                        <Image
+                          src={product.imageUrl}
+                          alt={product.imageAlt || product.name}
+                          fill
+                          className="object-cover transition-transform duration-300 hover:scale-110"
+                          sizes="(max-width: 640px) 50vw, 25vw"
+                        />
+                        {product.soldOut && (
+                          <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-lg font-bold text-xs shadow-lg">
+                            SOLD OUT
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                    
+                    <div className="space-y-2">
+                      <div className="text-center">
+                        <p className="text-xs text-app-green-600 font-medium mb-1">
+                          {product.category}
+                        </p>
+                        <Link href={`/product/${createProductSlug(product.name)}`}>
+                          <h3 className="font-semibold text-sm text-foreground mb-1 hover:text-app-green-600 transition-colors duration-200">
+                            {product.name}
+                          </h3>
+                        </Link>
+                        <p className="text-xs text-muted-foreground">
+                          From ${product.pricing?.[0]?.price || '25.50'}
+                        </p>
+                      </div>
+                      
+                      <div className="flex gap-1.5">
+                        <Button 
+                          onClick={() => onProductClick(product)}
+                          className="flex-1 secondary-button text-xs h-8" 
+                          size="sm"
+                          variant="secondary"
+                        >
+                          Quick View
+                        </Button>
+                        <a 
+                          href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}
+                          className="flex-1"
+                        >
+                          <Button 
+                            className="w-full primary-button text-xs h-8" 
+                            size="sm"
+                            disabled={product.soldOut}
+                          >
+                            <MessageSquare className="mr-1 h-3 w-3" />
+                            Order
+                          </Button>
+                        </a>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredProducts.length === 0 && (
+              <Card className="text-center p-8 card-glass animate-fade-in">
+                <CardContent className="p-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-app-green-100 to-app-green-200 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
+                    <Search className="h-8 w-8 text-app-green-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No products found</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Try adjusting your search or browse a different category
+                  </p>
+                  <Button 
+                    onClick={() => {
+                      setSearchQuery("")
+                      setActiveCategory("All")
+                    }}
+                    className="primary-button"
+                  >
+                    View All Products
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Contact to Order CTA */}
+          <Card className="glass-card border-app-green-200 animate-fade-in">
+            <CardContent className="p-4 text-center">
+              <h3 className="font-semibold text-app-green-800 mb-2">Ready to Order?</h3>
+              <p className="text-sm text-app-green-700 mb-4">
+                Text or call us to complete your order
+              </p>
+              <div className="flex gap-2">
+                <a href="sms:+16129301390?&body=Hi! I'd like to place an order." className="flex-1">
+                  <Button className="w-full primary-button">
+                    Text to Order
+                  </Button>
+                </a>
+                <a href="tel:+16129301390" className="flex-1">
+                  <Button variant="outline" className="w-full secondary-button">
+                    Call Now
+                  </Button>
+                </a>
+              </div>
+              <p className="text-xs text-app-green-600 font-medium mt-2">
+                📞 (612) 930-1390
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </section>
+
+      {/* Desktop Layout */}
+      <div className="hidden lg:block">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-12 gap-8">
+            {/* Sidebar */}
+            <div className="col-span-3">
+              <div className="sticky top-24 space-y-6">
+                {/* Search Bar */}
+                <div className="relative animate-fade-in">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input pl-12 h-12 text-base shadow-lg"
+                  />
+                </div>
+
+                {/* Categories */}
+                <div className="animate-slide-up">
+                  <h2 className="text-xl font-semibold text-foreground mb-4">Categories</h2>
+                  <div className="space-y-2">
+                    {categories.map((category, index) => {
+                      const Icon = category.icon
+                      const isActive = activeCategory === category.name
+                      return (
+                        <Button
+                          key={category.name}
+                          onClick={() => setActiveCategory(category.name)}
+                          variant={isActive ? "default" : "outline"}
+                          className={cn(
+                            "w-full justify-start h-12 transition-all duration-300 animate-scale-in gpu-accelerated",
+                            isActive 
+                              ? "primary-button shadow-lg scale-105" 
+                              : "secondary-button hover:scale-105"
+                          )}
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          {Icon && <Icon className="mr-3 h-5 w-5" />}
+                          <span className="font-medium">{category.name}</span>
+                        </Button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Contact CTA */}
+                <Card className="glass-card border-app-green-200 animate-fade-in">
+                  <CardContent className="p-4 text-center">
+                    <h3 className="font-semibold text-app-green-800 mb-2">Ready to Order?</h3>
+                    <p className="text-sm text-app-green-700 mb-4">
+                      Text or call us to complete your order
+                    </p>
+                    <div className="space-y-2">
+                      <a href="sms:+16129301390?&body=Hi! I'd like to place an order.">
+                        <Button className="w-full primary-button">
+                          Text to Order
+                        </Button>
+                      </a>
+                      <a href="tel:+16129301390">
+                        <Button variant="outline" className="w-full secondary-button">
+                          Call (612) 930-1390
+                        </Button>
+                      </a>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="col-span-9">
+              {/* Featured/Banner Product */}
+              {filteredProducts.length > 0 && activeCategory === "All" && !searchQuery && (
+                <div className="mb-8 animate-fade-in">
+                  <Link href={`/product/${createProductSlug(filteredProducts[0].name)}`}>
+                    <Card className="relative overflow-hidden bg-gradient-to-r from-app-green-600 to-app-green-700 text-white h-64 floating-effect hover-glow">
+                      <CardContent className="p-8">
+                        <div className="grid grid-cols-2 gap-8 h-full">
+                          <div className="flex flex-col justify-center">
+                            <h3 className="text-4xl font-bold mb-4">{filteredProducts[0].name}</h3>
+                            <p className="text-white/90 text-xl mb-6">
+                              From ${filteredProducts[0].pricing?.[0]?.price || '25.50'}
+                            </p>
+                            <Button className="secondary-button w-fit">
+                              View Product
+                            </Button>
+                          </div>
+                          <div className="relative opacity-80">
+                            <Image
+                              src={filteredProducts[0].imageUrl}
+                              alt={filteredProducts[0].name}
+                              fill
+                              className="object-cover object-center rounded-xl"
+                              sizes="400px"
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </div>
+              )}
+
+              {/* Products Header */}
+              <div className="flex items-center justify-between mb-6 animate-slide-up">
+                <h2 className="text-2xl font-semibold text-foreground">
+                  {searchQuery ? `Search Results` : activeCategory === "All" ? "All Products" : activeCategory}
+                </h2>
+                <span className="text-muted-foreground">
+                  {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+                </span>
+              </div>
+
+              {/* Products Grid */}
+              <div className="grid grid-cols-3 gap-6">
+                {filteredProducts.slice(activeCategory === "All" && !searchQuery ? 1 : 0).map((product, index) => (
+                  <Card 
+                    key={product.id} 
+                    className="product-card animate-slide-up" 
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <CardContent className="p-4">
+                      <Link href={`/product/${createProductSlug(product.name)}`}>
+                        <div className="aspect-square relative mb-4 rounded-xl overflow-hidden bg-white shadow-md">
+                          <Image
+                            src={product.imageUrl}
+                            alt={product.imageAlt || product.name}
+                            fill
+                            className="object-cover transition-transform duration-300 hover:scale-110"
+                            sizes="(max-width: 1024px) 33vw, 25vw"
+                          />
+                          {product.soldOut && (
+                            <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-sm shadow-lg">
+                              SOLD OUT
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                      
+                      <div className="space-y-3">
+                        <div className="text-center">
+                          <p className="text-sm text-app-green-600 font-medium mb-1">
+                            {product.category}
+                          </p>
+                          <Link href={`/product/${createProductSlug(product.name)}`}>
+                            <h3 className="font-semibold text-base text-foreground mb-2 hover:text-app-green-600 transition-colors duration-200">
+                              {product.name}
+                            </h3>
+                          </Link>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            From ${product.pricing?.[0]?.price || '25.50'}
+                          </p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button 
+                            onClick={() => onProductClick(product)}
+                            className="secondary-button text-sm h-10" 
+                            size="sm"
+                            variant="secondary"
+                          >
+                            Quick View
+                          </Button>
+                          <a 
+                            href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}
+                          >
+                            <Button 
+                              className="w-full primary-button text-sm h-10" 
+                              size="sm"
+                              disabled={product.soldOut}
+                            >
+                              <MessageSquare className="mr-2 h-4 w-4" />
+                              Order
+                            </Button>
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {filteredProducts.length === 0 && (
+                <Card className="text-center p-12 card-glass animate-fade-in">
+                  <CardContent className="p-0">
+                    <div className="w-20 h-20 bg-gradient-to-br from-app-green-100 to-app-green-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg animate-float">
+                      <Search className="h-10 w-10 text-app-green-600" />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-foreground mb-4">No products found</h3>
+                    <p className="text-muted-foreground mb-6">
+                      Try adjusting your search or browse a different category
+                    </p>
+                    <Button 
+                      onClick={() => {
+                        setSearchQuery("")
+                        setActiveCategory("All")
+                      }}
+                      className="primary-button"
+                    >
+                      View All Products
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

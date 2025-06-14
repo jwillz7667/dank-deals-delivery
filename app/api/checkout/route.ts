@@ -6,8 +6,8 @@ import { CartService } from '@/lib/services/cart.service';
 import { successResponse, handleApiError } from '@/lib/api/utils';
 import { z } from 'zod';
 
-// Validation schema for checkout
-const checkoutSchema = z.object({
+// Validation schema for text/call order logging
+const orderLogSchema = z.object({
   phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
   houseType: z.string().min(1, 'House type is required'),
   houseNumber: z.string().min(1, 'House number is required'),
@@ -17,22 +17,20 @@ const checkoutSchema = z.object({
   state: z.string().min(2, 'State is required'),
   zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
   deliveryInstructions: z.string().optional(),
-  paymentMethod: z.enum(['card', 'apple_pay', 'google_pay']),
-  tip: z.number().min(0, 'Tip cannot be negative').default(0),
   saveProfile: z.boolean().default(false),
 });
 
 /**
  * POST /api/checkout
- * Create an order from the user's cart
+ * Log an order for text/call processing (no payment processing)
  */
-async function checkout(req: AuthenticatedRequest): Promise<NextResponse> {
+async function logOrder(req: AuthenticatedRequest): Promise<NextResponse> {
   try {
     const userId = req.userId!;
     const body = await req.json();
     
     // Validate input
-    const validatedData = checkoutSchema.parse(body);
+    const validatedData = orderLogSchema.parse(body);
     
     // Check if cart has items
     const cart = await CartService.getCart(userId);
@@ -65,12 +63,11 @@ async function checkout(req: AuthenticatedRequest): Promise<NextResponse> {
         state: validatedData.state,
         zipCode: validatedData.zipCode,
         deliveryInstructions: validatedData.deliveryInstructions,
-        preferredPaymentMethod: validatedData.paymentMethod,
       });
     }
     
-    // Create order
-    const order = await OrderService.createOrder({
+    // Create order record with 'pending_contact' status
+    const order = await OrderService.createTextOrder({
       userId,
       deliveryHouseType: validatedData.houseType,
       deliveryHouseNumber: validatedData.houseNumber,
@@ -80,23 +77,15 @@ async function checkout(req: AuthenticatedRequest): Promise<NextResponse> {
       deliveryState: validatedData.state,
       deliveryZipCode: validatedData.zipCode,
       deliveryInstructions: validatedData.deliveryInstructions,
-      paymentMethod: validatedData.paymentMethod,
-      tip: validatedData.tip,
+      phoneNumber: validatedData.phoneNumber,
     });
     
-    // TODO: Process payment based on payment method
-    // In production, integrate with payment gateway
-    // await PaymentService.processPayment(order, validatedData.paymentMethod);
-    
-    // TODO: Send order confirmation email
-    // await EmailService.sendOrderConfirmation(userId, order);
-    
-    // TODO: Send order notification to admin/store
-    // await NotificationService.notifyNewOrder(order);
+    // TODO: Send notification to admin about new text order
+    // await NotificationService.notifyNewTextOrder(order);
     
     return successResponse({
       order,
-      message: 'Order placed successfully',
+      message: 'Order information saved. Please complete your order by text or phone.',
       redirectUrl: `/order-confirmation/${order.orderNumber}`,
     });
   } catch (error) {
@@ -122,4 +111,4 @@ async function checkout(req: AuthenticatedRequest): Promise<NextResponse> {
   }
 }
 
-export const POST = withAuth(checkout); 
+export const POST = withAuth(logOrder); 

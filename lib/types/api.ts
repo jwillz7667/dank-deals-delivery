@@ -115,18 +115,28 @@ export interface UserProfileDTO {
   id: number;
   userId: string;
   phoneNumber?: string;
-  deliveryAddress?: string;
+  houseType?: string;
+  houseNumber?: string;
+  streetName?: string;
+  aptNumber?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
   deliveryInstructions?: string;
-  preferredPaymentMethod?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface UpdateUserProfileRequest {
   phoneNumber?: string;
-  deliveryAddress?: string;
+  houseType?: string;
+  houseNumber?: string;
+  streetName?: string;
+  aptNumber?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
   deliveryInstructions?: string;
-  preferredPaymentMethod?: string;
 }
 
 // Validation

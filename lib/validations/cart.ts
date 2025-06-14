@@ -65,7 +65,6 @@ export const cartCheckoutSchema = z.object({
   deliveryInstructions: z.string()
     .max(500, 'Delivery instructions are too long')
     .optional(),
-  paymentMethod: z.enum(['cash', 'card', 'digital']),
   scheduledDeliveryTime: z.string().datetime().optional(),
   promoCode: z.string().max(20).optional(),
 });

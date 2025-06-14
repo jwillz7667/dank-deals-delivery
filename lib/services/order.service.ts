@@ -17,6 +17,19 @@ export interface CreateOrderInput {
   tip: number;
 }
 
+export interface CreateTextOrderInput {
+  userId: string;
+  deliveryHouseType: string;
+  deliveryHouseNumber: string;
+  deliveryStreetName: string;
+  deliveryAptNumber?: string;
+  deliveryCity: string;
+  deliveryState: string;
+  deliveryZipCode: string;
+  deliveryInstructions?: string;
+  phoneNumber: string;
+}
+
 export interface OrderWithItems extends Order {
   items: Array<{
     id: number;
@@ -28,6 +41,83 @@ export interface OrderWithItems extends Order {
 }
 
 export class OrderService {
+  /**
+   * Create a new text/call order from the user's cart
+   */
+  static async createTextOrder(input: CreateTextOrderInput): Promise<OrderWithItems> {
+    const { 
+      userId, 
+      deliveryHouseType,
+      deliveryHouseNumber,
+      deliveryStreetName,
+      deliveryAptNumber,
+      deliveryCity,
+      deliveryState,
+      deliveryZipCode,
+      deliveryInstructions,
+      phoneNumber
+    } = input;
+    
+    // Get user's cart
+    const cart = await CartService.getCart(userId);
+    if (!cart || cart.items.length === 0) {
+      throw new Error('Cart is empty');
+    }
+    
+    // Calculate order totals
+    const subtotal = cart.subtotal;
+    const tax = cart.estimatedTax;
+    const deliveryFee = cart.deliveryFee;
+    const total = cart.total;
+    
+    // Generate order number
+    const orderNumber = `TXT-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    
+    try {
+      // Create order with 'pending_contact' status
+      const [order] = await db.insert(orders).values({
+        userId,
+        orderNumber,
+        status: 'pending_contact',
+        subtotal: subtotal.toString(),
+        tax: tax.toString(),
+        deliveryFee: deliveryFee.toString(),
+        tip: '0.00',
+        total: total.toString(),
+        deliveryHouseType,
+        deliveryHouseNumber,
+        deliveryStreetName,
+        deliveryAptNumber,
+        deliveryCity,
+        deliveryState,
+        deliveryZipCode,
+        deliveryInstructions,
+        paymentMethod: 'text_call',
+      }).returning();
+      
+      // Create order items
+      const orderItemsData: NewOrderItem[] = cart.items.map(item => ({
+        orderId: order.id,
+        productId: item.productId,
+        productName: item.productName,
+        productPrice: item.productPrice.toString(),
+        quantity: item.quantity,
+      }));
+      
+      const createdItems = await db.insert(orderItems).values(orderItemsData).returning();
+      
+      // Don't clear the cart automatically - let customer decide after contact
+      
+      return {
+        ...order,
+        items: createdItems,
+      };
+    } catch (error) {
+      console.error('Error creating text order:', error);
+      throw new Error('Failed to create text order');
+    }
+  }
+
   /**
    * Create a new order from the user's cart
    */
