@@ -11,11 +11,11 @@ export default function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center mb-4">
               <Image
-                src="/dankdeals-logo.png"
+                src="/DANKDEALSMN.COM-LOGO.png"
                 alt="DankDealsMN.com Logo"
                 width={270}
                 height={61}
-                className="object-contain w-56 h-12 sm:w-60 sm:h-14 md:w-64 md:h-16 lg:w-72 lg:h-16"
+                className="object-contain w-48 h-auto sm:w-52 md:w-56 lg:w-64 transition-all duration-300 hover:scale-105"
               />
             </Link>
             <p className="text-muted-foreground text-sm">40 years experience, 'legally' since 2022.</p>

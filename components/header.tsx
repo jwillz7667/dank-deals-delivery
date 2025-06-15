@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { MessageSquare, ShoppingCart, User, LogOut, Package, UserCircle, Search, Menu, X } from "lucide-react"
@@ -111,8 +112,14 @@ function MobileMenu() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md p-6 modal-glass">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-app-green-600">
-            DankDealsMN.com
+          <DialogTitle className="flex justify-center mb-2">
+            <Image
+              src="/DANKDEALSMN.COM-LOGO.png" 
+              alt="DankDealsMN.com Logo"
+              width={180}
+              height={40}
+              className="object-contain h-10 w-auto"
+            />
           </DialogTitle>
         </DialogHeader>
         <div className="mt-6 space-y-4">
@@ -180,17 +187,21 @@ export default function Header() {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Mobile Menu + Logo */}
-          <div className="flex items-center space-x-4">
-            <MobileMenu />
+          {/* Logo - Left side */}
+          <div className="flex items-center">
             <Link href="/" className="flex items-center group">
-              <div className="text-xl lg:text-2xl font-bold text-app-green-600 transition-all duration-300 group-hover:scale-105 gpu-accelerated">
-                DankDealsMN.com
-              </div>
+              <Image
+                src="/DANKDEALSMN.COM-LOGO.png"
+                alt="DankDealsMN.com Logo"
+                width={360}
+                height={80}
+                className="object-contain h-16 w-auto sm:h-20 lg:h-24 transition-all duration-300 group-hover:scale-105 gpu-accelerated"
+                priority
+              />
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Center */}
           <nav className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -240,7 +251,7 @@ export default function Header() {
               </Button>
             </Link>
 
-            {/* Auth Section */}
+            {/* Auth Section - Desktop */}
             <div className="hidden lg:block">
               <UserSection />
             </div>
@@ -269,6 +280,11 @@ export default function Header() {
                 Text to Order
               </Button>
             </a>
+
+            {/* Mobile Menu - Far Right */}
+            <div className="lg:hidden">
+              <MobileMenu />
+            </div>
           </div>
         </div>
       </div>

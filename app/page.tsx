@@ -5,20 +5,29 @@ import Header from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Search, Leaf, Cookie, Cigarette, Heart, Plus } from "lucide-react"
+import { Search, Leaf, Cookie, Cigarette, Heart, Pill, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { products } from "@/lib/products"
 import JsonLd from "@/components/json-ld"
 import { createProductSlug } from "@/lib/utils"
+// Import Swiper React components
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { FreeMode, Pagination } from 'swiper/modules'
+
+// Import Swiper styles
+import 'swiper/css'
+import 'swiper/css/free-mode'
+import 'swiper/css/pagination'
 
 const categories = [
   { name: "Flower", icon: Leaf, href: "/menu?category=flower" },
   { name: "Edibles", icon: Cookie, href: "/menu?category=edibles" },
   { name: "Prerolls", icon: Cigarette, href: "/menu?category=prerolls" },
   { name: "Wellness", icon: Heart, href: "/menu?category=wellness" },
-  { name: "More", icon: Plus, href: "/menu" },
+  { name: "Vapes", icon: Sparkles, href: "/menu?category=vapes" },
+  { name: "Concentrates", icon: Pill, href: "/menu?category=concentrates" },
 ]
 
 export default function HomePage() {
@@ -28,23 +37,26 @@ export default function HomePage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/menu?search=${encodeURIComponent(searchQuery)}`)
+      router.push(`/menu?search=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
 
-  // Get featured products (6 for mobile, 8 for desktop)
-  const featuredProducts = products.slice(0, 8)
+  const featuredProducts = products.slice(0, 6)
 
   const homePageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "DankDealsMN - Premium Cannabis Delivery in Minneapolis",
-    description: "Discover DankDealsMN, your top choice for premium cannabis delivery in Minneapolis & St. Paul. Text to order at (612) 930-1390.",
+    name: "DankDealsMN.com - Premium Cannabis Delivery in Minneapolis & St. Paul",
+    description: "Twin Cities' fastest cannabis delivery service. Premium flower, edibles, and vapes delivered in under 30 minutes. Text to order: (612) 930-1390",
     url: "https://dankdealsmn.com/",
+    mainContentOfPage: {
+      "@type": "WebPageElement",
+      cssSelector: "main",
+    },
     isPartOf: {
       "@type": "WebSite",
       url: "https://dankdealsmn.com/",
-      name: "DankDealsMN",
+      name: "DankDealsMN.com",
     },
   }
 
@@ -56,7 +68,7 @@ export default function HomePage() {
       <main className="pt-20 pb-24 px-4">
         {/* Mobile Layout */}
         <div className="lg:hidden">
-          <div className="max-w-sm mx-auto space-y-6">
+          <div className="max-w-sm mx-auto space-y-8">
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="relative animate-fade-in">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -79,30 +91,36 @@ export default function HomePage() {
               </Button>
             </form>
 
-            {/* Categories */}
+            {/* Categories Swiper */}
             <div className="animate-slide-up">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Categories</h2>
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                {categories.slice(0, 4).map((category, index) => {
+              <h2 className="text-xl font-semibold text-foreground mb-6">Categories</h2>
+              <Swiper
+                slidesPerView="auto"
+                spaceBetween={12}
+                freeMode={true}
+                modules={[FreeMode]}
+                className="category-swiper"
+              >
+                {categories.map((category, index) => {
                   const Icon = category.icon
                   return (
-                    <Link key={category.name} href={category.href}>
-                      <div className="category-tile h-20 animate-scale-in" style={{ animationDelay: `${index * 100}ms` }}>
-                        <Icon className="h-6 w-6 mb-1" />
-                        <span className="text-sm font-medium">{category.name}</span>
-                      </div>
-                    </Link>
+                    <SwiperSlide key={category.name} className="!w-auto">
+                      <Link href={category.href}>
+                        <div 
+                          className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl text-white text-xs font-medium transition-all duration-300 hover:scale-105 floating-effect gpu-accelerated animate-scale-in shadow-xl backdrop-blur-lg border border-white/20"
+                          style={{ 
+                            background: 'linear-gradient(135deg, #2B5D3F 0%, #225031 100%)',
+                            animationDelay: `${index * 100}ms` 
+                          }}
+                        >
+                          <Icon className="h-5 w-5 mb-1" />
+                          <span className="text-center leading-tight">{category.name}</span>
+                        </div>
+                      </Link>
+                    </SwiperSlide>
                   )
                 })}
-              </div>
-              <div className="flex justify-center">
-                <Link href="/menu">
-                  <div className="category-tile w-20 h-20 animate-scale-in" style={{ animationDelay: '400ms' }}>
-                    <Plus className="h-6 w-6 mb-1" />
-                    <span className="text-sm font-medium">More</span>
-                  </div>
-                </Link>
-              </div>
+              </Swiper>
             </div>
 
             {/* Featured Product Banner */}
@@ -130,7 +148,7 @@ export default function HomePage() {
 
             {/* Hot Right Now */}
             <div className="animate-slide-up">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Hot right now</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-6">Hot right now</h2>
               <div className="grid grid-cols-2 gap-3">
                 {featuredProducts.slice(1, 5).map((product, index) => (
                   <Card key={product.id} className="product-card animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
@@ -224,7 +242,7 @@ export default function HomePage() {
         <div className="hidden lg:block">
           <div className="max-w-7xl mx-auto">
             {/* Hero Section */}
-            <div className="mb-12 animate-fade-in">
+            <div className="mb-16 animate-fade-in">
               <div className="grid grid-cols-12 gap-8 items-center">
                 {/* Left side - Search and main content */}
                 <div className="col-span-7">
@@ -307,26 +325,40 @@ export default function HomePage() {
             </div>
 
             {/* Categories Section */}
-            <div className="mb-12 animate-slide-up">
-              <h2 className="text-3xl font-semibold text-foreground mb-8">Shop by Category</h2>
-              <div className="grid grid-cols-4 gap-6">
-                {categories.slice(0, 4).map((category, index) => {
+            <div className="mb-16 animate-slide-up">
+              <h2 className="text-3xl font-semibold text-foreground mb-10">Shop by Category</h2>
+              <Swiper
+                slidesPerView="auto"
+                spaceBetween={24}
+                freeMode={true}
+                modules={[FreeMode]}
+                className="category-swiper-desktop"
+              >
+                {categories.map((category, index) => {
                   const Icon = category.icon
                   return (
-                    <Link key={category.name} href={category.href}>
-                      <div className="category-tile h-32 animate-scale-in" style={{ animationDelay: `${index * 100}ms` }}>
-                        <Icon className="h-8 w-8 mb-2" />
-                        <span className="text-lg font-medium">{category.name}</span>
-                      </div>
-                    </Link>
+                    <SwiperSlide key={category.name} className="!w-auto">
+                      <Link href={category.href}>
+                        <div 
+                          className="flex flex-col items-center justify-center w-32 h-32 rounded-2xl text-white text-lg font-medium transition-all duration-300 hover:scale-105 floating-effect gpu-accelerated animate-scale-in shadow-xl backdrop-blur-lg border border-white/20"
+                          style={{ 
+                            background: 'linear-gradient(135deg, #2B5D3F 0%, #225031 100%)',
+                            animationDelay: `${index * 100}ms` 
+                          }}
+                        >
+                          <Icon className="h-8 w-8 mb-2" />
+                          <span className="text-center leading-tight">{category.name}</span>
+                        </div>
+                      </Link>
+                    </SwiperSlide>
                   )
                 })}
-              </div>
+              </Swiper>
             </div>
 
             {/* Products Section */}
-            <div className="mb-12 animate-slide-up">
-              <div className="flex items-center justify-between mb-8">
+            <div className="mb-16 animate-slide-up">
+                              <div className="flex items-center justify-between mb-10">
                 <h2 className="text-3xl font-semibold text-foreground">Hot Right Now</h2>
                 <Link href="/menu">
                   <Button variant="outline" className="secondary-button">

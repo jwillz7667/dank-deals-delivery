@@ -19,7 +19,10 @@ export default function BottomNavigation() {
   const { cart } = useCart()
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bottom-nav shadow-2xl gpu-accelerated">
+    <nav 
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 shadow-2xl gpu-accelerated rounded-t-3xl backdrop-blur-xl border-t border-app-green-500/30"
+      style={{ backgroundColor: '#2B5D3F' }}
+    >
       <div className="flex justify-around items-center h-20 px-6">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (pathname.startsWith('/menu') && item.href === '/menu')
@@ -64,7 +67,7 @@ export default function BottomNavigation() {
         })}
       </div>
       {/* Glass effect overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-app-green-700/10 to-transparent pointer-events-none rounded-t-3xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-app-green-700/20 to-app-green-600/5 pointer-events-none rounded-t-3xl"></div>
     </nav>
   )
 }

@@ -177,7 +177,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
         
-        <link rel="preload" href="/dankdeals-logo.png" as="image" type="image/png" />
+        <link rel="preload" href="/DANKDEALSMN.COM-LOGO.png" as="image" type="image/png" />
         <link rel="preload" href="/king-bud-default.png" as="image" type="image/png" />
         
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

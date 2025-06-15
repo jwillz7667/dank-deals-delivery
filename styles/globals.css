@@ -23,11 +23,12 @@
   }
   
   .glass-bottom-nav {
-    @apply backdrop-blur-xl bg-app-green-600/95 border-t border-white/20 shadow-2xl;
+    @apply backdrop-blur-xl bg-app-green-600 border-t border-app-green-500/30 shadow-2xl;
   }
   
   .glass-category {
-    @apply backdrop-blur-lg bg-gradient-to-br from-app-green-600/90 to-app-green-700/90 border border-white/20 shadow-xl;
+    @apply backdrop-blur-lg border border-white/20 shadow-xl;
+    background: linear-gradient(135deg, #2B5D3F 0%, #225031 100%);
   }
   
   .glass-product {
@@ -149,7 +150,8 @@
 /* Enhanced App-specific component styles */
 @layer components {
   .category-tile {
-    @apply glass-category text-white rounded-2xl p-4 flex flex-col items-center justify-center min-h-[80px] transition-all duration-300 hover:scale-105 floating-effect gpu-accelerated;
+    @apply text-white rounded-2xl p-4 flex flex-col items-center justify-center min-h-[80px] transition-all duration-300 hover:scale-105 floating-effect gpu-accelerated backdrop-blur-lg border border-white/20 shadow-xl;
+    background: linear-gradient(135deg, #2B5D3F 0%, #225031 100%);
   }
   
   .product-card {
@@ -182,6 +184,25 @@
   
   .card-glass {
     @apply glass-card rounded-2xl p-6 floating-effect;
+  }
+
+  /* Swiper customizations */
+  .category-swiper {
+    @apply px-1 pb-4;
+  }
+  
+  .category-swiper-desktop {
+    @apply px-1 pb-4;
+  }
+  
+  .category-swiper .swiper-slide,
+  .category-swiper-desktop .swiper-slide {
+    @apply transition-all duration-300;
+  }
+  
+  .category-swiper .swiper-slide:hover,
+  .category-swiper-desktop .swiper-slide:hover {
+    @apply scale-105;
   }
 }
 
