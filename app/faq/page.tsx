@@ -1,6 +1,7 @@
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import JsonLd from "@/components/json-ld"
+import { Button } from "@/components/ui/button"
 import type { Metadata } from "next"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
@@ -56,27 +57,55 @@ export default function FaqPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-app-bg via-app-secondary to-app-accent">
       <Header />
-      <main className="pt-20">
-        <section id="faq" className="py-24 bg-neutral-900">
+      <main className="pt-20 pb-24">
+        <section id="faq" className="py-16">
           <JsonLd data={faqSchema} />
           <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="text-4xl font-bold text-center mb-12 text-foreground">Frequently Asked Questions</h2>
-            <Accordion type="single" collapsible className="w-full">
+            <div className="text-center mb-12 animate-fade-in">
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Frequently Asked Questions</h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Get answers to common questions about our cannabis delivery service in the Twin Cities
+              </p>
+            </div>
+            <Accordion type="single" collapsible className="w-full animate-slide-up">
               {faqs.map((faq, index) => (
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="glassmorphic-card mb-4 rounded-xl border-none px-6"
+                  className="bg-white/10 backdrop-blur-sm border border-app-green-200/30 mb-4 rounded-xl px-6 hover:bg-white/20 transition-all duration-300"
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline text-foreground">
+                  <AccordionTrigger className="text-lg font-semibold text-left hover:no-underline text-foreground py-6">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-base text-muted-foreground">{faq.answer}</AccordionContent>
+                  <AccordionContent className="text-base text-muted-foreground pb-6">{faq.answer}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
+            
+            {/* CTA Section */}
+            <div className="mt-16 text-center animate-fade-in">
+              <div className="bg-gradient-to-r from-app-green-600/20 to-app-green-800/20 border border-app-green-300/50 rounded-2xl p-8">
+                <h3 className="text-2xl font-bold text-foreground mb-4">Still Have Questions?</h3>
+                <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+                  Our friendly team is here to help! Text or call us directly for personalized assistance with your cannabis delivery order.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a href="sms:+16129301390?&body=Hi! I have a question about your delivery service.">
+                    <Button className="primary-button px-8 py-3 text-lg">
+                      Text Your Question
+                    </Button>
+                  </a>
+                  <a href="tel:+16129301390">
+                    <Button variant="outline" className="secondary-button px-8 py-3 text-lg">
+                      Call (612) 930-1390
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>

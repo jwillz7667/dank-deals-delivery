@@ -99,6 +99,7 @@ function MobileMenu() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Menu", href: "/menu" },
+    { name: "Delivery", href: "/delivery" },
     { name: "FAQ", href: "/faq" },
     { name: "Our Mission", href: "/mission" },
   ]
@@ -174,6 +175,7 @@ export default function Header() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Menu", href: "/menu" },
+    { name: "Delivery", href: "/delivery" },
     { name: "FAQ", href: "/faq" },
     { name: "Our Mission", href: "/mission" },
   ]

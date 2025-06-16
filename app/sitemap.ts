@@ -27,6 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
+      url: `${URL}/delivery`,
+      lastModified: currentDate,
+      changeFrequency: "weekly",
+      priority: 0.92, // High priority - hub page for all delivery areas
+    },
+    {
       url: `${URL}/faq`,
       lastModified: currentDate,
       changeFrequency: "weekly",

@@ -14,14 +14,56 @@ interface CityPageProps {
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { city } = await params
   const formattedCity = formatCityName(city)
-  const title = `THC delivery in ${formattedCity}`
-  const description = `Get fast, reliable, and discreet cannabis delivery in ${formattedCity}, MN. DankDeals offers a wide selection of flower, edibles, and vapes. Order now!`
+  const title = `Weed Delivery in ${formattedCity} in One Hour or Less | DankDealsMN`
+  const description = `Fast weed delivery in ${formattedCity}, MN in 1 hour or less! Professional cannabis delivery service with premium flower, edibles & vapes. 21+ verification required. Order now!`
 
   return {
     title,
     description,
+    keywords: [
+      `weed delivery ${formattedCity}`,
+      `cannabis delivery ${formattedCity}`,
+      `THC delivery ${formattedCity}`,
+      `marijuana delivery ${formattedCity}`, 
+      `${formattedCity} cannabis delivery`,
+      `${formattedCity} weed delivery service`,
+      `fast cannabis delivery ${formattedCity}`,
+      `1 hour cannabis delivery ${formattedCity}`,
+      `same day weed delivery ${formattedCity}`,
+      `${formattedCity} Minnesota cannabis delivery`
+    ],
+    openGraph: {
+      title: `Weed Delivery in ${formattedCity} in One Hour or Less | DankDealsMN`,
+      description: `Fast weed delivery in ${formattedCity}, MN in 1 hour or less! Professional cannabis delivery with premium products. 21+ verification required.`,
+      type: "website",
+      locale: "en_US",
+      siteName: "DankDealsMN",
+      url: `https://dankdealsmn.com/delivery/${city}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Weed Delivery in ${formattedCity} in One Hour or Less`,
+      description: `Fast weed delivery in ${formattedCity}, MN in 1 hour or less! Professional cannabis delivery service.`,
+    },
     alternates: {
       canonical: `/delivery/${city}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    other: {
+      "geo.region": "MN",
+      "geo.placename": `${formattedCity}, Minnesota`,
+      "geo.position": "44.9778;-93.2650",
+      "ICBM": "44.9778, -93.2650",
     },
   }
 }
