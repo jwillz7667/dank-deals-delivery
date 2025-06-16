@@ -62,7 +62,7 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
           </div>
 
           {/* Categories Swiper */}
-          <div className="animate-slide-up">
+          <div className="animate-slide-up mb-8">
             <h2 className="text-xl font-semibold text-foreground mb-6">Categories</h2>
             <Swiper
               slidesPerView="auto"
@@ -273,8 +273,8 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
                 </div>
 
                 {/* Categories Swiper */}
-                <div className="animate-slide-up">
-                  <h2 className="text-xl font-semibold text-foreground mb-6">Categories</h2>
+                <div className="animate-slide-up mb-8">
+                  <h2 className="text-xl font-semibold text-foreground mb-8">Categories</h2>
                   <Swiper
                     slidesPerView="auto"
                     spaceBetween={12}

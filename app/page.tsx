@@ -92,7 +92,7 @@ export default function HomePage() {
             </form>
 
             {/* Categories Swiper */}
-            <div className="animate-slide-up">
+            <div className="animate-slide-up mb-8">
               <h2 className="text-xl font-semibold text-foreground mb-6">Categories</h2>
               <Swiper
                 slidesPerView="auto"
@@ -328,8 +328,8 @@ export default function HomePage() {
             </div>
 
             {/* Categories Section */}
-            <div className="mb-20 animate-slide-up">
-              <h2 className="text-3xl font-semibold text-foreground mb-10">Shop by Category</h2>
+            <div className="mb-24 animate-slide-up">
+              <h2 className="text-3xl font-semibold text-foreground mb-12">Shop by Category</h2>
               <Swiper
                 slidesPerView="auto"
                 spaceBetween={24}
