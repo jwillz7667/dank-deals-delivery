@@ -48,7 +48,7 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
     <div className="px-4 bg-gradient-to-br from-app-bg via-app-secondary to-app-accent min-h-screen">
       {/* Mobile Layout */}
       <div className="lg:hidden">
-        <div className="max-w-sm mx-auto space-y-8">
+        <div className="max-w-sm mx-auto space-y-10">
           {/* Search Bar */}
           <div className="relative animate-fade-in">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -259,7 +259,7 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
           <div className="grid grid-cols-12 gap-8">
             {/* Sidebar */}
             <div className="col-span-3">
-              <div className="sticky top-24 space-y-8">
+              <div className="sticky top-24 space-y-10">
                 {/* Search Bar */}
                 <div className="relative animate-fade-in">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -338,7 +338,7 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
             <div className="col-span-9">
               {/* Featured/Banner Product */}
               {filteredProducts.length > 0 && activeCategory === "All" && !searchQuery && (
-                <div className="mb-12 animate-fade-in">
+                <div className="mb-16 animate-fade-in">
                   <Link href={`/product/${createProductSlug(filteredProducts[0].name)}`}>
                     <Card className="relative overflow-hidden bg-gradient-to-r from-app-green-600 to-app-green-700 text-white h-64 floating-effect hover-glow">
                       <CardContent className="p-8">

@@ -43,9 +43,9 @@ export default async function Page({ params }: CityPageProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-app-bg via-app-secondary to-app-accent">
       <Header />
-      <main className="pt-20">
+      <main className="pt-20 pb-24">
         <CityPageTemplate city={city} />
       </main>
       <Footer />

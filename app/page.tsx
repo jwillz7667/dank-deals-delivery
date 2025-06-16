@@ -68,7 +68,7 @@ export default function HomePage() {
       <main className="pt-20 pb-24 px-4">
         {/* Mobile Layout */}
         <div className="lg:hidden">
-          <div className="max-w-sm mx-auto space-y-8">
+          <div className="max-w-sm mx-auto space-y-10">
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="relative animate-fade-in">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -328,7 +328,7 @@ export default function HomePage() {
             </div>
 
             {/* Categories Section */}
-            <div className="mb-16 animate-slide-up">
+            <div className="mb-20 animate-slide-up">
               <h2 className="text-3xl font-semibold text-foreground mb-10">Shop by Category</h2>
               <Swiper
                 slidesPerView="auto"
