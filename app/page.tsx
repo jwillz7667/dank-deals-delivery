@@ -139,6 +139,7 @@ export default function HomePage() {
                       alt={featuredProducts[0].name}
                       fill
                       className="object-cover object-center rounded-xl"
+                      priority // FIXED: Priority load featured product banner
                       sizes="96px"
                     />
                   </div>
@@ -160,7 +161,8 @@ export default function HomePage() {
                             alt={product.name}
                             fill
                             className="object-cover hover:scale-110 transition-transform duration-300"
-                            sizes="(max-width: 768px) 150px, 200px"
+                            priority={index === 0} // FIXED: Priority load the first image (LCP element)
+                            sizes="(max-width: 768px) 180px, 250px"
                           />
                         </div>
                       </Link>
@@ -313,6 +315,7 @@ export default function HomePage() {
                               alt={featuredProducts[0].name}
                               fill
                               className="object-cover object-center"
+                              priority // FIXED: Priority load desktop featured banner
                               sizes="256px"
                             />
                           </div>
@@ -377,6 +380,7 @@ export default function HomePage() {
                             alt={product.name}
                             fill
                             className="object-cover hover:scale-110 transition-transform duration-300"
+                            priority={index < 2} // FIXED: Priority load first 2 images (likely LCP elements)
                             sizes="(max-width: 1024px) 200px, 250px"
                           />
                         </div>

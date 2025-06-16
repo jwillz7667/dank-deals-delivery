@@ -213,6 +213,8 @@ export default function RootLayout({
         
         <link rel="preload" href="/DANKDEALSMN.COM-LOGO.png" as="image" type="image/png" />
         <link rel="preload" href="/king-bud-default.png" as="image" type="image/png" />
+        <link rel="preload" href="/blue-nerds-gelato.jpg" as="image" type="image/jpeg" />
+        <link rel="preload" href="/cannabis-bud.png" as="image" type="image/png" />
         
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta httpEquiv="x-dns-prefetch-control" content="on" />

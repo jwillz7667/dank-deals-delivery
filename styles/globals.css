@@ -139,6 +139,9 @@
     @apply select-none;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: optimizeSpeed;
+    /* FIXED: Additional mobile performance optimizations */
+    will-change: auto;
+    transform: translateZ(0);
   }
   
   /* Optimize for mobile touch */

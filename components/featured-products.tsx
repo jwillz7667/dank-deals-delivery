@@ -45,6 +45,7 @@ export default function FeaturedProducts({ products, onProductClick }: FeaturedP
                     fill
                     style={{ objectFit: "cover" }}
                     className="group-hover:opacity-90 transition-opacity"
+                    priority={products.indexOf(product) === 0} // FIXED: Priority load first product
                     sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
                   />
                   {product.soldOut && (
