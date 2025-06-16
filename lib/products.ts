@@ -24,6 +24,21 @@ export interface Product {
   pricing?: WeightPrice[]
   soldOut?: boolean
   reviews?: Review[]
+  // Enhanced fields for better structured data
+  sku?: string // Stock Keeping Unit
+  gtin?: string // Global Trade Item Number (UPC/EAN)
+  mpn?: string // Manufacturer Part Number
+  condition?: "New" | "Used" | "Refurbished" // Product condition
+  brand?: string // Product brand
+  manufacturer?: string // Manufacturer name
+  model?: string // Product model
+  color?: string // Product color
+  material?: string // Product material
+  thcContent?: string // THC percentage for cannabis products
+  cbdContent?: string // CBD percentage for cannabis products
+  strainType?: "Indica" | "Sativa" | "Hybrid" // Cannabis strain type
+  weight?: string // Physical weight of product
+  dimensions?: string // Product dimensions
 }
 
 export const products: Product[] = [
@@ -54,6 +69,14 @@ export const products: Product[] = [
       { weight: "56g", price: 560 }
     ],
     soldOut: false,
+    // Enhanced fields
+    sku: "BCGN-001",
+    condition: "New",
+    brand: "DankDeals Premium",
+    manufacturer: "Local Cannabis Cultivator",
+    strainType: "Hybrid",
+    thcContent: "22-26%",
+    cbdContent: "0.1-0.5%",
     reviews: [
       {
         id: 1,
@@ -102,27 +125,15 @@ export const products: Product[] = [
       { weight: "14g", price: 140 },
       { weight: "28g", price: 260 }
     ],
-    soldOut: false
-  },
-  {
-    id: 3,
-    name: "Galaxy Gummy Bites",
-    category: "Edibles",
-    description:
-      "Deliciously sour, these multi-flavored gummies provide a balanced body and head high, perfect for relaxing without sedation.",
-    effects: "Relaxed, Happy, Euphoric, Giggly",
-    imageUrl: "/space-gummies.png",
-    soldOut: true
-  },
-  {
-    id: 4,
-    name: "Nebula Haze Vape",
-    category: "Vapes",
-    description:
-      "A smooth and discreet vape cartridge with a sweet, citrusy flavor. Ideal for on-the-go use to manage stress and anxiety.",
-    effects: "Calm, Focused, Uplifted",
-    imageUrl: "/sleek-vape-pen.png",
-    soldOut: true
+    soldOut: false,
+    // Enhanced fields
+    sku: "CC-002",
+    condition: "New",
+    brand: "DankDeals Premium",
+    manufacturer: "Local Cannabis Cultivator",
+    strainType: "Sativa",
+    thcContent: "20-24%",
+    cbdContent: "0.1-0.3%"
   },
   {
     id: 5,
@@ -141,27 +152,15 @@ export const products: Product[] = [
       { weight: "14g", price: 150 },
       { weight: "28g", price: 280 }
     ],
-    soldOut: false
-  },
-  {
-    id: 6,
-    name: "Solar Flare Sativa",
-    category: "Flower",
-    description:
-      "An intensely energetic sativa that is perfect for daytime activities, creative projects, or social gatherings.",
-    effects: "Energetic, Talkative, Creative, Uplifted",
-    imageUrl: "/cannabis-bud.png",
-    soldOut: true
-  },
-  {
-    id: 7,
-    name: "Chillwave Chocolate Bar",
-    category: "Edibles",
-    description:
-      "A rich dark chocolate bar infused with a hybrid extract for a mellow, full-body experience. Great for movie nights.",
-    effects: "Relaxed, Happy, Calm, Mellow",
-    imageUrl: "/placeholder.svg?height=400&width=400",
-    soldOut: true
+    soldOut: false,
+    // Enhanced fields
+    sku: "MI-005",
+    condition: "New",
+    brand: "DankDeals Premium",
+    manufacturer: "Local Cannabis Cultivator",
+    strainType: "Indica",
+    thcContent: "24-28%",
+    cbdContent: "0.1-0.4%"
   },
   {
     id: 8,
@@ -171,7 +170,15 @@ export const products: Product[] = [
       "A perfectly balanced hybrid vape offering the best of both worlds. Eases the mind while gently energizing the body.",
     effects: "Balanced, Happy, Relaxed, Uplifted",
     imageUrl: "/placeholder.svg?height=400&width=400",
-    soldOut: true
+    soldOut: true,
+    // Enhanced fields
+    sku: "ZGV-008",
+    condition: "New",
+    brand: "DankDeals Select",
+    manufacturer: "Premium Vape Co.",
+    strainType: "Hybrid",
+    thcContent: "85-90%",
+    cbdContent: "1-3%"
   },
   {
     id: 9,
@@ -181,6 +188,14 @@ export const products: Product[] = [
       "A zesty, lemon-scented sativa that hits fast and hard. Recommended for experienced users seeking a powerful cerebral high.",
     effects: "Euphoric, Energetic, Focused",
     imageUrl: "/placeholder.svg?height=400&width=400",
-    soldOut: true
+    soldOut: true,
+    // Enhanced fields
+    sku: "LRF-009",
+    condition: "New",
+    brand: "DankDeals Premium",
+    manufacturer: "Local Cannabis Cultivator",
+    strainType: "Sativa",
+    thcContent: "26-30%",
+    cbdContent: "0.1-0.2%"
   },
 ]

@@ -107,30 +107,128 @@ export default function ProductPage() {
     name: product.name,
     description: product.description,
     image: productImages,
+    // Enhanced brand information
     brand: {
       "@type": "Brand",
-      name: "DankDeals"
+      name: product.brand || "DankDeals"
     },
+    // Manufacturer information
+    manufacturer: {
+      "@type": "Organization",
+      name: product.manufacturer || "DankDeals"
+    },
+    // Product identifiers for better SEO
+    ...(product.sku && { sku: product.sku }),
+    ...(product.gtin && { gtin: product.gtin }),
+    ...(product.mpn && { mpn: product.mpn }),
+    
+    // Enhanced category using Schema.org format
+    category: {
+      "@type": "ProductCategory",
+      name: product.category,
+      url: `https://dankdealsmn.com/menu?category=${product.category.toLowerCase()}`
+    },
+    
+    // Additional product properties specific to cannabis
+    additionalProperty: [
+      ...(product.thcContent ? [{
+        "@type": "PropertyValue",
+        name: "THC Content",
+        value: product.thcContent
+      }] : []),
+      ...(product.cbdContent ? [{
+        "@type": "PropertyValue",
+        name: "CBD Content", 
+        value: product.cbdContent
+      }] : []),
+      ...(product.strainType ? [{
+        "@type": "PropertyValue",
+        name: "Strain Type",
+        value: product.strainType
+      }] : []),
+      {
+        "@type": "PropertyValue",
+        name: "Effects",
+        value: product.effects
+      }
+    ],
+    
+    // Enhanced offers with Google best practices
     offers: product.pricing && !product.soldOut ? product.pricing.map(price => ({
       "@type": "Offer",
-      price: price.price,
+      price: price.price.toString(),
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
+      itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
+      url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
+      priceValidUntil: "2024-12-31", // Set price validity date
       name: `${product.name} - ${price.weight}`,
+      description: `${product.description} Available in ${price.weight} size.`,
       seller: {
         "@type": "Organization",
-        name: "DankDealsMN.com"
+        name: "DankDealsMN.com",
+        url: "https://dankdealsmn.com",
+        logo: "https://dankdealsmn.com/logo.png",
+        telephone: "+1-612-930-1390",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Minneapolis",
+          addressRegion: "MN",
+          addressCountry: "US"
+        }
+      },
+      // Delivery/shipping information
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "0",
+          currency: "USD"
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 0,
+            maxValue: 1,
+            unitCode: "HUR"
+          },
+          transitTime: {
+            "@type": "QuantitativeValue", 
+            minValue: 0.5,
+            maxValue: 2,
+            unitCode: "HUR"
+          }
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "US",
+          addressRegion: "MN"
+        }
+      },
+      // Return policy
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "US",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 30,
+        returnMethod: "https://schema.org/ReturnInStore",
+        returnFees: "https://schema.org/FreeReturn"
       }
     })) : [{
       "@type": "Offer",
       availability: "https://schema.org/OutOfStock",
+      itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
+      url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
       seller: {
         "@type": "Organization",
-        name: "DankDealsMN.com"
+        name: "DankDealsMN.com",
+        url: "https://dankdealsmn.com",
+        logo: "https://dankdealsmn.com/logo.png"
       }
     }],
-    category: product.category,
-    // Add actual reviews if they exist
+    
+    // Reviews and ratings
     ...(product.reviews && product.reviews.length > 0 && {
       review: product.reviews.map(review => ({
         "@type": "Review",

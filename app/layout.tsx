@@ -12,6 +12,7 @@ import BottomNavigation from "@/components/bottom-navigation"
 import { products } from "@/lib/products"
 import { CartProvider } from "@/hooks/use-cart"
 import { Suspense } from "react"
+import { createProductSlug } from "@/lib/utils"
 
 const inter = Inter({ 
   subsets: ["latin"], 
@@ -151,14 +152,45 @@ export default function RootLayout({
       name: "Cannabis Product Menu",
       itemListElement: products.slice(0, 5).map((product) => ({
         "@type": "Offer",
+        price: product.pricing && product.pricing[0] ? product.pricing[0].price.toString() : undefined,
+        priceCurrency: product.pricing && product.pricing[0] ? "USD" : undefined,
+        availability: product.soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+        url: `${siteConfig.url}/product/${createProductSlug(product.name)}`,
+        itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
         itemOffered: {
           "@type": "Product",
           name: product.name,
           description: product.description,
           image: `${siteConfig.url}${product.imageUrl.startsWith("/") ? product.imageUrl : "/" + product.imageUrl}`,
-          category: product.category,
+          category: {
+            "@type": "ProductCategory",
+            name: product.category,
+            url: `${siteConfig.url}/menu?category=${product.category.toLowerCase()}`
+          },
+          brand: {
+            "@type": "Brand",
+            name: product.brand || "DankDeals"
+          },
+          ...(product.sku && { sku: product.sku }),
+          additionalProperty: [
+            ...(product.thcContent ? [{
+              "@type": "PropertyValue",
+              name: "THC Content",
+              value: product.thcContent
+            }] : []),
+            ...(product.strainType ? [{
+              "@type": "PropertyValue",
+              name: "Strain Type",
+              value: product.strainType
+            }] : [])
+          ]
         },
-      })),
+        seller: {
+          "@type": "Organization",
+          name: "DankDealsMN.com",
+          url: siteConfig.url
+        }
+      })).filter(offer => offer.itemOffered), // Filter out any undefined offers
     },
     openingHoursSpecification: [
       {
