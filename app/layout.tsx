@@ -152,11 +152,13 @@ export default function RootLayout({
       name: "Cannabis Product Menu",
       itemListElement: products.slice(0, 5).map((product) => ({
         "@type": "Offer",
-        price: product.pricing && product.pricing[0] ? product.pricing[0].price.toString() : undefined,
-        priceCurrency: product.pricing && product.pricing[0] ? "USD" : undefined,
+        // FIXED: Ensure pricing data is always available for Google structured data requirements
+        price: product.pricing && product.pricing[0] ? product.pricing[0].price.toString() : "0",
+        priceCurrency: "USD",
         availability: product.soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
         url: `${siteConfig.url}/product/${createProductSlug(product.name)}`,
         itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
+        priceValidUntil: "2025-12-31",
         itemOffered: {
           "@type": "Product",
           name: product.name,

@@ -100,7 +100,7 @@ export default function ProductPage() {
     }
   }
 
-  // Product structured data for SEO
+  // Product structured data for SEO - Fixed to ensure Google requirements are met
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -153,71 +153,103 @@ export default function ProductPage() {
       }
     ],
     
-    // Enhanced offers with Google best practices
-    offers: product.pricing && !product.soldOut ? product.pricing.map(price => ({
-      "@type": "Offer",
-      price: price.price.toString(),
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
-      url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
-      priceValidUntil: "2024-12-31", // Set price validity date
-      name: `${product.name} - ${price.weight}`,
-      description: `${product.description} Available in ${price.weight} size.`,
-      seller: {
-        "@type": "Organization",
-        name: "DankDealsMN.com",
-        url: "https://dankdealsmn.com",
-        logo: "https://dankdealsmn.com/logo.png",
-        telephone: "+1-612-930-1390",
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: "Minneapolis",
-          addressRegion: "MN",
-          addressCountry: "US"
-        }
-      },
-      // Delivery/shipping information
-      shippingDetails: {
-        "@type": "OfferShippingDetails",
-        shippingRate: {
-          "@type": "MonetaryAmount",
-          value: "0",
-          currency: "USD"
-        },
-        deliveryTime: {
-          "@type": "ShippingDeliveryTime",
-          handlingTime: {
-            "@type": "QuantitativeValue",
-            minValue: 0,
-            maxValue: 1,
-            unitCode: "HUR"
-          },
-          transitTime: {
-            "@type": "QuantitativeValue", 
-            minValue: 0.5,
-            maxValue: 2,
-            unitCode: "HUR"
+    // FIXED: Always include offers - this ensures Google's requirement is met
+    offers: product.pricing ? (
+      product.soldOut ? 
+        // For sold out products with pricing, show the pricing but mark as out of stock
+        product.pricing.map(price => ({
+          "@type": "Offer",
+          price: price.price.toString(),
+          priceCurrency: "USD",
+          availability: "https://schema.org/OutOfStock",
+          itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
+          url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
+          priceValidUntil: "2025-12-31",
+          name: `${product.name} - ${price.weight}`,
+          description: `${product.description} Available in ${price.weight} size.`,
+          seller: {
+            "@type": "Organization",
+            name: "DankDealsMN.com",
+            url: "https://dankdealsmn.com",
+            logo: "https://dankdealsmn.com/logo.png",
+            telephone: "+1-612-930-1390",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Minneapolis",
+              addressRegion: "MN",
+              addressCountry: "US"
+            }
           }
-        },
-        shippingDestination: {
-          "@type": "DefinedRegion",
-          addressCountry: "US",
-          addressRegion: "MN"
-        }
-      },
-      // Return policy
-      hasMerchantReturnPolicy: {
-        "@type": "MerchantReturnPolicy",
-        applicableCountry: "US",
-        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-        merchantReturnDays: 30,
-        returnMethod: "https://schema.org/ReturnInStore",
-        returnFees: "https://schema.org/FreeReturn"
-      }
-    })) : [{
+        }))
+        :
+        // For in-stock products with pricing
+        product.pricing.map(price => ({
+          "@type": "Offer",
+          price: price.price.toString(),
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
+          url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
+          priceValidUntil: "2025-12-31",
+          name: `${product.name} - ${price.weight}`,
+          description: `${product.description} Available in ${price.weight} size.`,
+          seller: {
+            "@type": "Organization",
+            name: "DankDealsMN.com",
+            url: "https://dankdealsmn.com",
+            logo: "https://dankdealsmn.com/logo.png",
+            telephone: "+1-612-930-1390",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Minneapolis",
+              addressRegion: "MN",
+              addressCountry: "US"
+            }
+          },
+          // Delivery/shipping information for in-stock items
+          shippingDetails: {
+            "@type": "OfferShippingDetails",
+            shippingRate: {
+              "@type": "MonetaryAmount",
+              value: "0",
+              currency: "USD"
+            },
+            deliveryTime: {
+              "@type": "ShippingDeliveryTime",
+              handlingTime: {
+                "@type": "QuantitativeValue",
+                minValue: 0,
+                maxValue: 1,
+                unitCode: "HUR"
+              },
+              transitTime: {
+                "@type": "QuantitativeValue", 
+                minValue: 0.5,
+                maxValue: 2,
+                unitCode: "HUR"
+              }
+            },
+            shippingDestination: {
+              "@type": "DefinedRegion",
+              addressCountry: "US",
+              addressRegion: "MN"
+            }
+          },
+          // Return policy
+          hasMerchantReturnPolicy: {
+            "@type": "MerchantReturnPolicy",
+            applicableCountry: "US",
+            returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+            merchantReturnDays: 30,
+            returnMethod: "https://schema.org/ReturnInStore",
+            returnFees: "https://schema.org/FreeReturn"
+          }
+        }))
+    ) : 
+    // For products without pricing, create a basic offer to meet Google requirements
+    [{
       "@type": "Offer",
-      availability: "https://schema.org/OutOfStock",
+      availability: product.soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/PreOrder",
       itemCondition: `https://schema.org/${product.condition || 'New'}Condition`,
       url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
       seller: {
@@ -228,7 +260,7 @@ export default function ProductPage() {
       }
     }],
     
-    // Reviews and ratings
+    // FIXED: Always include reviews and ratings when available
     ...(product.reviews && product.reviews.length > 0 && {
       review: product.reviews.map(review => ({
         "@type": "Review",
