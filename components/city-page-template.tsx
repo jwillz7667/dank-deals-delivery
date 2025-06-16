@@ -88,7 +88,7 @@ export default function CityPageTemplate({ city }: CityPageTemplateProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
+    <div className="container mx-auto px-4 py-16 max-w-4xl">
       <div className="text-center mb-12 animate-fade-in">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
           <span className="text-app-green-600">Weed Delivery</span> in {formattedCity} <span className="text-app-green-600">in One Hour or Less!</span>
@@ -131,11 +131,11 @@ export default function CityPageTemplate({ city }: CityPageTemplateProps) {
         <div className="space-y-4">
           <h3 className="text-2xl font-bold text-foreground mb-4">Ready for 1-Hour Delivery to {formattedCity}?</h3>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/menu">
-              <Button size="lg" className="primary-button px-8 py-4 text-lg">
+        <Link href="/menu">
+          <Button size="lg" className="primary-button px-8 py-4 text-lg">
                 Browse Menu for {formattedCity} <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+          </Button>
+        </Link>
             <a href={`sms:+16129301390?&body=Hi! I'd like weed delivery to ${formattedCity} in 1 hour or less.`}>
               <Button size="lg" variant="outline" className="secondary-button px-8 py-4 text-lg">
                 Text to Order Now
@@ -149,7 +149,7 @@ export default function CityPageTemplate({ city }: CityPageTemplateProps) {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-app-green-200/30">
           <h2 className="text-3xl font-bold text-foreground mb-6">Why Choose DankDeals for Weed Delivery in {formattedCity}?</h2>
           <div className="space-y-4">
-            <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed">
               We're the fastest cannabis delivery service in {formattedCity}, delivering premium products in one hour or less. 
               Our professional drivers provide discreet, reliable service with 21+ verification at your door.
             </p>
