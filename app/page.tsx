@@ -130,8 +130,8 @@ export default function HomePage() {
               <h2 className="text-xl font-semibold text-foreground mb-6">Hot right now</h2>
               <div className="grid grid-cols-2 gap-3">
                 {featuredProducts.slice(0, 4).map((product, index) => (
-                  <Card key={product.id} className="product-card animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
-                    <CardContent className="p-3">
+                  <Card key={product.id} className="product-card animate-slide-up h-full" style={{ animationDelay: `${index * 100}ms` }}>
+                    <CardContent className="p-3 h-full flex flex-col">
                       <Link href={`/product/${createProductSlug(product.name)}`}>
                         <div className="aspect-square relative mb-3 rounded-xl overflow-hidden bg-white shadow-md">
                           <Image
@@ -144,23 +144,25 @@ export default function HomePage() {
                           />
                         </div>
                       </Link>
-                      <div className="text-center">
+                      <div className="text-center flex flex-col h-full">
                         <p className="text-xs text-app-green-600 font-medium mb-1">
                           {product.category}
                         </p>
                         <Link href={`/product/${createProductSlug(product.name)}`}>
-                          <h3 className="font-semibold text-sm text-foreground mb-1 hover:text-app-green-600 transition-colors duration-200">
+                          <h3 className="font-semibold text-sm text-foreground mb-2 hover:text-app-green-600 transition-colors duration-200 line-clamp-2">
                             {product.name}
                           </h3>
                         </Link>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          From ${product.pricing?.[0]?.price || '25.50'}
-                        </p>
-                        <a href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}>
-                          <Button className="w-full primary-button text-xs h-8">
-                            Order Now
-                          </Button>
-                        </a>
+                        <div className="flex-grow flex flex-col justify-end">
+                          <p className="text-lg font-bold text-app-green-600 mb-3">
+                            ${product.pricing?.[0]?.price || '25.50'}
+                          </p>
+                          <a href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}>
+                            <Button className="w-full primary-button text-xs h-8">
+                              Order Now
+                            </Button>
+                          </a>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -346,8 +348,8 @@ export default function HomePage() {
               </div>
               <div className="grid grid-cols-4 gap-6">
                 {featuredProducts.slice(0, 6).map((product, index) => (
-                  <Card key={product.id} className="product-card animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
-                    <CardContent className="p-4">
+                  <Card key={product.id} className="product-card animate-slide-up h-full" style={{ animationDelay: `${index * 100}ms` }}>
+                    <CardContent className="p-4 h-full flex flex-col">
                       <Link href={`/product/${createProductSlug(product.name)}`}>
                         <div className="aspect-square relative mb-4 rounded-xl overflow-hidden bg-white shadow-md">
                           <Image
@@ -360,23 +362,25 @@ export default function HomePage() {
                           />
                         </div>
                       </Link>
-                      <div className="text-center">
+                      <div className="text-center flex flex-col h-full">
                         <p className="text-sm text-app-green-600 font-medium mb-2">
                           {product.category}
                         </p>
                         <Link href={`/product/${createProductSlug(product.name)}`}>
-                          <h3 className="font-semibold text-base text-foreground mb-2 hover:text-app-green-600 transition-colors duration-200">
+                          <h3 className="font-semibold text-base text-foreground mb-3 hover:text-app-green-600 transition-colors duration-200 line-clamp-2">
                             {product.name}
                           </h3>
                         </Link>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          From ${product.pricing?.[0]?.price || '25.50'}
-                        </p>
-                        <a href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}>
-                          <Button className="w-full primary-button">
-                            Order Now
-                          </Button>
-                        </a>
+                        <div className="flex-grow flex flex-col justify-end">
+                          <p className="text-xl font-bold text-app-green-600 mb-4">
+                            ${product.pricing?.[0]?.price || '25.50'}
+                          </p>
+                          <a href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}>
+                            <Button className="w-full primary-button">
+                              Order Now
+                            </Button>
+                          </a>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

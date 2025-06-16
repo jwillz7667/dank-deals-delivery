@@ -116,10 +116,10 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
               {filteredProducts.map((product, index) => (
                 <Card 
                   key={product.id} 
-                  className="product-card animate-slide-up" 
+                  className="product-card animate-slide-up h-full" 
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <CardContent className="p-3">
+                  <CardContent className="p-3 h-full flex flex-col">
                     <Link href={`/product/${createProductSlug(product.name)}`}>
                       <div className="aspect-square relative mb-3 rounded-xl overflow-hidden bg-white shadow-md">
                         <Image
@@ -137,22 +137,22 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
                       </div>
                     </Link>
                     
-                    <div className="space-y-2">
-                      <div className="text-center">
+                    <div className="flex flex-col flex-grow">
+                      <div className="text-center flex-grow">
                         <p className="text-xs text-app-green-600 font-medium mb-1">
                           {product.category}
                         </p>
                         <Link href={`/product/${createProductSlug(product.name)}`}>
-                          <h3 className="font-semibold text-sm text-foreground mb-1 hover:text-app-green-600 transition-colors duration-200">
+                          <h3 className="font-semibold text-sm text-foreground mb-2 hover:text-app-green-600 transition-colors duration-200 line-clamp-2">
                             {product.name}
                           </h3>
                         </Link>
-                        <p className="text-xs text-muted-foreground">
-                          From ${product.pricing?.[0]?.price || '25.50'}
+                        <p className="text-base font-bold text-app-green-600 mb-3">
+                          ${product.pricing?.[0]?.price || '25.50'}
                         </p>
                       </div>
                       
-                      <div className="flex gap-1.5">
+                      <div className="flex gap-1.5 mt-auto">
                         <Button 
                           onClick={() => onProductClick(product)}
                           className="flex-1 secondary-button text-xs h-8" 
@@ -332,10 +332,10 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
                 {filteredProducts.map((product, index) => (
                   <Card 
                     key={product.id} 
-                    className="product-card animate-slide-up" 
+                    className="product-card animate-slide-up h-full" 
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <CardContent className="p-4">
+                    <CardContent className="p-4 h-full flex flex-col">
                       <Link href={`/product/${createProductSlug(product.name)}`}>
                         <div className="aspect-square relative mb-4 rounded-xl overflow-hidden bg-white shadow-md">
                           <Image
@@ -353,22 +353,22 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
                         </div>
                       </Link>
                       
-                      <div className="space-y-3">
-                        <div className="text-center">
-                          <p className="text-sm text-app-green-600 font-medium mb-1">
+                      <div className="flex flex-col flex-grow">
+                        <div className="text-center flex-grow">
+                          <p className="text-sm text-app-green-600 font-medium mb-2">
                             {product.category}
                           </p>
                           <Link href={`/product/${createProductSlug(product.name)}`}>
-                            <h3 className="font-semibold text-base text-foreground mb-2 hover:text-app-green-600 transition-colors duration-200">
+                            <h3 className="font-semibold text-base text-foreground mb-3 hover:text-app-green-600 transition-colors duration-200 line-clamp-2">
                               {product.name}
                             </h3>
                           </Link>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            From ${product.pricing?.[0]?.price || '25.50'}
+                          <p className="text-xl font-bold text-app-green-600 mb-4">
+                            ${product.pricing?.[0]?.price || '25.50'}
                           </p>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-2 mt-auto">
                           <Button 
                             onClick={() => onProductClick(product)}
                             className="secondary-button text-sm h-10" 
