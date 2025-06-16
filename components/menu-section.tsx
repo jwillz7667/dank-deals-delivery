@@ -99,34 +99,13 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
             </Swiper>
           </div>
 
-          {/* Featured/Banner Product */}
-          {filteredProducts.length > 0 && activeCategory === "All" && !searchQuery && (
-            <Link href={`/product/${createProductSlug(filteredProducts[0].name)}`}>
-              <Card className="relative overflow-hidden bg-gradient-to-r from-app-green-600 to-app-green-700 text-white animate-fade-in floating-effect hover-glow">
-                <CardContent className="p-6 pr-32">
-                  <h3 className="text-2xl font-bold mb-2">{filteredProducts[0].name}</h3>
-                  <p className="text-white/90">
-                    From ${filteredProducts[0].pricing?.[0]?.price || '25.50'}
-                  </p>
-                </CardContent>
-                <div className="absolute right-4 top-4 bottom-4 w-24 opacity-80">
-                  <Image
-                    src={filteredProducts[0].imageUrl}
-                    alt={filteredProducts[0].name}
-                    fill
-                    className="object-cover object-center rounded-xl"
-                    sizes="96px"
-                  />
-                </div>
-              </Card>
-            </Link>
-          )}
+
 
           {/* Products Grid */}
           <div className="animate-slide-up">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-foreground">
-                {searchQuery ? `Search Results` : activeCategory === "All" ? "Hot right now" : activeCategory}
+                {searchQuery ? `Search Results` : activeCategory === "All" ? "All Products" : activeCategory}
               </h2>
               <span className="text-sm text-muted-foreground">
                 {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
@@ -134,7 +113,7 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
             </div>
             
             <div className="grid grid-cols-2 gap-3">
-              {filteredProducts.slice(activeCategory === "All" && !searchQuery ? 1 : 0).map((product, index) => (
+              {filteredProducts.map((product, index) => (
                 <Card 
                   key={product.id} 
                   className="product-card animate-slide-up" 
@@ -336,37 +315,7 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
 
             {/* Main Content */}
             <div className="col-span-9">
-              {/* Featured/Banner Product */}
-              {filteredProducts.length > 0 && activeCategory === "All" && !searchQuery && (
-                <div className="mb-16 animate-fade-in">
-                  <Link href={`/product/${createProductSlug(filteredProducts[0].name)}`}>
-                    <Card className="relative overflow-hidden bg-gradient-to-r from-app-green-600 to-app-green-700 text-white h-64 floating-effect hover-glow">
-                      <CardContent className="p-8">
-                        <div className="grid grid-cols-2 gap-8 h-full">
-                          <div className="flex flex-col justify-center">
-                            <h3 className="text-4xl font-bold mb-4">{filteredProducts[0].name}</h3>
-                            <p className="text-white/90 text-xl mb-6">
-                              From ${filteredProducts[0].pricing?.[0]?.price || '25.50'}
-                            </p>
-                            <Button className="secondary-button w-fit">
-                              View Product
-                            </Button>
-                          </div>
-                          <div className="relative opacity-80">
-                            <Image
-                              src={filteredProducts[0].imageUrl}
-                              alt={filteredProducts[0].name}
-                              fill
-                              className="object-cover object-center rounded-xl"
-                              sizes="400px"
-                            />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </div>
-              )}
+
 
               {/* Products Header */}
               <div className="flex items-center justify-between mb-6 animate-slide-up">
@@ -380,7 +329,7 @@ export default function MenuSection({ onProductClick }: MenuSectionProps) {
 
               {/* Products Grid */}
               <div className="grid grid-cols-3 gap-6">
-                {filteredProducts.slice(activeCategory === "All" && !searchQuery ? 1 : 0).map((product, index) => (
+                {filteredProducts.map((product, index) => (
                   <Card 
                     key={product.id} 
                     className="product-card animate-slide-up" 

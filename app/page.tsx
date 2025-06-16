@@ -123,35 +123,13 @@ export default function HomePage() {
               </Swiper>
             </div>
 
-            {/* Featured Product Banner */}
-            {featuredProducts[0] && (
-              <Link href={`/product/${createProductSlug(featuredProducts[0].name)}`}>
-                <Card className="relative overflow-hidden bg-gradient-to-r from-app-green-600 to-app-green-700 text-white animate-fade-in floating-effect">
-                  <CardContent className="p-6 pr-32">
-                    <h3 className="text-2xl font-bold mb-2">{featuredProducts[0].name}</h3>
-                    <p className="text-white/90">
-                      From ${featuredProducts[0].pricing?.[0]?.price || '25.50'}
-                    </p>
-                  </CardContent>
-                  <div className="absolute right-4 top-4 bottom-4 w-24 opacity-80">
-                    <Image
-                      src={featuredProducts[0].imageUrl}
-                      alt={featuredProducts[0].name}
-                      fill
-                      className="object-cover object-center rounded-xl"
-                      priority // FIXED: Priority load featured product banner
-                      sizes="96px"
-                    />
-                  </div>
-                </Card>
-              </Link>
-            )}
+
 
             {/* Hot Right Now */}
             <div className="animate-slide-up">
               <h2 className="text-xl font-semibold text-foreground mb-6">Hot right now</h2>
               <div className="grid grid-cols-2 gap-3">
-                {featuredProducts.slice(1, 5).map((product, index) => (
+                {featuredProducts.slice(0, 4).map((product, index) => (
                   <Card key={product.id} className="product-card animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
                     <CardContent className="p-3">
                       <Link href={`/product/${createProductSlug(product.name)}`}>
@@ -294,35 +272,32 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Right side - Featured Product */}
+                {/* Right side - Contact CTA */}
                 <div className="col-span-5">
-                  {featuredProducts[0] && (
-                    <Link href={`/product/${createProductSlug(featuredProducts[0].name)}`}>
-                      <Card className="relative overflow-hidden bg-gradient-to-br from-app-green-600 to-app-green-700 text-white animate-scale-in h-80 floating-effect hover-glow">
-                        <CardContent className="p-8">
-                          <div className="relative z-10">
-                            <h3 className="text-3xl font-bold mb-4">{featuredProducts[0].name}</h3>
-                            <p className="text-white/90 text-lg mb-4">
-                              From ${featuredProducts[0].pricing?.[0]?.price || '25.50'}
-                            </p>
-                            <Button className="secondary-button">
-                              View Product
-                            </Button>
-                          </div>
-                          <div className="absolute -right-8 -top-8 w-64 h-64 opacity-20">
-                            <Image
-                              src={featuredProducts[0].imageUrl}
-                              alt={featuredProducts[0].name}
-                              fill
-                              className="object-cover object-center"
-                              priority // FIXED: Priority load desktop featured banner
-                              sizes="256px"
-                            />
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  )}
+                  <Card className="glass-card border-app-green-200 h-80">
+                    <CardContent className="p-8 text-center h-full flex flex-col justify-center">
+                      <h3 className="text-3xl font-bold text-app-green-800 mb-4">Ready to Order?</h3>
+                      <p className="text-app-green-700 mb-6 text-lg">
+                        Text or call us to complete your order.<br />
+                        We're here 7 days a week.
+                      </p>
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <a href="sms:+16129301390?&body=Hi! I'd like to place an order.">
+                          <Button className="w-full primary-button">
+                            Text to Order
+                          </Button>
+                        </a>
+                        <a href="tel:+16129301390">
+                          <Button variant="outline" className="w-full secondary-button">
+                            Call Now
+                          </Button>
+                        </a>
+                      </div>
+                      <p className="text-xl text-app-green-600 font-bold">
+                        📞 (612) 930-1390
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </div>
@@ -370,7 +345,7 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="grid grid-cols-4 gap-6">
-                {featuredProducts.slice(1, 7).map((product, index) => (
+                {featuredProducts.slice(0, 6).map((product, index) => (
                   <Card key={product.id} className="product-card animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
                     <CardContent className="p-4">
                       <Link href={`/product/${createProductSlug(product.name)}`}>
