@@ -3,23 +3,17 @@ import { withAuth, AuthenticatedRequest } from '@/lib/auth/middleware';
 import { OrderService } from '@/lib/services/order.service';
 import { successResponse, handleApiError } from '@/lib/api/utils';
 
-interface RouteParams {
-  params: {
-    orderNumber: string;
-  };
-}
-
 /**
  * GET /api/orders/[orderNumber]
  * Get a specific order by order number
  */
 async function getOrder(
   req: AuthenticatedRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ orderNumber: string }> }
 ): Promise<NextResponse> {
   try {
     const userId = req.userId!;
-    const { orderNumber } = params;
+    const { orderNumber } = await params;
     
     const order = await OrderService.getOrderByNumber(orderNumber, userId);
     
@@ -52,11 +46,11 @@ async function getOrder(
  */
 async function cancelOrder(
   req: AuthenticatedRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ orderNumber: string }> }
 ): Promise<NextResponse> {
   try {
     const userId = req.userId!;
-    const { orderNumber } = params;
+    const { orderNumber } = await params;
     const body = await req.json();
     
     if (body.action !== 'cancel') {

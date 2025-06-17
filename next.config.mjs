@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     formats: ['image/webp', 'image/avif'],
@@ -28,17 +29,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
-  
-  // Bundle analyzer for production analysis
-  ...(process.env.ANALYZE === 'true' && {
-    webpack: (config, { isServer }) => {
-      if (!isServer) {
-        const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')()
-        config.plugins.push(new BundleAnalyzerPlugin())
-      }
-      return config
-    },
-  }),
   
   // Enhanced modular imports
   modularizeImports: {

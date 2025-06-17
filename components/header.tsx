@@ -38,7 +38,7 @@ function UserSection() {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110 gpu-accelerated">
+          <Button variant="ghost" size="icon" className="relative hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110 gpu-accelerated" aria-label="Open user menu">
             <User className="h-5 w-5 text-app-green-600" />
           </Button>
         </DropdownMenuTrigger>
@@ -107,7 +107,7 @@ function MobileMenu() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110 gpu-accelerated">
+        <Button variant="ghost" size="icon" className="lg:hidden hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110 gpu-accelerated" aria-label="Open navigation menu">
           <Menu className="h-5 w-5 text-app-green-600" />
         </Button>
       </DialogTrigger>
@@ -231,6 +231,7 @@ export default function Header() {
               onClick={() => {
                 // Add search functionality later if needed
               }}
+              aria-label="Search"
             >
               <Search className="h-5 w-5 text-app-green-600" />
             </Button>
@@ -241,6 +242,7 @@ export default function Header() {
                 variant="ghost" 
                 size="icon"
                 className="relative hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110 gpu-accelerated"
+                aria-label="View shopping cart"
               >
                 <ShoppingCart className="h-5 w-5 text-app-green-600" />
                 {cart && cart.itemCount > 0 && (
@@ -267,6 +269,7 @@ export default function Header() {
                   // Handle mobile auth
                 }}
                 className="hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110 gpu-accelerated"
+                aria-label="Open user menu"
               >
                 <User className="h-5 w-5 text-app-green-600" />
               </Button>

@@ -4,23 +4,17 @@ import { CartService } from '@/lib/services/cart.service';
 import { successResponse, handleApiError, errorResponse } from '@/lib/api/utils';
 import { API_ERROR_CODES } from '@/lib/types/api';
 
-interface RouteParams {
-  params: {
-    productId: string;
-  };
-}
-
 /**
  * DELETE /api/cart/remove/[productId]
  * Remove an item from the cart
  */
 async function removeFromCart(
   req: AuthenticatedRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ productId: string }> }
 ): Promise<NextResponse> {
   try {
     const userId = req.userId!;
-    const { productId } = params;
+    const { productId } = await params;
     
     if (!productId) {
       return errorResponse({

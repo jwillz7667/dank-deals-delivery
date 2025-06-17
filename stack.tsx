@@ -17,7 +17,6 @@ const createStackApp = () => {
       // Use dummy values during build
       publishableClientKey: "pk_dummy_build_key",
       secretServerKey: "sk_dummy_build_key",
-      appDomain: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     });
   }
   
@@ -25,7 +24,6 @@ const createStackApp = () => {
     tokenStore: "nextjs-cookie",
     publishableClientKey,
     secretServerKey,
-    appDomain: process.env.NEXT_PUBLIC_STACK_APP_DOMAIN || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   });
 };
 

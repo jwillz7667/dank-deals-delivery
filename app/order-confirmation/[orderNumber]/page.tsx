@@ -57,7 +57,12 @@ const statusColors: Record<string, string> = {
   cancelled: 'destructive',
 };
 
-export default function OrderConfirmationPage({ params }: { params: { orderNumber: string } }) {
+export default function OrderConfirmationPage({ params }: { params: Promise<{ orderNumber: string }> }) {
+  const [orderNumber, setOrderNumber] = useState<string>('');
+
+  useEffect(() => {
+    params.then(p => setOrderNumber(p.orderNumber));
+  }, [params]);
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [order, setOrder] = useState<OrderDetails | null>(null);
@@ -65,14 +70,16 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!orderNumber) return;
+    
     if (!isAuthenticated) {
-      router.push('/handler/sign-in?after=/order-confirmation/' + params.orderNumber);
+      router.push('/handler/sign-in?after=/order-confirmation/' + orderNumber);
       return;
     }
 
     const fetchOrder = async () => {
       try {
-        const response = await fetch(`/api/orders/${params.orderNumber}`);
+        const response = await fetch(`/api/orders/${orderNumber}`);
         const data = await response.json();
 
         if (data.success) {
@@ -89,7 +96,7 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
     };
 
     fetchOrder();
-  }, [isAuthenticated, params.orderNumber, router]);
+  }, [isAuthenticated, orderNumber, router]);
 
   if (loading) {
     return (
@@ -166,7 +173,7 @@ export default function OrderConfirmationPage({ params }: { params: { orderNumbe
                 <p>3. Schedule your delivery time</p>
               </div>
               <div className="flex gap-2 mt-3">
-                <a href="sms:+16129301390?&body=Hi! I'd like to complete my order %23{order.orderNumber}. Please let me know the next steps. Thank you!">
+                <a href={`sms:+16129301390?&body=Hi! I'd like to complete my order %23${order.orderNumber}. Please let me know the next steps. Thank you!`}>
                   <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Text Us

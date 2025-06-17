@@ -8,6 +8,17 @@ const config: Config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
+  safelist: [
+    'animate-pulse',
+    'animate-spin',
+    'animate-bounce',
+    'opacity-0',
+    'opacity-100',
+    'translate-y-0',
+    'translate-y-8',
+    'scale-100',
+    'scale-110',
+  ],
   prefix: "",
   theme: {
   	container: {
@@ -185,32 +196,6 @@ const config: Config = {
     preflight: true,
     container: true,
   },
-  // Purge unused styles in production
-  ...(process.env.NODE_ENV === 'production' && {
-    purge: {
-      enabled: true,
-      content: [
-        './pages/**/*.{js,ts,jsx,tsx}',
-        './components/**/*.{js,ts,jsx,tsx}',
-        './app/**/*.{js,ts,jsx,tsx}',
-        './src/**/*.{js,ts,jsx,tsx}',
-      ],
-      options: {
-        safelist: [
-          // Keep critical classes that might be added dynamically
-          'animate-pulse',
-          'animate-spin',
-          'animate-bounce',
-          'opacity-0',
-          'opacity-100',
-          'translate-y-0',
-          'translate-y-8',
-          'scale-100',
-          'scale-110',
-        ]
-      }
-    }
-  })
 }
 
 export default config;

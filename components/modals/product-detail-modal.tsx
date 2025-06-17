@@ -28,21 +28,19 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
   const defaultSize = product.pricing?.[0]?.size || "1g"
   const currentSize = selectedSize || defaultSize
 
-  const currentPrice = product.pricing?.find(p => p.size === currentSize)?.price || 
-                      product.pricing?.[0]?.price || 
-                      "25.50"
+  const currentPriceValue = product.pricing?.find(p => p.size === currentSize)?.price || 
+                           product.pricing?.[0]?.price || 
+                           25.50
+  const currentPrice = typeof currentPriceValue === 'string' ? parseFloat(currentPriceValue) : currentPriceValue
 
   const handleAddToCart = () => {
     if (product) {
-      addItem({
-        id: product.id,
-        name: product.name,
-        price: parseFloat(currentPrice),
-        quantity: quantity,
-        size: currentSize,
-        imageUrl: product.imageUrl,
-        category: product.category
-      })
+      addItem(
+        product.id.toString(),
+        product.name,
+        currentPrice,
+        quantity
+      )
       onClose()
     }
   }
@@ -183,7 +181,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
               {/* Total */}
               <div className="flex justify-between items-center text-xl font-bold">
                 <span>Total:</span>
-                <span>${(parseFloat(currentPrice) * quantity).toFixed(2)}</span>
+                <span>${(currentPrice * quantity).toFixed(2)}</span>
               </div>
 
               {/* Action Buttons */}
@@ -347,7 +345,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 {/* Total */}
                 <div className="flex justify-between items-center text-2xl font-bold">
                   <span>Total:</span>
-                  <span>${(parseFloat(currentPrice) * quantity).toFixed(2)}</span>
+                  <span>${(currentPrice * quantity).toFixed(2)}</span>
                 </div>
 
                 {/* Action Buttons */}

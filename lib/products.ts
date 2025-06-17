@@ -1,5 +1,6 @@
 export interface WeightPrice {
   weight: string
+  size: string // Alias for weight for backwards compatibility
   price: number
 }
 
@@ -36,6 +37,8 @@ export interface Product {
   material?: string // Product material
   thcContent?: string // THC percentage for cannabis products
   cbdContent?: string // CBD percentage for cannabis products
+  thc?: string // Alias for thcContent for backwards compatibility
+  cbd?: string // Alias for cbdContent for backwards compatibility
   strainType?: "Indica" | "Sativa" | "Hybrid" // Cannabis strain type
   weight?: string // Physical weight of product
   dimensions?: string // Product dimensions
@@ -90,13 +93,13 @@ export const products: Product[] = [
     imageAlt: "Blue Candy Gelato Nerdz premium cannabis flower - exotic hybrid strain with purple hues and sweet candy aroma",
     metaDescription: "Premium Blue Candy Gelato Nerdz flower - An exotic hybrid cannabis strain with sweet candy and creamy gelato flavors. Lab-tested, premium quality, available for delivery in Minneapolis & St. Paul.",
     pricing: [
-      { weight: "1.75g", price: 25 },
-      { weight: "3.5g", price: 45 },
-      { weight: "7g", price: 85 },
-      { weight: "14g", price: 160 },
-      { weight: "28g", price: 300 },
-      { weight: "42g", price: 440 },
-      { weight: "56g", price: 560 }
+      { weight: "1.75g", size: "1.75g", price: 25 },
+      { weight: "3.5g", size: "3.5g", price: 45 },
+      { weight: "7g", size: "7g", price: 85 },
+      { weight: "14g", size: "14g", price: 160 },
+      { weight: "28g", size: "28g", price: 300 },
+      { weight: "42g", size: "42g", price: 440 },
+      { weight: "56g", size: "56g", price: 560 }
     ],
     soldOut: false,
     // Enhanced fields for Google structured data compliance
@@ -112,6 +115,8 @@ export const products: Product[] = [
     strainType: "Hybrid",
     thcContent: "22-26%",
     cbdContent: "0.1-0.5%",
+    thc: "22-26%", // Alias for backwards compatibility
+    cbd: "0.1-0.5%", // Alias for backwards compatibility
     weight: "Available in multiple sizes",
     dimensions: "Varies by package size",
     productionCountry: "United States",

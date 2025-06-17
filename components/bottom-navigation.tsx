@@ -30,6 +30,7 @@ export default function BottomNavigation() {
             <Link
               key={item.name}
               href={item.href}
+              aria-label={item.name}
               className={cn(
                 "flex flex-col items-center justify-center text-xs font-medium transition-all duration-300 min-w-[60px] group hover:scale-110 gpu-accelerated",
                 isActive ? "text-white" : "text-white/70 hover:text-white",

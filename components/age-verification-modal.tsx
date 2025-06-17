@@ -96,7 +96,7 @@ export default function AgeVerificationModal({ isOpen, onVerify, onDecline }: Ag
             <div className="space-y-3">
               <Button 
                 onClick={onVerify}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
+                className="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
               >
                 Yes, I am 21+ and a Minnesota Resident
               </Button>

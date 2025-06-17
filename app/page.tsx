@@ -114,7 +114,7 @@ export default function HomePage() {
             </Card>
 
             {/* Categories Swiper */}
-            <div className="animate-slide-up mb-8">
+``            <div className="animate-slide-up mb-8">
               <h2 className="text-xl font-semibold text-foreground mb-6">Categories</h2>
               <Swiper
                 slidesPerView="auto"
@@ -144,8 +144,6 @@ export default function HomePage() {
                 })}
               </Swiper>
             </div>
-
-
 
             {/* Hot Right Now */}
             <div className="animate-slide-up">
@@ -239,6 +237,7 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
+
           </div>
         </div>
 

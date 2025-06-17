@@ -18,6 +18,10 @@ interface Cart {
   items: CartItem[];
   totalAmount: number;
   itemCount: number;
+  subtotal: number;
+  estimatedTax: number;
+  deliveryFee: number;
+  total: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,6 +30,7 @@ interface CartContextType {
   cart: Cart | null;
   loading: boolean;
   addToCart: (productId: string, productName: string, productPrice: number, quantity?: number) => Promise<void>;
+  addItem: (productId: string, productName: string, productPrice: number, quantity?: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -217,6 +222,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         cart,
         loading,
         addToCart,
+        addItem: addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
