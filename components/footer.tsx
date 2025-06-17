@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-card text-muted-foreground">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center mb-4">
               <Image
@@ -51,6 +51,46 @@ export default function Footer() {
               <li>
                 <Link href="/mission" className="hover:text-primary">
                   Our Mission
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-lg text-foreground mb-4">Legal</h4>
+            <ul className="space-y-1">
+              <li>
+                <Link href="/privacy-policy" className="hover:text-primary text-sm">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms-of-service" className="hover:text-primary text-sm">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/cannabis-compliance" className="hover:text-primary text-sm">
+                  Cannabis Compliance
+                </Link>
+              </li>
+              <li>
+                <Link href="/delivery-policy" className="hover:text-primary text-sm">
+                  Delivery Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/return-refund-policy" className="hover:text-primary text-sm">
+                  Return Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookie-policy" className="hover:text-primary text-sm">
+                  Cookie Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/accessibility" className="hover:text-primary text-sm">
+                  Accessibility
                 </Link>
               </li>
             </ul>

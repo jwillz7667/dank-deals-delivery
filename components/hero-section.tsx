@@ -35,7 +35,7 @@ export default function HeroSection({ onCtaClick }: HeroSectionProps) {
 
       {/* Hero Content */}
       <div className={`relative z-10 max-w-4xl mx-auto px-4 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-shadow-lg">
+        <h1 className="text-5xl md:text-7xl font-bold mb-6">
           Premium Cannabis
           <br />
           <span className="text-green-400">Delivered Fast</span>
