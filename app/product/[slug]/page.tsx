@@ -82,45 +82,41 @@ export default function ProductPage() {
     window.open(`sms:+16129301390?&body=${encodeURIComponent(message)}`, '_self')
   }
 
-  // Calculate actual aggregate rating from reviews
-  const calculateAggregateRating = () => {
-    if (!product.reviews || product.reviews.length === 0) {
-      return null
-    }
-    
-    const totalRating = product.reviews.reduce((sum, review) => sum + review.rating, 0)
-    const averageRating = totalRating / product.reviews.length
-    
-    return {
-      "@type": "AggregateRating",
-      ratingValue: averageRating.toFixed(1),
-      reviewCount: product.reviews.length,
-      bestRating: "5",
-      worstRating: "1"
-    }
-  }
 
-  // Product structured data for SEO - Fixed to ensure Google requirements are met
+
+  // Enhanced Product structured data for SEO - Fully Google compliant
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: productImages,
+    image: productImages.map(img => img.startsWith('http') ? img : `https://dankdealsmn.com${img}`),
+    
     // Enhanced brand information
     brand: {
       "@type": "Brand",
-      name: product.brand || "DankDeals"
+      name: product.brand || "DankDeals Premium"
     },
+    
     // Manufacturer information
     manufacturer: {
       "@type": "Organization",
-      name: product.manufacturer || "DankDeals"
+      name: product.manufacturer || "DankDeals Cannabis Co.",
+      url: "https://dankdealsmn.com"
     },
-    // Product identifiers for better SEO
+    
+    // Product identifiers for better SEO and Google compliance
     ...(product.sku && { sku: product.sku }),
     ...(product.gtin && { gtin: product.gtin }),
     ...(product.mpn && { mpn: product.mpn }),
+    ...(product.model && { model: product.model }),
+    ...(product.color && { color: product.color }),
+    ...(product.material && { material: product.material }),
+    ...(product.weight && { weight: product.weight }),
+    ...(product.dimensions && { size: product.dimensions }),
+    ...(product.productionCountry && { countryOfOrigin: product.productionCountry }),
+    ...(product.releaseDate && { datePublished: product.releaseDate }),
+    ...(product.additionalType && { additionalType: product.additionalType }),
     
     // Enhanced category using Schema.org format
     category: {
@@ -129,33 +125,78 @@ export default function ProductPage() {
       url: `https://dankdealsmn.com/menu?category=${product.category.toLowerCase()}`
     },
     
-    // Additional product properties specific to cannabis
+    // Product condition (required for Google)
+    ...(product.condition && { 
+      itemCondition: `https://schema.org/${product.condition}Condition` 
+    }),
+    
+    // Target audience
+    ...(product.targetAudience && {
+      audience: {
+        "@type": "Audience",
+        audienceType: product.targetAudience
+      }
+    }),
+    
+    // Awards and certifications
+    ...(product.awards && product.awards.length > 0 && {
+      award: product.awards
+    }),
+    
+    // Additional product properties specific to cannabis and enhanced SEO
     additionalProperty: [
       ...(product.thcContent ? [{
         "@type": "PropertyValue",
         name: "THC Content",
-        value: product.thcContent
+        value: product.thcContent,
+        propertyID: "thc_content"
       }] : []),
       ...(product.cbdContent ? [{
         "@type": "PropertyValue",
         name: "CBD Content", 
-        value: product.cbdContent
+        value: product.cbdContent,
+        propertyID: "cbd_content"
       }] : []),
       ...(product.strainType ? [{
         "@type": "PropertyValue",
         name: "Strain Type",
-        value: product.strainType
+        value: product.strainType,
+        propertyID: "strain_type"
       }] : []),
       {
         "@type": "PropertyValue",
         name: "Effects",
-        value: product.effects
-      }
+        value: product.effects,
+        propertyID: "effects"
+      },
+      ...(product.color ? [{
+        "@type": "PropertyValue",
+        name: "Color",
+        value: product.color,
+        propertyID: "color"
+      }] : []),
+      ...(product.material ? [{
+        "@type": "PropertyValue",
+        name: "Material",
+        value: product.material,
+        propertyID: "material"
+      }] : [])
     ],
     
-    // FIXED: Always include properly formatted offers to meet Google's requirements
+    // Use pre-structured offers if available, otherwise generate them
     offers: (() => {
-      // Define common seller information for all offers
+      // If product has pre-structured offers, use them
+      if (product.offers && product.offers.length > 0) {
+        return product.offers.map(offer => ({
+          ...offer,
+          // Ensure URL is absolute
+          url: offer.url.startsWith('http') ? offer.url : `https://dankdealsmn.com${offer.url}`,
+          // Ensure proper availability format
+          availability: product.soldOut ? "https://schema.org/OutOfStock" : offer.availability,
+        }))
+      }
+      
+      // Fallback to generating offers from pricing
       const sellerInfo = {
         "@type": "Organization",
         name: "DankDealsMN",
@@ -169,7 +210,6 @@ export default function ProductPage() {
         }
       }
 
-      // If product has pricing, create offers for each price point
       if (product.pricing && product.pricing.length > 0) {
         return product.pricing.map(price => ({
           "@type": "Offer",
@@ -185,27 +225,27 @@ export default function ProductPage() {
             description: `${product.description} Available in ${price.weight} size.`
           })
         }))
-      } else {
-        // For products without specific pricing, create a basic offer
-        return [{
-          "@type": "Offer",
-          availability: product.soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
-          itemCondition: "https://schema.org/NewCondition", 
-          url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
-          seller: sellerInfo
-        }]
       }
+      
+      // Basic offer if no pricing available
+      return [{
+        "@type": "Offer",
+        availability: product.soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+        itemCondition: "https://schema.org/NewCondition", 
+        url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
+        seller: sellerInfo
+      }]
     })(),
     
-    // FIXED: Always include reviews and ratings when available - ensures Google requirements are met
+    // Enhanced reviews with proper schema structure
     ...(product.reviews && product.reviews.length > 0 && {
       review: product.reviews.map(review => ({
         "@type": "Review",
         reviewRating: {
           "@type": "Rating",
-          ratingValue: review.rating,
-          bestRating: 5,
-          worstRating: 1
+          ratingValue: review.rating.toString(),
+          bestRating: "5",
+          worstRating: "1"
         },
         author: {
           "@type": "Person",
@@ -215,15 +255,34 @@ export default function ProductPage() {
         reviewBody: review.comment,
         publisher: {
           "@type": "Organization",
-          name: "DankDealsMN"
+          name: "DankDealsMN",
+          url: "https://dankdealsmn.com"
         }
       }))
     }),
     
-    // Always include aggregateRating when reviews exist
+    // Enhanced aggregate rating calculation
     ...(product.reviews && product.reviews.length > 0 && {
-      aggregateRating: calculateAggregateRating()
-    })
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: (product.reviews.reduce((sum, review) => sum + review.rating, 0) / product.reviews.length).toFixed(1),
+        reviewCount: product.reviews.length.toString(),
+        bestRating: "5",
+        worstRating: "1"
+      }
+    }),
+    
+    // Main entity of page
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://dankdealsmn.com/product/${createProductSlug(product.name)}`
+    },
+    
+    // Enhanced URL with canonical
+    url: `https://dankdealsmn.com/product/${createProductSlug(product.name)}`,
+    
+    // Enhanced identifier
+    identifier: product.sku || product.gtin || product.mpn || product.id.toString()
   }
 
   return (
