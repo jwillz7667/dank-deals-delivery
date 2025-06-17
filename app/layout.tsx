@@ -11,6 +11,8 @@ import { siteConfig } from "@/config/site"
 import BottomNavigation from "@/components/bottom-navigation"
 import { products } from "@/lib/products"
 import { CartProvider } from "@/hooks/use-cart"
+import { AgeVerificationProvider } from "@/hooks/use-age-verification"
+import AgeVerificationWrapper from "@/components/age-verification-wrapper"
 import { Suspense } from "react"
 import { createProductSlug } from "@/lib/utils"
 
@@ -227,15 +229,19 @@ export default function RootLayout({
         <StackProvider app={stackServerApp}>
           <StackTheme>
             <Suspense fallback={<LoadingFallback />}>
-              <CartProvider>
-                <div className="min-h-screen bg-app-bg">
-                  <Suspense fallback={<LoadingFallback />}>
-                    {children}
-                  </Suspense>
-                </div>
-                <Toaster />
-                <BottomNavigation />
-              </CartProvider>
+              <AgeVerificationProvider>
+                <CartProvider>
+                  <AgeVerificationWrapper>
+                    <div className="min-h-screen bg-app-bg">
+                      <Suspense fallback={<LoadingFallback />}>
+                        {children}
+                      </Suspense>
+                    </div>
+                    <Toaster />
+                    <BottomNavigation />
+                  </AgeVerificationWrapper>
+                </CartProvider>
+              </AgeVerificationProvider>
             </Suspense>
           </StackTheme>
         </StackProvider>
