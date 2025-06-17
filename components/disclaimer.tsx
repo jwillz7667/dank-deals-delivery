@@ -1,19 +1,36 @@
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, CheckCircle } from "lucide-react"
 
 export default function Disclaimer() {
   return (
-    <div className="bg-yellow-900/30 border-l-4 border-yellow-500 text-yellow-200 p-6 rounded-r-lg my-8">
-      <div className="flex items-center">
-        <AlertTriangle className="h-8 w-8 mr-4 text-yellow-500" />
+    <div className="bg-red-50 border-red-500 border-2 p-6 rounded-lg my-8">
+      <div className="flex items-start">
+        <AlertTriangle className="h-6 w-6 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
         <div>
-          <h4 className="font-bold text-lg text-yellow-400">Important Delivery Information</h4>
-          <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-            <li>
-              <span className="font-semibold">Pre-payment is required</span> for all orders to ensure driver safety.
+          <h4 className="font-bold text-lg text-black mb-3">Important Delivery Requirements</h4>
+          <ul className="space-y-3 text-black">
+            <li className="flex items-start">
+              <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
+              <div>
+                <strong>Age Verification:</strong> Must be 21+ with valid state-issued photo ID
+              </div>
             </li>
-            <li>
-              A <span className="font-semibold">valid state ID matching the delivery address</span> must be presented
-              upon receipt.
+            <li className="flex items-start">
+              <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
+              <div>
+                <strong>Address Matching:</strong> ID address must match delivery location
+              </div>
+            </li>
+            <li className="flex items-start">
+              <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
+              <div>
+                <strong>Pre-Payment Required:</strong> All orders must be paid before delivery for driver safety
+              </div>
+            </li>
+            <li className="flex items-start">
+              <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
+              <div>
+                <strong>Service Hours:</strong> Daily delivery available from 10 AM to 10 PM
+              </div>
             </li>
           </ul>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react"
 
 interface AgeVerificationContextType {
   isVerified: boolean
@@ -18,53 +18,77 @@ interface AgeVerificationProviderProps {
 export function AgeVerificationProvider({ children }: AgeVerificationProviderProps) {
   const [isVerified, setIsVerified] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [isClient, setIsClient] = useState(false)
+  const [isHydrated, setIsHydrated] = useState(false)
 
+  // Optimized hydration effect
   useEffect(() => {
-    setIsClient(true)
-    
-    // Check if user has verified age in current session
-    const hasVerified = sessionStorage.getItem('ageVerified') === 'true'
-    
-    if (hasVerified) {
-      setIsVerified(true)
-      setShowModal(false)
-    } else {
-      setIsVerified(false)
-      setShowModal(true)
+    // Use single effect for hydration and verification check
+    const checkVerification = () => {
+      setIsHydrated(true)
+      
+      // Check sessionStorage once during hydration
+      try {
+        const hasVerified = sessionStorage.getItem('ageVerified') === 'true'
+        if (hasVerified) {
+          setIsVerified(true)
+          setShowModal(false)
+        } else {
+          setIsVerified(false)
+          // Use requestAnimationFrame to prevent layout thrashing
+          requestAnimationFrame(() => {
+            setShowModal(true)
+          })
+        }
+      } catch (error) {
+        // Fallback for environments without sessionStorage
+        setIsVerified(false)
+        setShowModal(true)
+      }
     }
+
+    checkVerification()
   }, [])
 
-  const verifyAge = () => {
-    sessionStorage.setItem('ageVerified', 'true')
+  // Memoized callback to prevent unnecessary re-renders
+  const verifyAge = useCallback(() => {
+    try {
+      sessionStorage.setItem('ageVerified', 'true')
+    } catch (error) {
+      // Handle sessionStorage errors gracefully
+      console.warn('Could not save age verification to sessionStorage')
+    }
+    
     setIsVerified(true)
     setShowModal(false)
-  }
+  }, [])
 
-  const declineVerification = () => {
-    // Redirect to external site or show warning
-    window.location.href = 'https://www.samhsa.gov/find-help/national-helpline'
-  }
+  // Memoized callback with optimized redirect
+  const declineVerification = useCallback(() => {
+    // Use replace instead of href for better performance
+    window.location.replace('https://www.samhsa.gov/find-help/national-helpline')
+  }, [])
 
-  // Don't render until client-side hydration is complete
-  if (!isClient) {
-    return null
-  }
-
-  const value = {
+  // Memoized context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
     isVerified,
     showModal,
     verifyAge,
     declineVerification
+  }), [isVerified, showModal, verifyAge, declineVerification])
+
+  // Prevent flash of content before hydration
+  if (!isHydrated) {
+    return <div className="opacity-0" aria-hidden="true">{children}</div>
   }
 
   return (
-    <AgeVerificationContext.Provider value={value}>
+    <AgeVerificationContext.Provider value={contextValue}>
       {children}
     </AgeVerificationContext.Provider>
   )
 }
 
+// Optimized hook with error boundary
 export function useAgeVerification() {
   const context = useContext(AgeVerificationContext)
   if (context === undefined) {
