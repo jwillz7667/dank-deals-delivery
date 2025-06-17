@@ -1,8 +1,9 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import Image from "next/image"
+import { useState, useRef, useEffect } from "react"
+import { Search, Sparkles, MessageSquare, Star } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Bot, Truck, Send } from "lucide-react"
@@ -12,18 +13,25 @@ import { Swiper, SwiperSlide } from "swiper/react"
 import { Autoplay, Pagination } from "swiper/modules"
 import "swiper/css"
 import "swiper/css/pagination"
+import { cn } from "@/lib/utils"
+import OptimizedImage from "@/components/ui/optimized-image"
 
 interface BentoGridSectionProps {
   onAiBudtenderClick: (initialMessage?: string) => void
   onProductClick: (product: Product) => void
 }
 
-const GlassmorphicCard = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div
-    className={`bg-card/50 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg overflow-hidden ${className}`}
+const GlassmorphicCard = ({ children, className, ...props }: any) => (
+  <Card 
+    className={cn(
+      "backdrop-blur-md bg-white/10 border-white/20 shadow-xl",
+      "hover:bg-white/15 transition-all duration-300",
+      className
+    )}
+    {...props}
   >
     {children}
-  </div>
+  </Card>
 )
 
 const testimonials = [
@@ -47,10 +55,19 @@ const testimonials = [
 export default function BentoGridSection({ onAiBudtenderClick, onProductClick }: BentoGridSectionProps) {
   const featuredProducts = products.slice(0, 5)
   const [budtenderInput, setBudtenderInput] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleBudtenderSubmit = (e: React.FormEvent) => {
+  const handleBudtenderSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!budtenderInput.trim() || isSubmitting) return
+    
+    setIsSubmitting(true)
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500))
     onAiBudtenderClick(budtenderInput || undefined)
+    setIsSubmitting(false)
+    setBudtenderInput("")
   }
 
   return (
@@ -60,12 +77,15 @@ export default function BentoGridSection({ onAiBudtenderClick, onProductClick }:
           {/* AI Budtender CTA - Full width on mobile */}
           <GlassmorphicCard className="md:col-span-2 lg:col-span-2 md:row-span-2 flex flex-col items-center text-center justify-between p-6 sm:p-8">
             <div className="flex flex-col items-center w-full">
-              <Image
+              <OptimizedImage
                 src="/king-bud-default.png"
                 alt="King Bud - AI Budtender Mascot"
                 width={96}
                 height={96}
                 className="mb-3 sm:mb-4 sm:w-32 sm:h-32"
+                loading="lazy"
+                quality={75}
+                sizes="(max-width: 640px) 96px, 128px"
               />
               <h3 className="text-2xl sm:text-3xl font-bold text-foreground">Meet Your AI Budtender</h3>
               <p className="mt-2 text-base sm:text-lg text-muted-foreground max-w-md">
@@ -81,6 +101,7 @@ export default function BentoGridSection({ onAiBudtenderClick, onProductClick }:
                     value={budtenderInput}
                     onChange={(e) => setBudtenderInput(e.target.value)}
                     className="pr-10 bg-white/70 dark:bg-black/50 border-green-200 dark:border-green-800 focus:border-green-500 dark:focus:border-green-400"
+                    ref={inputRef}
                   />
                   <Button
                     type="submit"

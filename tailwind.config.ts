@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const config = {
+const config: Config = {
     darkMode: ["class"],
     content: [
     './pages/**/*.{ts,tsx}',
@@ -25,59 +25,61 @@ const config = {
   			background: "hsl(var(--background))",
   			foreground: "hsl(var(--foreground))",
   			primary: {
-  				DEFAULT: "#2B5D3F", // Dark green from screenshots
-  				foreground: "#FFFFFF",
-  				50: "#F0F7F3",
-  				100: "#E1F0E7", 
-  				200: "#C3E1CF",
-  				300: "#A5D2B7",
-  				400: "#87C39F",
-  				500: "#69B487",
-  				600: "#2B5D3F", // Main dark green
-  				700: "#225031",
-  				800: "#1A3E26",
-  				900: "#112B1B",
+  				DEFAULT: "hsl(var(--primary))",
+  				foreground: "hsl(var(--primary-foreground))",
   			},
   			secondary: {
-  				DEFAULT: "#F8FBF9", // Off-white/very light green
-  				foreground: "#2B5D3F",
+  				DEFAULT: "hsl(var(--secondary))",
+  				foreground: "hsl(var(--secondary-foreground))",
   			},
   			destructive: {
   				DEFAULT: "hsl(var(--destructive))",
   				foreground: "hsl(var(--destructive-foreground))",
   			},
   			muted: {
-  				DEFAULT: "#F5F8F6", // Light off-white with hint of green
-  				foreground: "#6B7280",
+  				DEFAULT: "hsl(var(--muted))",
+  				foreground: "hsl(var(--muted-foreground))",
   			},
   			accent: {
-  				DEFAULT: "#E8F5E8", // Very light green for product cards
-  				foreground: "#2B5D3F",
+  				DEFAULT: "hsl(var(--accent))",
+  				foreground: "hsl(var(--accent-foreground))",
   			},
   			popover: {
-  				DEFAULT: "#FFFFFF",
-  				foreground: "#2B5D3F",
+  				DEFAULT: "hsl(var(--popover))",
+  				foreground: "hsl(var(--popover-foreground))",
   			},
   			card: {
-  				DEFAULT: "#FFFFFF",
-  				foreground: "#2B5D3F",
+  				DEFAULT: "hsl(var(--card))",
+  				foreground: "hsl(var(--card-foreground))",
   			},
-  			// Custom colors for the app
-  			'app-green': {
-  				50: '#F0F7F3',
-  				100: '#E1F0E7',
-  				200: '#C3E1CF', 
-  				300: '#A5D2B7',
-  				400: '#87C39F',
-  				500: '#69B487',
-  				600: '#2B5D3F', // Primary dark green
-  				700: '#225031',
-  				800: '#1A3E26',
-  				900: '#112B1B',
+  			// Cannabis-themed color palette
+  			"app-bg": "#F8FAF6",
+  			"app-secondary": "#E8F2E8",
+  			"app-accent": "#D4F2D4",
+  			"app-green": {
+  				50: "#F0F9F0",
+  				100: "#E1F3E1",
+  				200: "#C3E7C3",
+  				300: "#9DD69D",
+  				400: "#6ABE6A", 
+  				500: "#4A9F4A",
+  				600: "#2B5D3F",
+  				700: "#1F4A2F",
+  				800: "#163A23",
+  				900: "#0D2918",
   			},
-  			'app-bg': '#FEFFFE', // Pure white background
-  			'app-secondary': '#F8FBF9', // Off-white
-  			'app-accent': '#E8F5E8', // Light green for cards
+  			"app-purple": {
+  				50: "#F5F2FF",
+  				100: "#EDE8FF", 
+  				200: "#DDD4FF",
+  				300: "#C4B5FF",
+  				400: "#A388FF",
+  				500: "#8B5DFF",
+  				600: "#7C3AED",
+  				700: "#6B21A8",
+  				800: "#581C87",
+  				900: "#4C1D95",
+  			}
   		},
   		borderRadius: {
   			lg: "var(--radius)",
@@ -93,44 +95,51 @@ const config = {
   				from: { height: "var(--radix-accordion-content-height)" },
   				to: { height: "0" },
   			},
-  			"shimmer": {
-  				"0%": { transform: "translateX(-100%)" },
-  				"100%": { transform: "translateX(100%)" },
+  			"fade-in": {
+  				from: { opacity: "0" },
+  				to: { opacity: "1" },
+  			},
+  			"slide-up": {
+  				from: { 
+  					opacity: "0", 
+  					transform: "translateY(20px)" 
+  				},
+  				to: { 
+  					opacity: "1", 
+  					transform: "translateY(0)" 
+  				},
+  			},
+  			"scale-in": {
+  				from: { 
+  					opacity: "0", 
+  					transform: "scale(0.9)" 
+  				},
+  				to: { 
+  					opacity: "1", 
+  					transform: "scale(1)" 
+  				},
   			},
   			"float": {
   				"0%, 100%": { transform: "translateY(0px)" },
-  				"50%": { transform: "translateY(-6px)" },
+  				"50%": { transform: "translateY(-10px)" },
   			},
   			"glow": {
   				"0%, 100%": { 
-  					boxShadow: "0 0 20px rgba(139, 195, 159, 0.3)" 
+  					textShadow: "0 0 5px currentColor" 
   				},
   				"50%": { 
-  					boxShadow: "0 0 30px rgba(139, 195, 159, 0.5)" 
+  					textShadow: "0 0 20px currentColor, 0 0 30px currentColor" 
   				},
-  			},
-  			"fade-in": {
-  				"0%": { opacity: "0", transform: "translateY(10px)" },
-  				"100%": { opacity: "1", transform: "translateY(0)" },
-  			},
-  			"slide-up": {
-  				"0%": { opacity: "0", transform: "translateY(20px)" },
-  				"100%": { opacity: "1", transform: "translateY(0)" },
-  			},
-  			"scale-in": {
-  				"0%": { opacity: "0", transform: "scale(0.95)" },
-  				"100%": { opacity: "1", transform: "scale(1)" },
   			},
   		},
   		animation: {
   			"accordion-down": "accordion-down 0.2s ease-out",
   			"accordion-up": "accordion-up 0.2s ease-out",
-  			"shimmer": "shimmer 1.5s infinite",
+  			"fade-in": "fade-in 0.6s ease-out",
+  			"slide-up": "slide-up 0.6s ease-out",
+  			"scale-in": "scale-in 0.4s ease-out",
   			"float": "float 3s ease-in-out infinite",
   			"glow": "glow 2s ease-in-out infinite",
-  			"fade-in": "fade-in 0.3s ease-out",
-  			"slide-up": "slide-up 0.4s ease-out",
-  			"scale-in": "scale-in 0.2s ease-out",
   		},
   		fontFamily: {
   			sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -180,6 +189,38 @@ const config = {
       addUtilities(newUtilities)
     }
   ],
-} satisfies Config
+  // Production optimizations
+  corePlugins: {
+    // Disable unused core plugins for smaller CSS
+    preflight: true,
+    container: true,
+  },
+  // Purge unused styles in production
+  ...(process.env.NODE_ENV === 'production' && {
+    purge: {
+      enabled: true,
+      content: [
+        './pages/**/*.{js,ts,jsx,tsx}',
+        './components/**/*.{js,ts,jsx,tsx}',
+        './app/**/*.{js,ts,jsx,tsx}',
+        './src/**/*.{js,ts,jsx,tsx}',
+      ],
+      options: {
+        safelist: [
+          // Keep critical classes that might be added dynamically
+          'animate-pulse',
+          'animate-spin',
+          'animate-bounce',
+          'opacity-0',
+          'opacity-100',
+          'translate-y-0',
+          'translate-y-8',
+          'scale-100',
+          'scale-110',
+        ]
+      }
+    }
+  })
+}
 
 export default config;

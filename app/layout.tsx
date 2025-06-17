@@ -213,14 +213,15 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
         
-        <link rel="preload" href="/DANKDEALSMN.COM-LOGO.png" as="image" type="image/png" />
-        <link rel="preload" href="/king-bud-default.png" as="image" type="image/png" />
-        <link rel="preload" href="/blue-nerds-gelato.jpg" as="image" type="image/jpeg" />
-        <link rel="preload" href="/cannabis-bud.png" as="image" type="image/png" />
+        <link rel="preload" href="/hero-fallback.jpg" as="image" type="image/jpeg" />
+        <link rel="prefetch" href="/blue-nerds-gelato.jpg" />
+        <link rel="prefetch" href="/DANKDEALSMN.COM-LOGO.png" />
         
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta httpEquiv="x-dns-prefetch-control" content="on" />
         <meta name="format-detection" content="telephone=no" />
+        
+        <link rel="dns-prefetch" href="//dankdealsmn.com" />
         
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />

@@ -3,11 +3,12 @@
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image" // Import Next.js Image component
+import OptimizedImage from "@/components/ui/optimized-image"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, Sparkles, Send, Cannabis } from "lucide-react"
+import { Loader2, Sparkles, Send, Cannabis, MessageSquare } from "lucide-react"
 import { products, type Product } from "@/lib/products"
 
 interface AiBudtenderModalProps {
@@ -37,6 +38,7 @@ export default function AiBudtenderModal({ isOpen, onClose, onProductSelect, ini
   const [response, setResponse] = useState<BudtenderResponse | null>(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const { toast } = useToast()
+  const [isTyping, setIsTyping] = useState(false)
 
   const submitQuery = async (queryText: string) => {
     if (!queryText.trim()) {
@@ -112,13 +114,25 @@ export default function AiBudtenderModal({ isOpen, onClose, onProductSelect, ini
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="glassmorphic-card sm:max-w-3xl max-h-[85vh] overflow-y-auto p-6">
         <DialogHeader className="flex flex-row items-center gap-4 sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur pb-4">
-          <Image
-            src="/king-bud-default.png"
-            alt="King Bud - Your AI Budtender"
-            width={72}
-            height={72}
-            className="rounded-full object-cover border-2 border-green-500"
-          />
+          <div className="mb-6 flex justify-center">
+            <div className="relative">
+              <OptimizedImage
+                src="/king-bud-default.png"
+                alt="King Bud - AI Budtender"
+                width={120}
+                height={120}
+                className="animate-float"
+                loading="lazy"
+                quality={75}
+                sizes="120px"
+              />
+              {isTyping && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full animate-pulse flex items-center justify-center">
+                  <MessageSquare className="w-3 h-3 text-white" />
+                </div>
+              )}
+            </div>
+          </div>
           <div>
             <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               King Bud <Cannabis className="h-6 w-6 text-green-500" />

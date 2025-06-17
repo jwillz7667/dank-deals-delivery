@@ -4,7 +4,7 @@ import { products } from "@/lib/products"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { notFound } from "next/navigation"
-import Image from "next/image"
+import OptimizedImage from "@/components/ui/optimized-image"
 import { Button } from "@/components/ui/button"
 import { MessageSquare, ShoppingCart, Plus, Minus } from "lucide-react"
 import JsonLd from "@/components/json-ld"
@@ -295,13 +295,13 @@ export default function ProductPage() {
             {/* Image Gallery */}
             <div className="space-y-4">
               <div className="relative h-96 sm:h-[500px] rounded-lg overflow-hidden cursor-pointer group">
-                <Image
+                <OptimizedImage
                   src={productImages[0]}
                   alt={product.imageAlt || product.name}
                   fill
-                  style={{ objectFit: "cover" }}
                   priority
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover hover:scale-110 transition-transform duration-300"
                   onClick={() => handleImageClick(0)}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200 flex items-center justify-center">
@@ -323,11 +323,11 @@ export default function ProductPage() {
                       className="relative h-24 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={() => handleImageClick(index + 1)}
                     >
-                      <Image
+                      <OptimizedImage
                         src={image}
                         alt={`${product.name} - View ${index + 2}`}
                         fill
-                        style={{ objectFit: "cover" }}
+                        className="object-cover"
                         sizes="(max-width: 1024px) 25vw, 12.5vw"
                       />
                     </div>
