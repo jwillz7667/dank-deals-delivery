@@ -202,35 +202,35 @@ export default function DeliveryPage() {
 
             {/* Important Requirements */}
             <section className="mb-16 animate-slide-up">
-              <Card className="bg-yellow-900/20 border-yellow-500/50">
+              <Card className="bg-red-50 border-red-500 border-2">
                 <CardHeader>
-                  <CardTitle className="flex items-center text-yellow-300">
-                    <AlertTriangle className="h-6 w-6 mr-2" />
+                  <CardTitle className="flex items-center text-black">
+                    <AlertTriangle className="h-6 w-6 mr-2 text-red-600" />
                     Important Delivery Requirements
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-yellow-100">
+                <CardContent className="text-black">
                   <ul className="space-y-3">
                     <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-yellow-300 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
                       <div>
                         <strong>Age Verification:</strong> Must be 21+ with valid state-issued photo ID
                       </div>
                     </li>
                     <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-yellow-300 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
                       <div>
                         <strong>Address Matching:</strong> ID address must match delivery location
                       </div>
                     </li>
                     <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-yellow-300 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
                       <div>
                         <strong>Pre-Payment Required:</strong> All orders must be paid before delivery for driver safety
                       </div>
                     </li>
                     <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-yellow-300 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 mr-3 mt-0.5 text-red-600 flex-shrink-0" />
                       <div>
                         <strong>Service Hours:</strong> Daily delivery available from 10 AM to 10 PM
                       </div>
