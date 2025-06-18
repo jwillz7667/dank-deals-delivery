@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { cn } from "@/lib/utils"
 
 interface OptimizedImageProps {
@@ -79,25 +79,28 @@ export default function OptimizedImage({
   const optimizedSources = OPTIMIZED_IMAGE_MAP[src]
   const imageSrc = optimizedSources?.webp || src
   
-  const handleLoad = () => {
+  const handleLoad = useCallback(() => {
     setIsLoaded(true)
     onLoad?.()
-  }
+  }, [onLoad])
 
-  const handleError = () => {
+  const handleError = useCallback(() => {
     setHasError(true)
     onError?.()
-  }
+  }, [onError])
 
-  // Create a loading placeholder
+  // Enhanced loading placeholder with skeleton animation
   const LoadingPlaceholder = () => (
     <div 
       className={cn(
         "animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700",
+        "relative overflow-hidden",
         className
       )}
       style={!fill ? { width, height } : undefined}
-    />
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+    </div>
   )
 
   return (

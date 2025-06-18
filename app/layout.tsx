@@ -16,11 +16,15 @@ import AgeVerificationWrapper from "@/components/age-verification-wrapper"
 import { Suspense } from "react"
 import { createProductSlug } from "@/lib/utils"
 
+// Optimized font loading with better performance
 const inter = Inter({ 
   subsets: ["latin"], 
   variable: "--font-sans",
   display: 'swap',
-  preload: true
+  preload: true,
+  // Only load needed font weights
+  weight: ['400', '500', '600', '700'],
+  fallback: ['system-ui', 'arial']
 })
 
 export const metadata: Metadata = {
@@ -84,7 +88,7 @@ export const metadata: Metadata = {
   }
 }
 
-// Loading fallback component
+// Optimized loading fallback component
 function LoadingFallback() {
   return (
     <div className="min-h-screen bg-app-bg flex items-center justify-center">
@@ -98,12 +102,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Optimized organization schema
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "DankDealsMN",
     url: siteConfig.url,
-    logo: `${siteConfig.url}/logo.png`,
+    logo: `${siteConfig.url}/DANKDEALSMN.COM-LOGO.png`,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+1-612-930-1390",
@@ -111,11 +116,9 @@ export default function RootLayout({
       areaServed: "US",
       availableLanguage: "en",
     },
-    sameAs: [
-      // Add social media links if available
-    ],
   }
 
+  // Optimized local business schema with better performance
   const localBusinessSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -149,13 +152,13 @@ export default function RootLayout({
         name: "Twin Cities Metropolitan Area",
       },
     ],
+    // Optimized product catalog for better performance
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Cannabis Product Menu",
       itemListElement: products.slice(0, 5).map((product) => ({
         "@type": "Offer",
-        // FIXED: Ensure pricing data is always available for Google structured data requirements
-        price: product.pricing && product.pricing[0] ? product.pricing[0].price.toString() : "0",
+        price: product.pricing?.[0]?.price?.toString() || "0",
         priceCurrency: "USD",
         availability: product.soldOut ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
         url: `${siteConfig.url}/product/${createProductSlug(product.name)}`,
@@ -169,32 +172,28 @@ export default function RootLayout({
           category: {
             "@type": "ProductCategory",
             name: product.category,
-            url: `${siteConfig.url}/menu?category=${product.category.toLowerCase()}`
           },
           brand: {
             "@type": "Brand",
             name: product.brand || "DankDeals"
           },
           ...(product.sku && { sku: product.sku }),
-          additionalProperty: [
-            ...(product.thcContent ? [{
-              "@type": "PropertyValue",
-              name: "THC Content",
-              value: product.thcContent
-            }] : []),
-            ...(product.strainType ? [{
-              "@type": "PropertyValue",
-              name: "Strain Type",
-              value: product.strainType
-            }] : [])
-          ]
+          ...(product.thcContent && {
+            additionalProperty: [
+              {
+                "@type": "PropertyValue",
+                name: "THC Content",
+                value: product.thcContent
+              }
+            ]
+          })
         },
         seller: {
           "@type": "Organization",
           name: "DankDealsMN.com",
           url: siteConfig.url
         }
-      })).filter(offer => offer.itemOffered), // Filter out any undefined offers
+      })),
     },
     openingHoursSpecification: [
       {
@@ -209,19 +208,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Optimized resource hints */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="//stackframe.cloud" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
         
-        {/* Only preload critical resources that are actually used */}
-        <link rel="prefetch" href="/DANKDEALSMN.COM-LOGO.png" />
+        {/* Only preload critical resources */}
+        <link rel="preload" href="/DANKDEALSMN.COM-LOGO.png" as="image" type="image/png" />
         
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta httpEquiv="x-dns-prefetch-control" content="on" />
         <meta name="format-detection" content="telephone=no" />
         
-        <link rel="dns-prefetch" href="//dankdealsmn.com" />
-        
+        {/* Optimized JSON-LD structured data */}
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />
       </head>

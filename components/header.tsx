@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, memo, useCallback } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -25,14 +25,31 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-function UserSection() {
+// Memoized UserSection component for better performance
+const UserSection = memo(function UserSection() {
   const user = useUser()
   const router = useRouter()
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     await user?.signOut()
     router.push('/')
-  }
+  }, [user, router])
+
+  const handleProfileClick = useCallback(() => {
+    router.push('/profile')
+  }, [router])
+
+  const handleOrdersClick = useCallback(() => {
+    router.push('/profile?tab=orders')
+  }, [router])
+
+  const handleSignInClick = useCallback(() => {
+    router.push('/handler/sign-in')
+  }, [router])
+
+  const handleSignUpClick = useCallback(() => {
+    router.push('/handler/sign-up')
+  }, [router])
 
   if (user) {
     return (
@@ -54,11 +71,11 @@ function UserSection() {
             </div>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push('/profile')} className="hover:bg-app-green-50/80 transition-colors duration-200">
+          <DropdownMenuItem onClick={handleProfileClick} className="hover:bg-app-green-50/80 transition-colors duration-200">
             <UserCircle className="mr-2 h-4 w-4" />
             Profile
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push('/profile?tab=orders')} className="hover:bg-app-green-50/80 transition-colors duration-200">
+          <DropdownMenuItem onClick={handleOrdersClick} className="hover:bg-app-green-50/80 transition-colors duration-200">
             <Package className="mr-2 h-4 w-4" />
             My Orders
           </DropdownMenuItem>
@@ -76,23 +93,24 @@ function UserSection() {
     <div className="flex items-center space-x-2">
       <Button 
         variant="ghost"
-        onClick={() => router.push('/handler/sign-in')}
+        onClick={handleSignInClick}
         className="hidden sm:flex text-app-green-600 hover:bg-white/20 backdrop-blur-sm rounded-full px-4 transition-all duration-300 hover:scale-105 gpu-accelerated"
       >
         Sign In
       </Button>
       <Button 
         variant="default"
-        onClick={() => router.push('/handler/sign-up')}
+        onClick={handleSignUpClick}
         className="primary-button"
       >
         Sign Up
       </Button>
     </div>
   )
-}
+})
 
-function MobileMenu() {
+// Memoized MobileMenu component
+const MobileMenu = memo(function MobileMenu() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   
@@ -103,6 +121,10 @@ function MobileMenu() {
     { name: "FAQ", href: "/faq" },
     { name: "Our Mission", href: "/mission" },
   ]
+
+  const handleLinkClick = useCallback(() => {
+    setIsOpen(false)
+  }, [])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -120,6 +142,7 @@ function MobileMenu() {
               width={180}
               height={40}
               className="object-contain h-10 w-auto"
+              priority
             />
           </DialogTitle>
         </DialogHeader>
@@ -128,7 +151,7 @@ function MobileMenu() {
             <Link
               key={link.name}
               href={link.href}
-              onClick={() => setIsOpen(false)}
+              onClick={handleLinkClick}
               className={cn(
                 "block py-3 px-4 text-lg font-medium rounded-2xl transition-all duration-300 hover:scale-105 gpu-accelerated",
                 pathname === link.href 
@@ -157,18 +180,28 @@ function MobileMenu() {
       </DialogContent>
     </Dialog>
   )
-}
+})
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
   const { cart } = useCart()
 
+  // Optimized scroll handler with throttling
   useEffect(() => {
+    let ticking = false
+    
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 10)
+          ticking = false
+        })
+        ticking = true
+      }
     }
-    window.addEventListener("scroll", handleScroll)
+    
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
@@ -265,9 +298,6 @@ export default function Header() {
               <Button 
                 variant="ghost"
                 size="icon"
-                onClick={() => {
-                  // Handle mobile auth
-                }}
                 className="hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-300 hover:scale-110 gpu-accelerated"
                 aria-label="Open user menu"
               >

@@ -1,5 +1,5 @@
 {
-  "name": "my-v0-project",
+  "name": "dankdealsmn-cannabis-delivery",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,14 +8,18 @@
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "optimize-images": "node scripts/optimize-images.js",
     "performance-test": "echo 'Run: npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html'",
+    "performance-monitor": "node scripts/performance-monitor.js",
     "bundle-analyzer": "ANALYZE=true pnpm run build",
     "test-performance": "pnpm run build && pnpm run start & sleep 5 && npx lighthouse http://localhost:3000 --only-categories=performance --output=json --output-path=./performance-report.json && pkill -f 'next start'",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "clean": "rm -rf .next",
+    "build:clean": "pnpm run clean && pnpm run build"
   },
   "dependencies": {
     "@ai-sdk/google": "latest",
@@ -87,5 +91,15 @@
     "sharp": "^0.33.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
 }

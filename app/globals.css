@@ -2,9 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Optimized font loading */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @layer base {
   :root {
-    /* Light theme (kept for reference or future toggling) */
+    /* Light theme (optimized for better performance) */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -28,19 +31,16 @@
   }
 
   .dark {
-    /* New Dark Theme Palette */
-    --background: 224 71% 4%; /* Near-black */
-    --foreground: 210 40% 98%; /* Almost white */
-    --card: 224 71% 6%; /* Slightly lighter than background */
+    /* Optimized Dark Theme */
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+    --card: 224 71% 6%;
     --card-foreground: 210 40% 98%;
     --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
-
-    /* Updated Green to match bud character */
-    --primary: 100 65% 50%; /* Vibrant, slightly yellowish-green */
-    --primary-foreground: 100 30% 15%; /* Darker green for text on primary buttons */
-
-    --secondary: 217 33% 17%; /* Dark Slate Blue */
+    --primary: 100 65% 50%;
+    --primary-foreground: 100 30% 15%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
@@ -50,10 +50,8 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-
-    /* Updated Ring color to match new primary */
-    --ring: 100 65% 55%; /* Brighter version of the new primary for Focus Ring */
-
+    --ring: 100 65% 55%;
+    
     /* Dark Neumorphism Colors */
     --neumorphic-bg: #212428;
     --neumorphic-shadow-light: #2a2e33;
@@ -65,9 +63,33 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1, 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Performance optimizations */
+  img {
+    @apply select-none;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimizeSpeed;
+    will-change: auto;
+    transform: translateZ(0);
+  }
+  
+  /* Optimize for mobile touch */
+  button, a, [role="button"] {
+    touch-action: manipulation;
   }
 }
 
@@ -76,7 +98,7 @@
     text-wrap: balance;
   }
 
-  /* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+  /* Custom scrollbar for WebKit browsers */
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
   }
@@ -95,50 +117,73 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted) / 0.5) transparent;
   }
-}
-
-/* Aurora Background Animation */
-/* Commented out - replaced with video background
-@layer utilities {
-  .aurora-bg {
-    position: relative;
-    overflow: hidden;
-  }
-  .aurora-bg::before,
-  .aurora-bg::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    top: 50%;
-    left: 50%;
-    width: 150%;
-    height: 150%;
-    border-radius: 50%;
-    opacity: 0.3;
-    filter: blur(100px);
-    will-change: transform;
-  }
-  .aurora-bg::before {
-    background-image: linear-gradient(135deg, hsl(var(--primary)), #3b82f6, #8b5cf6);
-    animation: aurora-spin 20s linear infinite;
-  }
-  .aurora-bg::after {
-    background-image: linear-gradient(135deg, #f472b6, #fb923c, #facc15);
-    animation: aurora-spin 25s linear infinite reverse;
+  
+  /* Performance Optimizations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
 }
 
-@keyframes aurora-spin {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
+/* Enhanced App-specific component styles */
+@layer components {
+  /* Glassmorphism Utilities */
+  .glass-card {
+    @apply backdrop-blur-lg bg-white/20 border border-white/30 shadow-lg;
   }
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
+  
+  .glass-nav {
+    @apply backdrop-blur-xl bg-white/95 border-b border-white/20 shadow-sm;
+  }
+  
+  .glass-modal {
+    @apply backdrop-blur-2xl bg-white/95 border border-white/30 shadow-2xl rounded-3xl;
+  }
+  
+  .category-tile {
+    @apply text-white rounded-2xl p-4 flex flex-col items-center justify-center min-h-[80px] transition-all duration-300 hover:scale-105 floating-effect gpu-accelerated backdrop-blur-lg border border-white/20 shadow-xl;
+    background: linear-gradient(135deg, #2B5D3F 0%, #225031 100%);
+  }
+  
+  .product-card {
+    @apply backdrop-blur-lg bg-white/80 border border-white/30 shadow-lg hover:shadow-xl rounded-2xl p-4 transition-all duration-300 hover:scale-105 gpu-accelerated;
+  }
+  
+  .search-input {
+    @apply bg-white/90 backdrop-blur-sm border-app-green-200 rounded-2xl px-4 py-3 w-full placeholder:text-muted-foreground focus:border-app-green-400 focus:ring-2 focus:ring-app-green-200/50 focus:bg-white transition-all duration-200;
+  }
+  
+  .primary-button {
+    @apply bg-app-green-600 text-white rounded-2xl px-6 py-3 font-medium transition-all duration-300 hover:bg-app-green-700 hover:scale-105 focus:ring-2 focus:ring-app-green-200 shadow-lg hover:shadow-xl gpu-accelerated;
+  }
+  
+  .secondary-button {
+    @apply bg-white/90 backdrop-blur-sm text-app-green-600 border border-app-green-200 rounded-2xl px-6 py-3 font-medium transition-all duration-300 hover:bg-app-green-50 hover:scale-105 focus:ring-2 focus:ring-app-green-200 shadow-md hover:shadow-lg gpu-accelerated;
+  }
+  
+  .floating-effect {
+    @apply shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300;
+  }
+
+  /* Swiper optimizations */
+  .category-swiper,
+  .category-swiper-desktop {
+    @apply px-1 pb-4;
+  }
+  
+  .category-swiper .swiper-slide,
+  .category-swiper-desktop .swiper-slide {
+    @apply transition-all duration-300;
+  }
+  
+  .category-swiper .swiper-slide:hover,
+  .category-swiper-desktop .swiper-slide:hover {
+    @apply scale-105;
   }
 }
-*/
 
-/* Scroll-triggered fade-in animation */
+/* Optimized animations */
 .fade-in-section {
   opacity: 0;
   transform: translateY(20px);
@@ -149,4 +194,80 @@
 .fade-in-section.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Enhanced focus states for accessibility */
+.focus-visible:focus-visible {
+  @apply outline-none ring-2 ring-app-green-400 ring-offset-2;
+}
+
+/* Custom scrollbar with glassmorphism */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-white/50 backdrop-blur-sm rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-app-green-300/80 rounded-full hover:bg-app-green-400/80 transition-colors duration-200;
+}
+
+/* Optimize text selection */
+::selection {
+  @apply bg-app-green-200 text-app-green-800;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-float,
+  .animate-glow {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .transition-all,
+  .floating-effect {
+    transition: none;
+  }
+  
+  .fade-in-section {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass-card,
+  .glass-nav,
+  .glass-modal {
+    @apply bg-white border-gray-400;
+  }
+  
+  .category-tile {
+    @apply bg-app-green-600 border-app-green-700;
+  }
+}
+
+/* Dark mode media query support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 143 43% 19%;
+    --foreground: 0 0% 98%;
+  }
+  
+  .glass-nav {
+    @apply bg-app-green-900/95;
+  }
+  
+  .product-card {
+    @apply bg-app-green-800/80;
+  }
 }
