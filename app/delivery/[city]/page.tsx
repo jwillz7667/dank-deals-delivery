@@ -1,7 +1,5 @@
-"use client"
-
 import { cities, formatCityName } from "@/lib/cities"
-import { useEffect } from "react"
+import { Metadata } from "next"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import CityPageTemplate from "@/components/city-page-template"
@@ -12,7 +10,15 @@ interface CityPageProps {
   }
 }
 
-
+// Generate metadata for SEO
+export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
+  const formattedCity = formatCityName(params.city)
+  
+  return {
+    title: `Weed Delivery in ${formattedCity} in One Hour or Less | DankDealsMN`,
+    description: `Fast weed delivery in ${formattedCity}, MN in 1 hour or less! Professional cannabis delivery service with premium flower, edibles & vapes. 21+ verification required. Order now!`,
+  }
+}
 
 // Pre-render all city pages at build time
 export async function generateStaticParams() {
@@ -23,15 +29,6 @@ export async function generateStaticParams() {
 
 export default function Page({ params }: CityPageProps) {
   const city = params?.city || "minneapolis"
-  const formattedCity = formatCityName(city)
-  
-  useEffect(() => {
-    document.title = `Weed Delivery in ${formattedCity} in One Hour or Less | DankDealsMN`
-    const metaDescription = document.querySelector('meta[name="description"]')
-    if (metaDescription) {
-      metaDescription.setAttribute('content', `Fast weed delivery in ${formattedCity}, MN in 1 hour or less! Professional cannabis delivery service with premium flower, edibles & vapes. 21+ verification required. Order now!`)
-    }
-  }, [formattedCity])
   
   // Redirect if the city is not in our list (optional but good practice)
   if (!cities.includes(city)) {
