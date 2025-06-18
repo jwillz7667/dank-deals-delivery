@@ -303,56 +303,56 @@ export const products: Product[] = [
         author: "Jake S.",
         rating: 5,
         comment: "This strain is absolutely incredible! The flavor is exactly like sweet candy with a creamy finish. Effects are perfectly balanced - relaxing but not sedating. This is now my go-to strain for evening relaxation.",
-        date: "2024-12-22"
+        date: "2025-06-15"
       },
       {
         id: 2,
         author: "Mia R.",
         rating: 5,
         comment: "This strain hits different 🔥 Perfect balance and the taste is unreal. Got me feeling creative and relaxed at the same time. The buds are gorgeous with amazing purple colors. Definitely premium quality.",
-        date: "2024-12-19"
+        date: "2025-06-12"
       },
       {
         id: 3,
         author: "Tyler D.",
         rating: 5,
         comment: "No cap this is the best flower I've had in MN. Smooth af and the high lasts forever. The candy flavor comes through perfectly and the effects are exactly what I want from a hybrid. Definitely copping more.",
-        date: "2024-12-15"
+        date: "2025-06-08"
       },
       {
         id: 4,
         author: "Ashley M.",
         rating: 5,
         comment: "Really amazing strain! The candy flavor is legit and it helped with my anxiety while keeping me creative. The quality is top-notch and the effects are consistent. Love the variety of sizes available.",
-        date: "2024-12-12"
+        date: "2025-06-05"
       },
       {
         id: 5,
         author: "Marcus T.",
         rating: 5,
         comment: "Been smoking for 15 years and this is some of the best flower I've ever had. The terpene profile is incredible - sweet, fruity, with that gelato creaminess. Effects are perfectly balanced hybrid.",
-        date: "2024-12-10"
+        date: "2025-06-01"
       },
       {
         id: 6,
         author: "Sarah K.",
         rating: 5,
         comment: "Perfect strain for unwinding after work. The candy taste is amazing and the effects help me relax without making me too sleepy. The purple colors in the buds are beautiful. Premium quality for sure.",
-        date: "2024-12-08"
+        date: "2025-05-28"
       },
       {
         id: 7,
         author: "David L.",
         rating: 4,
         comment: "Great hybrid strain with excellent flavor. The candy notes are prominent and the effects are well-balanced. Only giving 4 stars because I wish the larger sizes were slightly more discounted, but the quality is definitely there.",
-        date: "2024-12-05"
+        date: "2025-05-24"
       },
       {
         id: 8,
         author: "Emma W.",
         rating: 5,
         comment: "This is hands down the best tasting strain I've tried. The gelato and candy flavors are so pronounced. Perfect for creative activities or just chilling. The effects last a long time too.",
-        date: "2024-12-02"
+        date: "2025-05-20"
       }
     ]
   }
