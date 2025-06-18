@@ -238,8 +238,8 @@ export default function RootLayout({
                       </Suspense>
                     </div>
                     <Toaster />
-                    <BottomNavigation />
                   </AgeVerificationWrapper>
+                  <BottomNavigation />
                 </CartProvider>
               </AgeVerificationProvider>
             </Suspense>

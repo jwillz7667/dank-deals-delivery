@@ -12,6 +12,7 @@ import Image from "next/image"
 import { products } from "@/lib/products"
 import JsonLd from "@/components/json-ld"
 import { createProductSlug } from "@/lib/utils"
+import CyclingImage from "@/components/ui/cycling-image"
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { FreeMode, Pagination } from 'swiper/modules'
@@ -154,14 +155,23 @@ export default function HomePage() {
                     <CardContent className="p-3 h-full flex flex-col">
                       <Link href={`/product/${createProductSlug(product.name)}`}>
                         <div className="aspect-square relative mb-3 rounded-xl overflow-hidden bg-white shadow-md">
-                          <Image
-                            src={product.imageUrl}
-                            alt={product.name}
-                            fill
-                            className="object-cover hover:scale-110 transition-transform duration-300"
-                            priority={index === 0} // FIXED: Priority load the first image (LCP element)
-                            sizes="(max-width: 768px) 180px, 250px"
-                          />
+                          {product.images && product.images.length > 1 ? (
+                            <CyclingImage
+                              images={product.images}
+                              alt={product.name}
+                              priority={index === 0}
+                              sizes="(max-width: 768px) 180px, 250px"
+                            />
+                          ) : (
+                            <Image
+                              src={product.imageUrl}
+                              alt={product.name}
+                              fill
+                              className="object-cover hover:scale-110 transition-transform duration-300"
+                              priority={index === 0}
+                              sizes="(max-width: 768px) 180px, 250px"
+                            />
+                          )}
                         </div>
                       </Link>
                       <div className="text-center flex flex-col h-full">
@@ -423,14 +433,23 @@ export default function HomePage() {
                     <CardContent className="p-4 h-full flex flex-col">
                       <Link href={`/product/${createProductSlug(product.name)}`}>
                         <div className="aspect-square relative mb-4 rounded-xl overflow-hidden bg-white shadow-md">
-                          <Image
-                            src={product.imageUrl}
-                            alt={product.name}
-                            fill
-                            className="object-cover hover:scale-110 transition-transform duration-300"
-                            priority={index < 2} // FIXED: Priority load first 2 images (likely LCP elements)
-                            sizes="(max-width: 1024px) 200px, 250px"
-                          />
+                          {product.images && product.images.length > 1 ? (
+                            <CyclingImage
+                              images={product.images}
+                              alt={product.name}
+                              priority={index < 2}
+                              sizes="(max-width: 1024px) 200px, 250px"
+                            />
+                          ) : (
+                            <Image
+                              src={product.imageUrl}
+                              alt={product.name}
+                              fill
+                              className="object-cover hover:scale-110 transition-transform duration-300"
+                              priority={index < 2}
+                              sizes="(max-width: 1024px) 200px, 250px"
+                            />
+                          )}
                         </div>
                       </Link>
                       <div className="text-center flex flex-col h-full">

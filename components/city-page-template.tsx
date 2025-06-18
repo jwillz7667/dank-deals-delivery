@@ -11,7 +11,12 @@ interface CityPageTemplateProps {
 export default function CityPageTemplate({ city }: CityPageTemplateProps) {
   const formattedCity = formatCityName(city)
   const mapQuery = encodeURIComponent(`${formattedCity}, MN`)
-  const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${mapQuery}&zoom=11`
+  
+  // Use Google Maps Embed API if key is available, otherwise use basic Google Maps search
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  const mapSrc = googleMapsApiKey 
+    ? `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${mapQuery}&zoom=11`
+    : `https://maps.google.com/maps?q=${mapQuery}&t=&z=11&ie=UTF8&iwloc=&output=embed`
 
   // JSON-LD structured data for local SEO
   const jsonLd = {
@@ -106,21 +111,31 @@ export default function CityPageTemplate({ city }: CityPageTemplateProps) {
           <MapPin className="h-8 w-8 mr-3 text-app-green-600" />
           Delivering to {formattedCity}
         </h2>
-        <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-2xl border border-app-green-200">
-          {/* 
-            For production, ensure you have a Google Maps API key and that it's properly secured.
-            You might want to consider loading the iframe lazily or using a placeholder.
-          */}
+        <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-2xl border border-app-green-200 relative">
           <iframe
             src={mapSrc}
             width="100%"
-            height="100%"
-            style={{ border: 0 }}
+            height="400"
+            style={{ border: 0, minHeight: '400px' }}
             allowFullScreen={false}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             title={`Map of ${formattedCity}, MN`}
+            onError={() => {
+              console.error('Failed to load Google Maps iframe');
+            }}
           ></iframe>
+          {/* Fallback link if map fails to load */}
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-app-bg/80 to-app-secondary/80 opacity-0 hover:opacity-100 transition-opacity">
+            <a 
+              href={`https://www.google.com/maps/search/${mapQuery}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-app-green-600 hover:text-app-green-700 font-semibold underline"
+            >
+              Open in Google Maps
+            </a>
+          </div>
         </div>
         <p className="text-center text-xs text-muted-foreground mt-2">
           Map showing approximate service area for {formattedCity}.
@@ -201,9 +216,12 @@ export default function CityPageTemplate({ city }: CityPageTemplateProps) {
               </div>
             </li>
           </ol>
-          <div className="mt-8 text-center">
-            <a href={`sms:+16129301390?&body=Hi! I'd like to place a delivery order to ${formattedCity}.`}>
-              <Button className="primary-button px-8 py-3 text-lg">
+          <div className="mt-8 flex justify-center">
+            <a 
+              href={`sms:+16129301390?&body=Hi! I'd like to place a delivery order to ${formattedCity}.`}
+              className="inline-block"
+            >
+              <Button className="primary-button px-8 py-3 text-lg w-full sm:w-auto">
                 Order Delivery to {formattedCity} Now
               </Button>
             </a>

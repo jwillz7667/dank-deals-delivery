@@ -20,8 +20,14 @@ export default function BottomNavigation() {
 
   return (
     <nav 
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 shadow-2xl gpu-accelerated rounded-t-3xl backdrop-blur-xl border-t border-app-green-500/30"
-      style={{ backgroundColor: '#2B5D3F' }}
+      className="md:hidden fixed bottom-0 left-0 right-0 z-[9999] shadow-2xl gpu-accelerated rounded-t-3xl backdrop-blur-xl border-t border-app-green-500/30"
+      style={{ 
+        backgroundColor: '#2B5D3F',
+        position: 'fixed',
+        bottom: '0',
+        left: '0',
+        right: '0'
+      }}
     >
       <div className="flex justify-around items-center h-20 px-6">
         {navItems.map((item) => {
