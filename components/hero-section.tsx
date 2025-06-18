@@ -20,15 +20,16 @@ export default function HeroSection({ onCtaClick }: HeroSectionProps) {
       id="home"
       className="relative h-screen w-full flex items-center justify-center text-center text-white overflow-hidden"
     >
-      {/* Simple Image Background */}
+      {/* Optimized Image Background */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/hero-fallback.jpg"
-          alt="Cannabis background"
+          src="/blue-nerds-gelato-optimized.webp"
+          alt="Premium cannabis background"
           fill
           className="object-cover"
           priority
           quality={75}
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>

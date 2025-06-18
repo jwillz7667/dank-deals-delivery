@@ -213,8 +213,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
         
-        <link rel="preload" href="/hero-fallback.jpg" as="image" type="image/jpeg" />
-        <link rel="prefetch" href="/blue-nerds-gelato.jpg" />
+        {/* Only preload critical resources that are actually used */}
         <link rel="prefetch" href="/DANKDEALSMN.COM-LOGO.png" />
         
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
