@@ -121,9 +121,6 @@ export default function CityPageTemplate({ city }: CityPageTemplateProps) {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             title={`Map of ${formattedCity}, MN`}
-            onError={() => {
-              console.error('Failed to load Google Maps iframe');
-            }}
           ></iframe>
           {/* Fallback link if map fails to load */}
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-app-bg/80 to-app-secondary/80 opacity-0 hover:opacity-100 transition-opacity">
