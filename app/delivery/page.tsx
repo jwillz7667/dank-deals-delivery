@@ -1,4 +1,6 @@
-import type { Metadata } from "next"
+"use client"
+
+import { useEffect } from "react"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,45 +22,7 @@ import {
   Navigation
 } from "lucide-react"
 
-export const metadata: Metadata = {
-  title: "Weed Delivery Twin Cities & Suburbs in 1 Hour or Less | DankDealsMN",
-  description: "Weed delivery anywhere in the Twin Cities & surrounding suburbs in 1 hour or less! Professional, discreet THC delivery with 21+ verification to 20+ metro cities.",
-  keywords: [
-    "cannabis delivery Minneapolis",
-    "THC delivery St Paul", 
-    "marijuana delivery Twin Cities",
-    "weed delivery service areas",
-    "cannabis delivery zones Minnesota",
-    "THC delivery areas",
-    "marijuana delivery Minneapolis metro"
-  ],
-  openGraph: {
-    title: "Weed Delivery Twin Cities & Suburbs in 1 Hour or Less | DankDealsMN",
-    description: "Weed delivery anywhere in the Twin Cities & surrounding suburbs in 1 hour or less! Professional, discreet service with 21+ verification.",
-    type: "website",
-    locale: "en_US",
-    siteName: "DankDealsMN",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Weed Delivery Twin Cities & Suburbs in 1 Hour or Less | DankDealsMN",
-    description: "Weed delivery anywhere in the Twin Cities & surrounding suburbs in 1 hour or less!",
-  },
-  alternates: {
-    canonical: "/delivery",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-}
+
 
 // JSON-LD structured data for SEO
 const jsonLd = {
@@ -97,6 +61,14 @@ const jsonLd = {
 }
 
 export default function DeliveryPage() {
+  useEffect(() => {
+    document.title = "Weed Delivery Twin Cities & Suburbs in 1 Hour or Less | DankDealsMN"
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Weed delivery anywhere in the Twin Cities & surrounding suburbs in 1 hour or less! Professional, discreet THC delivery with 21+ verification to 20+ metro cities.')
+    }
+  }, [])
+
   return (
     <>
       <script

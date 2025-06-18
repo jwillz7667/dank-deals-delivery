@@ -1,14 +1,18 @@
+"use client"
+
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Accessibility Statement | DankDealsMN",
-  description: "DankDealsMN Accessibility Statement - Our commitment to digital accessibility and inclusive design for all users.",
-  robots: "index, follow"
-}
+import { useEffect } from "react"
 
 export default function AccessibilityPage() {
+  useEffect(() => {
+    document.title = "Accessibility Statement | DankDealsMN"
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'DankDealsMN Accessibility Statement - Our commitment to digital accessibility and inclusive design for all users.')
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-app-bg">
       <Header />

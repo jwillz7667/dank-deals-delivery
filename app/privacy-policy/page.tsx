@@ -1,14 +1,18 @@
+"use client"
+
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: "Privacy Policy | DankDealsMN",
-  description: "DankDealsMN Privacy Policy - Learn how we collect, use, and protect your personal information in compliance with Minnesota and federal privacy laws.",
-  robots: "index, follow"
-}
+import { useEffect } from "react"
 
 export default function PrivacyPolicyPage() {
+  useEffect(() => {
+    document.title = "Privacy Policy | DankDealsMN"
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'DankDealsMN Privacy Policy - Learn how we collect, use, and protect your personal information in compliance with Minnesota and federal privacy laws.')
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-app-bg">
       <Header />
