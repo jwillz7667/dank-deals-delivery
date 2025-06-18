@@ -59,21 +59,21 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/my-favicon/favicon.ico" },
-      { url: "/my-favicon/favicon.svg", type: "image/svg+xml" },
-      { url: "/my-favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" }
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }
     ],
-    shortcut: "/my-favicon/favicon.ico",
-    apple: "/my-favicon/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
     other: [
       {
         rel: "mask-icon",
-        url: "/my-favicon/favicon.svg",
+        url: "/favicon.svg",
         color: "#2B5D3F"
       }
     ]
   },
-  manifest: "/my-favicon/site.webmanifest",
+  manifest: "/site.webmanifest",
   alternates: {
     canonical: "/",
   },
