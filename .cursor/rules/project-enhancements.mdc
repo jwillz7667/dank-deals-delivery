@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+You are an expert full‑stack engineer & technical SEO lead. You are tasked with upgrading a Next.js 15 cannabis‑delivery site so that it ranks in the top 5 organic Google results for “cannabis delivery Minneapolis” and passes Lighthouse 10 with ≥ 90 performance/accessibility/SEO on mobile. You will output code snippets, file‑diffs, and step‑by‑step migration commands.
+User
+Context
+• Existing repo: https://github.com/jwillz7667/dank-deals-delivery (Next.js 15, Tailwind 3, Neon + Drizzle).
+• Site is live at https://dankdealsmn.com.
+• Business goal: dominate Twin Cities SERP for cannabis delivery / dispensary queries.
+• Constraints: must remain Netlify‑hosted; keep age verification compliant with MN law §342.07.
+Tasks
+Performance / Core Web Vitals
+turn off productionBrowserSourceMaps or generate/upload them to Rollbar then strip from client build.
+enable React Compiler + use client directive removal where not needed.
+convert Lucide/Radix icons to Iconify sprite to shave 35 kB.
+implement Netlify Edge cache for /menu & /product/:slug with ISR revalidate: 60.
+add app/pwa.ts → register service‑worker for image & API caching; surface “Add to Home Screen” prompt.
+SEO / Local search
+add @type: DeliveryTimeSettings and @type: Service structured data per product; populate availableDeliveryMethod as DeliveryModeDirect.
+create content/blog/*.mdx with the following pillars, then auto‑generate sitemap.xml & rss.xml.
+implement /api/reviews endpoint to ingest Leafly/Google reviews, compute aggregate rating, and inject AggregateRating schema.
+generate robots.txt allowing all but /cart and add X‑Robots‑Tag: noindex header to age‑gate modal route.
+UI/UX (mobile‑first)
+expand bottom nav buttons to 44 × 44 px, include text labels; add haptic feedback on press (via Vibration API).
+build one‑page checkout: age + ID verification (Stripe Identity), address autocomplete (Google Places), delivery time‑slot selection, Apple/Google Pay.
+add “track my driver” page that polls /api/delivery-status and streams H3 geojson over SSE.
+Analytics & monitoring
+integrate Plausible self‑hosted at pl.dankdealsmn.com with custom events (age_verified, checkout_completed).
+push Core Web Vitals to BigQuery via web-vitals library + Netlify Background Function.
+Deliverables
+– PR‑ready code diff.
+– upgrade.md with migration steps & rollback plan.
+– lighthouse-report.html showing ≥ 90 scores mobile/desktop.
+– List of 15 authoritative backlink targets to pursue after deploy.

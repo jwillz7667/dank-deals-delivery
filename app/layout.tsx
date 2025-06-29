@@ -15,6 +15,8 @@ import { AgeVerificationProvider } from "@/hooks/use-age-verification"
 import AgeVerificationWrapper from "@/components/age-verification-wrapper"
 import { Suspense } from "react"
 import { createProductSlug } from "@/lib/utils"
+import Analytics from '@/components/analytics'
+import PWAInstallPrompt from '@/components/pwa-install-prompt'
 
 const inter = Inter({ 
   subsets: ["latin"], 
@@ -240,6 +242,8 @@ export default function RootLayout({
                     <Toaster />
                   </AgeVerificationWrapper>
                   <BottomNavigation />
+                  <Analytics />
+                  <PWAInstallPrompt />
                 </CartProvider>
               </AgeVerificationProvider>
             </Suspense>

@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, integer, decimal, unique, index } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, integer, decimal, unique, index, boolean, real } from 'drizzle-orm/pg-core';
 
 // User profiles extension (Stack Auth handles base user data)
 export const userProfiles = pgTable('user_profiles', {
@@ -83,6 +83,44 @@ export const orderItems = pgTable('order_items', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+// Products table
+export const products = pgTable('products', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  category: text('category'),
+  thcContent: text('thc_content'),
+  cbdContent: text('cbd_content'),
+  imageUrl: text('image_url'),
+  rating: real('rating').default(0),
+  reviewCount: integer('review_count').default(0),
+  inStock: boolean('in_stock').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  categoryIdx: index('idx_products_category').on(table.category),
+  ratingIdx: index('idx_products_rating').on(table.rating),
+}));
+
+// Reviews table
+export const reviews = pgTable('reviews', {
+  id: serial('id').primaryKey(),
+  productId: text('product_id').notNull().references(() => products.id, { onDelete: 'cascade' }),
+  source: text('source').notNull(), // 'leafly', 'google', 'internal'
+  rating: integer('rating').notNull(),
+  reviewerName: text('reviewer_name').notNull(),
+  reviewText: text('review_text'),
+  date: timestamp('date').notNull(),
+  verified: boolean('verified').notNull().default(false),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  productIdIdx: index('idx_reviews_product_id').on(table.productId),
+  sourceIdx: index('idx_reviews_source').on(table.source),
+  dateIdx: index('idx_reviews_date').on(table.date),
+  ratingIdx: index('idx_reviews_rating').on(table.rating),
+}));
+
 // Types for TypeScript
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type NewUserProfile = typeof userProfiles.$inferInsert;
@@ -97,4 +135,10 @@ export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 
 export type OrderItem = typeof orderItems.$inferSelect;
-export type NewOrderItem = typeof orderItems.$inferInsert; 
+export type NewOrderItem = typeof orderItems.$inferInsert;
+
+export type Product = typeof products.$inferSelect;
+export type NewProduct = typeof products.$inferInsert;
+
+export type Review = typeof reviews.$inferSelect;
+export type NewReview = typeof reviews.$inferInsert; 
