@@ -40,7 +40,7 @@ export default async function BlogPage() {
 
   return (
     <>
-      <JsonLd schema={breadcrumbSchema} />
+      <JsonLd data={breadcrumbSchema} />
       
       <div className="container max-w-7xl mx-auto px-4 py-8">
         {/* Hero Section */}
@@ -200,5 +200,5 @@ export default async function BlogPage() {
 }
 
 function getCategoryName(category: string): string {
-  return CONTENT_PILLARS[category]?.title || category
+  return CONTENT_PILLARS[category as keyof typeof CONTENT_PILLARS]?.title || category
 } 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { geoToH3 } from 'h3-js'
+import { latLngToCell } from 'h3-js'
 
 // SSE endpoint for real-time delivery tracking
 export async function GET(request: NextRequest) {
@@ -100,12 +100,12 @@ async function getDriverLocation(orderId: string, updateCount: number) {
     currentLocation: {
       lat: driverLat,
       lng: driverLng,
-      h3Index: geoToH3(driverLat, driverLng, 9), // Resolution 9 for neighborhood-level
+      h3Index: latLngToCell(driverLat, driverLng, 9), // Resolution 9 for neighborhood-level
     },
     customerLocation: {
       lat: customerLat,
       lng: customerLng,
-      h3Index: geoToH3(customerLat, customerLng, 9),
+      h3Index: latLngToCell(customerLat, customerLng, 9),
     },
   }
 } 

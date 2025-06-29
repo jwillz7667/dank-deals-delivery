@@ -1,10 +1,11 @@
 // Structured data helpers for enhanced SEO
-import { Product } from './products';
+import { Product, Review } from './db/schema';
 
 interface StructuredDataConfig {
   product?: Product;
   businessInfo?: BusinessInfo;
   aggregateRating?: AggregateRating;
+  reviews?: Review[];
 }
 
 interface BusinessInfo {
@@ -148,25 +149,25 @@ export function generateLocalBusinessSchema(businessInfo: BusinessInfo = default
 }
 
 // Generate product schema with delivery settings
-export function generateProductSchema(product: Product, aggregateRating?: AggregateRating) {
+export function generateProductSchema(product: Product, aggregateRating?: AggregateRating, reviews?: Review[]) {
   const schema: any = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "@id": `https://dankdealsmn.com/product/${product.slug}`,
+    "@id": `https://dankdealsmn.com/product/${product.id}`,
     name: product.name,
     description: product.description,
-    image: product.images.map(img => `https://dankdealsmn.com${img}`),
+    image: product.imageUrl ? [`https://dankdealsmn.com${product.imageUrl}`] : [],
     brand: {
       "@type": "Brand",
-      name: product.brand || "Dank Deals MN"
+      name: "Dank Deals MN"
     },
     sku: product.id,
     category: product.category,
     offers: {
       "@type": "Offer",
-      url: `https://dankdealsmn.com/product/${product.slug}`,
+      url: `https://dankdealsmn.com/product/${product.id}`,
       priceCurrency: "USD",
-      price: product.price,
+      price: parseFloat(product.price),
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       seller: {
@@ -223,17 +224,17 @@ export function generateProductSchema(product: Product, aggregateRating?: Aggreg
       {
         "@type": "PropertyValue",
         name: "THC Content",
-        value: product.thc || "N/A"
+        value: product.thcContent || "N/A"
       },
       {
         "@type": "PropertyValue",
         name: "CBD Content",
-        value: product.cbd || "N/A"
+        value: product.cbdContent || "N/A"
       },
       {
         "@type": "PropertyValue",
-        name: "Strain Type",
-        value: product.strain || "Hybrid"
+        name: "Category",
+        value: product.category || "Cannabis"
       },
       {
         "@type": "PropertyValue",
@@ -254,9 +255,9 @@ export function generateProductSchema(product: Product, aggregateRating?: Aggreg
     };
   }
 
-  // Add review if available
-  if (product.reviews && product.reviews.length > 0) {
-    schema.review = product.reviews.map(review => ({
+  // Add reviews if available
+  if (reviews && reviews.length > 0) {
+    schema.review = reviews.map(review => ({
       "@type": "Review",
       reviewRating: {
         "@type": "Rating",
@@ -266,10 +267,10 @@ export function generateProductSchema(product: Product, aggregateRating?: Aggreg
       },
       author: {
         "@type": "Person",
-        name: review.author
+        name: review.reviewerName
       },
       datePublished: review.date,
-      reviewBody: review.text
+      reviewBody: review.reviewText
     }));
   }
 
@@ -405,7 +406,7 @@ export function generatePageSchemas(config: StructuredDataConfig) {
 
   // Add product schema if product is provided
   if (config.product) {
-    schemas.push(generateProductSchema(config.product, config.aggregateRating));
+    schemas.push(generateProductSchema(config.product, config.aggregateRating, config.reviews));
   }
 
   return schemas;

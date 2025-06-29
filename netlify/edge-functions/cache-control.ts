@@ -1,6 +1,18 @@
-import type { Context } from "@netlify/edge-functions";
+// Netlify Edge Function types
+interface NetlifyContext {
+  next: () => Promise<Response>;
+  requestStart?: number;
+  geo?: {
+    city?: string;
+    country?: { code: string; name: string };
+    subdivision?: { code: string; name: string };
+  };
+  ip?: string;
+  params?: Record<string, string>;
+  site?: { id: string; name: string; url: string };
+}
 
-export default async function handler(request: Request, context: Context) {
+export default async function handler(request: Request, context: NetlifyContext) {
   const url = new URL(request.url);
   const path = url.pathname;
   
@@ -24,7 +36,8 @@ export default async function handler(request: Request, context: Context) {
   modifiedResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   
   // Add timing headers for performance monitoring
-  modifiedResponse.headers.set('Server-Timing', `edge;dur=${Date.now() - context.requestStart}`);
+  const startTime = context.requestStart || Date.now();
+  modifiedResponse.headers.set('Server-Timing', `edge;dur=${Date.now() - startTime}`);
   
   return modifiedResponse;
 }

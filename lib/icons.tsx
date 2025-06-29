@@ -107,8 +107,8 @@ export function preloadCriticalIcons() {
     icons.cannabis,
   ];
   
-  // Use Iconify's preload API
-  import('@iconify/react').then(({ preloadIcon }) => {
-    criticalIcons.forEach(icon => preloadIcon(icon));
+  // Load icons in the background using the loadIcons API
+  import('@iconify/react').then(({ loadIcons }) => {
+    loadIcons(criticalIcons);
   });
 } 

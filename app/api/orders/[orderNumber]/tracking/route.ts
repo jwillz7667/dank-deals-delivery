@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { orders, orderItems, products } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { geoToH3 } from 'h3-js'
+import { latLngToCell } from 'h3-js'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orderNumber: string } }
+  { params }: { params: Promise<{ orderNumber: string }> }
 ) {
   try {
-    const orderNumber = params.orderNumber
+    const { orderNumber } = await params
 
     // Fetch order details
     const [order] = await db
@@ -74,7 +74,7 @@ export async function GET(
     if (order.status === 'out_for_delivery') {
       estimatedArrival = new Date(now.getTime() + 20 * 60 * 1000) // 20 mins
     } else if (order.status === 'delivered') {
-      estimatedArrival = new Date(order.updatedAt)
+      estimatedArrival = order.updatedAt ? new Date(order.updatedAt) : new Date()
     }
 
     // Map order status to tracking status
@@ -100,7 +100,7 @@ export async function GET(
       customerLocation: {
         lat: customerLat,
         lng: customerLng,
-        h3Index: geoToH3(customerLat, customerLng, 9),
+        h3Index: latLngToCell(customerLat, customerLng, 9),
       },
       orderDetails: {
         items: items.map(({ orderItem, product }) => ({
@@ -121,7 +121,7 @@ export async function GET(
       (response as any).driverLocation = {
         lat: driverLat,
         lng: driverLng,
-        h3Index: geoToH3(driverLat, driverLng, 9),
+        h3Index: latLngToCell(driverLat, driverLng, 9),
       }
     }
 

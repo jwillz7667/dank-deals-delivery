@@ -13,7 +13,7 @@ const plausible = Plausible({
 
 // Custom events
 export const trackEvent = (eventName: string, options?: EventOptions) => {
-  plausible(eventName, options)
+  plausible.trackEvent(eventName, options)
 }
 
 // Predefined events
@@ -80,7 +80,7 @@ export default function Analytics() {
 
   useEffect(() => {
     // Track pageviews
-    plausible('pageview')
+    plausible.trackPageview()
   }, [pathname, searchParams])
 
   // Track Web Vitals
