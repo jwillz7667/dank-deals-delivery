@@ -11,8 +11,6 @@ import { siteConfig } from "@/config/site"
 import BottomNavigation from "@/components/bottom-navigation"
 import { products } from "@/lib/products"
 import { CartProvider } from "@/hooks/use-cart"
-import { AgeVerificationProvider } from "@/hooks/use-age-verification"
-import AgeVerificationWrapper from "@/components/age-verification-wrapper"
 import { Suspense } from "react"
 import { createProductSlug } from "@/lib/utils"
 import PWAInstallPrompt from '@/components/pwa-install-prompt'
@@ -311,21 +309,17 @@ export default function RootLayout({
           <StackProvider app={stackServerApp}>
             <StackTheme>
               <Suspense fallback={<LoadingFallback />}>
-                <AgeVerificationProvider>
-                  <CartProvider>
-                    <AgeVerificationWrapper>
-                      <div className="min-h-screen bg-app-bg">
-                        <Suspense fallback={<LoadingFallback />}>
-                          {children}
-                        </Suspense>
-                      </div>
-                      <Toaster />
-                    </AgeVerificationWrapper>
-                    <BottomNavigation />
-                    <AnalyticsLoader />
-                    <PWAInstallPrompt />
-                  </CartProvider>
-                </AgeVerificationProvider>
+                <CartProvider>
+                  <div className="min-h-screen bg-app-bg">
+                    <Suspense fallback={<LoadingFallback />}>
+                      {children}
+                    </Suspense>
+                  </div>
+                  <Toaster />
+                  <BottomNavigation />
+                  <AnalyticsLoader />
+                  <PWAInstallPrompt />
+                </CartProvider>
               </Suspense>
             </StackTheme>
           </StackProvider>

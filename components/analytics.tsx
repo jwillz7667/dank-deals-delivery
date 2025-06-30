@@ -18,59 +18,57 @@ export const trackEvent = (eventName: string, options?: EventOptions) => {
 
 // Predefined events
 export const analyticsEvents = {
-  // Age verification
-  ageVerified: () => trackEvent('age_verified'),
-  ageVerificationFailed: () => trackEvent('age_verification_failed'),
-  
-  // Product interactions
-  viewProduct: (productId: string, category: string) => 
-    trackEvent('view_product', { props: { product_id: productId, category } }),
-  addToCart: (productId: string, quantity: number, value: number) => 
-    trackEvent('add_to_cart', { props: { product_id: productId, quantity: quantity.toString(), value: value.toString() } }),
-  removeFromCart: (productId: string) => 
-    trackEvent('remove_from_cart', { props: { product_id: productId } }),
-  
-  // Checkout flow
-  beginCheckout: (value: number) => 
-    trackEvent('begin_checkout', { props: { value: value.toString() } }),
-  checkoutStep: (step: string, value: number) => 
-    trackEvent('checkout_step', { props: { step, value: value.toString() } }),
-  checkoutCompleted: (orderId: string, value: number, paymentMethod: string) => 
-    trackEvent('checkout_completed', { 
-      props: { 
-        order_id: orderId, 
-        value: value.toString(), 
-        payment_method: paymentMethod 
-      } 
-    }),
-  checkoutAbandoned: (step: string, value: number) => 
-    trackEvent('checkout_abandoned', { props: { step, value: value.toString() } }),
-  
-  // Search
-  search: (query: string, resultsCount: number) => 
-    trackEvent('search', { props: { query, results_count: resultsCount.toString() } }),
-  
-  // User actions
-  login: (method: string) => trackEvent('login', { props: { method } }),
-  signup: (method: string) => trackEvent('signup', { props: { method } }),
-  logout: () => trackEvent('logout'),
+  // Navigation and engagement
+  pageView: (page: string, properties?: Record<string, any>) => trackEvent('page_view', { props: { page, ...properties } }),
+  productView: (productId: string, productName: string) => trackEvent('product_view', { props: { product_id: productId, product_name: productName } }),
+  categoryView: (category: string) => trackEvent('category_view', { props: { category } }),
+  searchPerformed: (query: string, results: number) => trackEvent('search', { props: { query, results: results.toString() } }),
+
+  // Commerce events  
+  addToCart: (productId: string, productName: string, price: number, quantity: number) => trackEvent('add_to_cart', { 
+    props: {
+      product_id: productId, 
+      product_name: productName, 
+      price: price.toString(), 
+      quantity: quantity.toString()
+    }
+  }),
+  removeFromCart: (productId: string) => trackEvent('remove_from_cart', { props: { product_id: productId } }),
+  beginCheckout: (cartValue: number, itemCount: number) => trackEvent('begin_checkout', { props: { value: cartValue.toString(), items: itemCount.toString() } }),
+  purchase: (orderId: string, revenue: number, items: number) => trackEvent('purchase', { 
+    props: {
+      transaction_id: orderId, 
+      value: revenue.toString(), 
+      items: items.toString()
+    }
+  }),
+
+  // User interactions
+  contactClick: (method: string) => trackEvent('contact_click', { props: { method } }),
+  socialShare: (platform: string, url: string) => trackEvent('social_share', { props: { platform, url } }),
+  newsletterSignup: (source: string) => trackEvent('newsletter_signup', { props: { source } }),
   
   // PWA events
   pwaInstallPromptShown: () => trackEvent('pwa_install_prompt_shown'),
-  pwaInstallAccepted: () => trackEvent('pwa_install_accepted'),
-  pwaInstallDismissed: () => trackEvent('pwa_install_dismissed'),
+  pwaInstallPromptAccepted: () => trackEvent('pwa_install_prompt_accepted'),
+  pwaInstallPromptDismissed: () => trackEvent('pwa_install_prompt_dismissed'),
+  pwaInstall: () => trackEvent('pwa_install'),
+
+  // Error tracking
+  errorOccurred: (error: string, context?: string) => trackEvent('error', { 
+    props: { 
+      error, 
+      ...(context && { context }) 
+    } 
+  }),
   
-  // Delivery tracking
-  trackingStarted: (orderId: string) => 
-    trackEvent('tracking_started', { props: { order_id: orderId } }),
-  driverCalled: (orderId: string) => 
-    trackEvent('driver_called', { props: { order_id: orderId } }),
-  
-  // Blog engagement
-  blogPostViewed: (slug: string, category: string) => 
-    trackEvent('blog_post_viewed', { props: { slug, category } }),
-  blogCategoryViewed: (category: string) => 
-    trackEvent('blog_category_viewed', { props: { category } }),
+  // Performance tracking
+  webVitals: (metric: string, value: number, rating: string) => trackEvent('web_vitals', { props: { metric, value: value.toString(), rating } }),
+
+  // Business metrics
+  deliveryAreaView: (area: string) => trackEvent('delivery_area_view', { props: { area } }),
+  menuFilterUsed: (filter: string) => trackEvent('menu_filter_used', { props: { filter } }),
+  productReviewRead: (productId: string) => trackEvent('product_review_read', { props: { product_id: productId } }),
 }
 
 // Analytics Provider Component

@@ -46,10 +46,6 @@ export default function SinglePageCheckout() {
   
   // Form state
   const [formData, setFormData] = useState({
-    // Age verification
-    dateOfBirth: '',
-    idVerified: false,
-    
     // Contact info
     email: '',
     phone: '',
@@ -74,14 +70,15 @@ export default function SinglePageCheckout() {
   })
 
   // Checkout steps
-  const [steps, setSteps] = useState<CheckoutStep[]>([
-    { id: 'age', title: 'Age Verification', description: 'Verify you are 21+', icon: 'check', completed: false },
-    { id: 'contact', title: 'Contact Info', description: 'How to reach you', icon: 'user', completed: false },
-    { id: 'delivery', title: 'Delivery Details', description: 'Where and when', icon: 'delivery', completed: false },
-    { id: 'payment', title: 'Payment', description: 'Secure checkout', icon: 'creditCard', completed: false },
-  ])
+  const steps = [
+    { id: 'delivery', title: 'Delivery Info', description: 'Address & contact', icon: 'truck', completed: false },
+    { id: 'payment', title: 'Payment', description: 'Card or cash', icon: 'credit-card', completed: false },
+    { id: 'review', title: 'Review Order', description: 'Confirm details', icon: 'check', completed: false },
+  ]
 
   const [currentStep, setCurrentStep] = useState(0)
+  const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
 
   // Initialize Stripe
   useEffect(() => {
@@ -145,62 +142,20 @@ export default function SinglePageCheckout() {
     })
   }, [])
 
-  // Verify age with Stripe Identity
-  const verifyIdentity = async () => {
-    if (!stripe) return
-
-    setLoading(true)
-    try {
-      const response = await fetch('/api/checkout/verify-identity', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dateOfBirth: formData.dateOfBirth })
-      })
-
-      const { clientSecret } = await response.json()
-
-      // Open Stripe Identity verification modal
-      const { error } = await stripe.verifyIdentity(clientSecret)
-
-      if (error) {
-        throw new Error(error.message)
-      }
-
-      setFormData(prev => ({ ...prev, idVerified: true }))
-      markStepComplete(0)
-      toast({
-        title: 'Identity verified!',
-        description: 'Your age has been successfully verified.',
-      })
-    } catch (error) {
-      toast({
-        title: 'Verification failed',
-        description: error instanceof Error ? error.message : 'Please try again.',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
   // Mark step as complete
   const markStepComplete = (stepIndex: number) => {
-    setSteps(prev => prev.map((step, index) => 
-      index === stepIndex ? { ...step, completed: true } : step
-    ))
+    setCompletedSteps(prev => [...prev, stepIndex])
   }
 
   // Validate current step
   const validateStep = (stepIndex: number): boolean => {
     switch (stepIndex) {
-      case 0: // Age verification
-        return formData.idVerified
-      case 1: // Contact info
-        return !!(formData.email && formData.phone && formData.firstName && formData.lastName)
-      case 2: // Delivery details
-        return !!(formData.address && formData.city && formData.state && formData.zipCode)
-      case 3: // Payment
-        return true // Validated during payment processing
+      case 0: // Delivery info
+        return !!(formData.email && formData.phone && formData.firstName && formData.lastName && formData.address && formData.city && formData.state && formData.zipCode)
+      case 1: // Payment
+        return !!(formData.paymentMethod)
+      case 2: // Review
+        return true
       default:
         return false
     }
@@ -299,11 +254,11 @@ export default function SinglePageCheckout() {
                 <div className={cn(
                   "flex items-center justify-center w-10 h-10 rounded-full",
                   "border-2 transition-colors",
-                  step.completed ? "bg-primary border-primary text-primary-foreground" :
+                  completedSteps.includes(index) ? "bg-primary border-primary text-primary-foreground" :
                   index === currentStep ? "border-primary text-primary" :
                   "border-muted-foreground text-muted-foreground"
                 )}>
-                  {step.completed ? (
+                  {completedSteps.includes(index) ? (
                     <DankIcon name="check" size={20} />
                   ) : (
                     <span className="text-sm font-semibold">{index + 1}</span>
@@ -312,7 +267,7 @@ export default function SinglePageCheckout() {
                 {index < steps.length - 1 && (
                   <div className={cn(
                     "w-full h-0.5 mx-2",
-                    step.completed ? "bg-primary" : "bg-muted"
+                    completedSteps.includes(index) ? "bg-primary" : "bg-muted"
                   )} />
                 )}
               </div>
@@ -329,133 +284,118 @@ export default function SinglePageCheckout() {
               <CardDescription>{steps[currentStep].description}</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Age Verification Step */}
+              {/* Delivery Info Step */}
               {currentStep === 0 && (
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  {/* Contact Information */}
                   <div>
-                    <Label htmlFor="dob">Date of Birth</Label>
-                    <Input
-                      id="dob"
-                      type="date"
-                      value={formData.dateOfBirth}
-                      onChange={(e) => setFormData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
-                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 21)).toISOString().split('T')[0]}
-                      required
-                    />
-                    <p className="text-sm text-muted-foreground mt-1">
-                      You must be 21 or older to order
-                    </p>
+                    <h3 className="text-lg font-medium mb-4">Contact Information</h3>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="firstName">First Name</Label>
+                          <Input
+                            id="firstName"
+                            value={formData.firstName}
+                            onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lastName">Last Name</Label>
+                          <Input
+                            id="lastName"
+                            value={formData.lastName}
+                            onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                          placeholder="(612) 555-0123"
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <Button 
-                    onClick={verifyIdentity} 
-                    disabled={!formData.dateOfBirth || loading}
-                    className="w-full"
-                  >
-                    {loading ? 'Verifying...' : 'Verify Identity with Stripe'}
-                  </Button>
-                </div>
-              )}
 
-              {/* Contact Info Step */}
-              {currentStep === 1 && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        value={formData.firstName}
-                        onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                      placeholder="(612) 555-0123"
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Delivery Details Step */}
-              {currentStep === 2 && (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="address-input">Street Address</Label>
-                    <Input
-                      id="address-input"
-                      value={formData.address}
-                      onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                      placeholder="Enter your address"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="apartment">Apt/Suite (optional)</Label>
-                    <Input
-                      id="apartment"
-                      value={formData.apartment}
-                      onChange={(e) => setFormData(prev => ({ ...prev, apartment: e.target.value }))}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="city">City</Label>
-                      <Input
-                        id="city"
-                        value={formData.city}
-                        onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="zipCode">ZIP Code</Label>
-                      <Input
-                        id="zipCode"
-                        value={formData.zipCode}
-                        onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="deliveryInstructions">Delivery Instructions (optional)</Label>
-                    <Input
-                      id="deliveryInstructions"
-                      value={formData.deliveryInstructions}
-                      onChange={(e) => setFormData(prev => ({ ...prev, deliveryInstructions: e.target.value }))}
-                      placeholder="Gate code, building entrance, etc."
-                    />
-                  </div>
                   <Separator />
+
+                  {/* Delivery Address */}
                   <div>
-                    <Label>Delivery Time</Label>
+                    <h3 className="text-lg font-medium mb-4">Delivery Address</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="address-input">Street Address</Label>
+                        <Input
+                          id="address-input"
+                          value={formData.address}
+                          onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                          placeholder="Enter your address"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="apartment">Apt/Suite (optional)</Label>
+                        <Input
+                          id="apartment"
+                          value={formData.apartment}
+                          onChange={(e) => setFormData(prev => ({ ...prev, apartment: e.target.value }))}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="city">City</Label>
+                          <Input
+                            id="city"
+                            value={formData.city}
+                            onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="zipCode">ZIP Code</Label>
+                          <Input
+                            id="zipCode"
+                            value={formData.zipCode}
+                            onChange={(e) => setFormData(prev => ({ ...prev, zipCode: e.target.value }))}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="deliveryInstructions">Delivery Instructions (optional)</Label>
+                        <Input
+                          id="deliveryInstructions"
+                          value={formData.deliveryInstructions}
+                          onChange={(e) => setFormData(prev => ({ ...prev, deliveryInstructions: e.target.value }))}
+                          placeholder="Gate code, building entrance, etc."
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Delivery Time */}
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Delivery Time</h3>
                     <RadioGroup
                       value={formData.deliveryTimeSlot}
                       onValueChange={(value) => setFormData(prev => ({ ...prev, deliveryTimeSlot: value }))}
@@ -480,7 +420,7 @@ export default function SinglePageCheckout() {
               )}
 
               {/* Payment Step */}
-              {currentStep === 3 && (
+              {currentStep === 1 && (
                 <div className="space-y-4">
                   <div>
                     <Label>Payment Method</Label>
@@ -526,6 +466,46 @@ export default function SinglePageCheckout() {
                   </div>
                   <div id="payment-request-button" className="mt-4">
                     {/* Stripe Payment Request Button will be mounted here */}
+                  </div>
+                </div>
+              )}
+
+              {/* Review Order Step */}
+              {currentStep === 2 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Review Your Order</h3>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="font-medium">Contact</p>
+                          <p>{formData.firstName} {formData.lastName}</p>
+                          <p>{formData.email}</p>
+                          <p>{formData.phone}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Delivery Address</p>
+                          <p>{formData.address}</p>
+                          {formData.apartment && <p>Apt {formData.apartment}</p>}
+                          <p>{formData.city}, {formData.state} {formData.zipCode}</p>
+                        </div>
+                      </div>
+                      {formData.deliveryInstructions && (
+                        <div>
+                          <p className="font-medium text-sm">Delivery Instructions</p>
+                          <p className="text-sm text-muted-foreground">{formData.deliveryInstructions}</p>
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-medium text-sm">Payment Method</p>
+                        <p className="text-sm text-muted-foreground capitalize">{formData.paymentMethod?.replace('_', ' ')}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-muted p-4 rounded-lg">
+                    <p className="text-sm text-center text-muted-foreground">
+                      By placing this order, you agree to our Terms of Service and confirm that you are 21+ years old.
+                    </p>
                   </div>
                 </div>
               )}
