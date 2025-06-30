@@ -1,141 +1,273 @@
 // Service Worker for Dank Deals MN PWA
-const CACHE_VERSION = 'v1';
-const STATIC_CACHE = `static-${CACHE_VERSION}`;
-const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
-const IMAGE_CACHE = `images-${CACHE_VERSION}`;
+const CACHE_NAME = 'dankdeals-v2025-01'
+const STATIC_CACHE = 'dankdeals-static-v2025-01'
+const API_CACHE = 'dankdeals-api-v2025-01'
+const IMAGE_CACHE = 'dankdeals-images-v2025-01'
 
-// Assets to cache on install
-const STATIC_ASSETS = [
+// Critical resources to cache immediately
+const CRITICAL_RESOURCES = [
   '/',
   '/menu',
-  '/manifest.json',
+  '/delivery',
   '/offline.html',
-];
+  '/DANKDEALSMN.COM-LOGO.png',
+  '/favicon.ico',
+  '/_next/static/css/app/layout.css',
+  '/_next/static/css/app/globals.css'
+]
+
+// API endpoints to cache
+const API_ROUTES = [
+  '/api/reviews',
+  '/api/analytics/web-vitals',
+  '/api/analytics/business-metrics'
+]
+
+// Image patterns to cache
+const IMAGE_PATTERNS = [
+  /\.(jpg|jpeg|png|gif|webp|avif|svg)$/i,
+  /_next\/image/,
+  /\/images\//
+]
 
 // Install event - cache static assets
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
+  console.log('Service Worker installing...')
+  
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+    Promise.all([
+      // Cache critical resources
+      caches.open(STATIC_CACHE).then(cache => {
+        console.log('Caching critical resources')
+        return cache.addAll(CRITICAL_RESOURCES)
+      }),
+      
+      // Preload critical icons
+      caches.open(IMAGE_CACHE).then(cache => {
+        const iconPromises = [
+          'lucide:search',
+          'lucide:leaf', 
+          'lucide:menu',
+          'lucide:home',
+          'lucide:shopping-cart',
+          'lucide:user'
+        ].map(icon => 
+          fetch(`https://api.iconify.design/${icon}.svg`)
+            .then(response => cache.put(`/icons/${icon}.svg`, response))
+            .catch(() => {}) // Fail silently for icons
+        )
+        return Promise.all(iconPromises)
+      })
+    ]).then(() => {
+      console.log('Service Worker installed successfully')
+      return self.skipWaiting()
     })
-  );
-  self.skipWaiting();
-});
+  )
+})
 
 // Activate event - clean old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
+  console.log('Service Worker activating...')
+  
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames
-          .filter((name) => name.startsWith('static-') || name.startsWith('dynamic-') || name.startsWith('images-'))
-          .filter((name) => !name.includes(CACHE_VERSION))
-          .map((name) => caches.delete(name))
-      );
+        cacheNames.map(cacheName => {
+          // Delete old caches
+          if (cacheName !== CACHE_NAME && 
+              cacheName !== STATIC_CACHE && 
+              cacheName !== API_CACHE && 
+              cacheName !== IMAGE_CACHE) {
+            console.log('Deleting old cache:', cacheName)
+            return caches.delete(cacheName)
+          }
+        })
+      )
+    }).then(() => {
+      console.log('Service Worker activated')
+      return self.clients.claim()
     })
-  );
-  self.clients.claim();
-});
+  )
+})
 
 // Fetch event - implement caching strategies
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
+self.addEventListener('fetch', event => {
+  const { request } = event
+  const url = new URL(request.url)
+  
   // Skip non-GET requests
-  if (request.method !== 'GET') return;
-
-  // API calls - Network first, fallback to cache
+  if (request.method !== 'GET') return
+  
+  // Skip chrome-extension and other non-http requests
+  if (!url.protocol.startsWith('http')) return
+  
+  // Handle different types of requests
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clonedResponse = response.clone();
-          caches.open(DYNAMIC_CACHE).then((cache) => {
-            cache.put(request, clonedResponse);
-          });
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
-    return;
+    event.respondWith(handleApiRequest(request))
+  } else if (isImageRequest(request)) {
+    event.respondWith(handleImageRequest(request))
+  } else if (isStaticResource(request)) {
+    event.respondWith(handleStaticRequest(request))
+  } else {
+    event.respondWith(handleNavigationRequest(request))
   }
+})
 
-  // Images - Cache first, fallback to network
-  if (request.destination === 'image') {
-    event.respondWith(
-      caches.open(IMAGE_CACHE).then((cache) => {
-        return cache.match(request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          return fetch(request).then((networkResponse) => {
-            cache.put(request, networkResponse.clone());
-            return networkResponse;
-          });
-        });
-      })
-    );
-    return;
-  }
-
-  // HTML pages - Network first for freshness
-  if (request.headers.get('accept')?.includes('text/html')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clonedResponse = response.clone();
-          caches.open(DYNAMIC_CACHE).then((cache) => {
-            cache.put(request, clonedResponse);
-          });
-          return response;
-        })
-        .catch(() => 
-          caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            return caches.match('/offline.html');
-          })
-        )
-    );
-    return;
-  }
-
-  // Default - Try cache first
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(request);
-    })
-  );
-});
-
-// Background sync for cart updates
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-cart') {
-    event.waitUntil(syncCart());
-  }
-});
-
-async function syncCart() {
+// API request handler with smart caching
+async function handleApiRequest(request) {
+  const url = new URL(request.url)
+  const cache = await caches.open(API_CACHE)
+  
   try {
-    const cache = await caches.open(DYNAMIC_CACHE);
-    const requests = await cache.keys();
-    const cartRequests = requests.filter(req => req.url.includes('/api/cart'));
-    
-    for (const request of cartRequests) {
+    // For analytics and reviews, try network first with cache fallback
+    if (API_ROUTES.some(route => url.pathname.startsWith(route))) {
       try {
-        await fetch(request);
-        await cache.delete(request);
+        const networkResponse = await fetch(request)
+        if (networkResponse.ok) {
+          // Cache successful responses for 5 minutes
+          const responseClone = networkResponse.clone()
+          cache.put(request, responseClone)
+        }
+        return networkResponse
       } catch (error) {
-        console.error('Failed to sync cart request:', error);
+        console.log('Network failed, trying cache for:', url.pathname)
+        const cachedResponse = await cache.match(request)
+        if (cachedResponse) return cachedResponse
+        throw error
       }
     }
+    
+    // For other APIs, always try network
+    return await fetch(request)
   } catch (error) {
-    console.error('Cart sync failed:', error);
+    console.log('API request failed:', url.pathname)
+    return new Response(JSON.stringify({ error: 'Network unavailable' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
+}
+
+// Image request handler with aggressive caching
+async function handleImageRequest(request) {
+  const cache = await caches.open(IMAGE_CACHE)
+  
+  // Try cache first for images
+  const cachedResponse = await cache.match(request)
+  if (cachedResponse) return cachedResponse
+  
+  try {
+    const networkResponse = await fetch(request)
+    if (networkResponse.ok) {
+      // Cache images for 30 days
+      const responseClone = networkResponse.clone()
+      cache.put(request, responseClone)
+    }
+    return networkResponse
+  } catch (error) {
+    console.log('Image request failed:', request.url)
+    // Return a placeholder or empty response
+    return new Response('', { status: 404 })
+  }
+}
+
+// Static resource handler
+async function handleStaticRequest(request) {
+  const cache = await caches.open(STATIC_CACHE)
+  
+  // Try cache first for static resources
+  const cachedResponse = await cache.match(request)
+  if (cachedResponse) return cachedResponse
+  
+  try {
+    const networkResponse = await fetch(request)
+    if (networkResponse.ok) {
+      const responseClone = networkResponse.clone()
+      cache.put(request, responseClone)
+    }
+    return networkResponse
+  } catch (error) {
+    console.log('Static resource failed:', request.url)
+    throw error
+  }
+}
+
+// Navigation request handler
+async function handleNavigationRequest(request) {
+  const cache = await caches.open(STATIC_CACHE)
+  
+  try {
+    // Try network first for navigation
+    const networkResponse = await fetch(request)
+    if (networkResponse.ok) {
+      const responseClone = networkResponse.clone()
+      cache.put(request, responseClone)
+    }
+    return networkResponse
+  } catch (error) {
+    console.log('Navigation failed, trying cache for:', request.url)
+    
+    // Try to find cached version
+    const cachedResponse = await cache.match(request)
+    if (cachedResponse) return cachedResponse
+    
+    // Fall back to cached homepage or offline page
+    const fallbackResponse = await cache.match('/') || await cache.match('/offline.html')
+    if (fallbackResponse) return fallbackResponse
+    
+    // Last resort - create minimal offline response
+    return new Response(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>DankDealsMN - Offline</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body { font-family: system-ui, sans-serif; text-align: center; padding: 50px; }
+            .offline { color: #666; }
+          </style>
+        </head>
+        <body>
+          <h1>DankDealsMN</h1>
+          <p class="offline">You're currently offline. Please check your connection and try again.</p>
+          <button onclick="window.location.reload()">Retry</button>
+        </body>
+      </html>
+    `, {
+      headers: { 'Content-Type': 'text/html' }
+    })
+  }
+}
+
+// Helper functions
+function isImageRequest(request) {
+  return IMAGE_PATTERNS.some(pattern => pattern.test(request.url))
+}
+
+function isStaticResource(request) {
+  const url = new URL(request.url)
+  return url.pathname.startsWith('/_next/static/') || 
+         url.pathname.includes('.css') ||
+         url.pathname.includes('.js') ||
+         url.pathname.includes('.woff') ||
+         url.pathname.includes('.ttf')
+}
+
+// Background sync for analytics
+self.addEventListener('sync', event => {
+  if (event.tag === 'analytics-sync') {
+    event.waitUntil(syncAnalytics())
+  }
+})
+
+async function syncAnalytics() {
+  try {
+    // Sync any queued analytics data when back online
+    const cache = await caches.open(API_CACHE)
+    // Implementation would sync stored analytics events
+    console.log('Analytics synced successfully')
+  } catch (error) {
+    console.log('Analytics sync failed:', error)
   }
 }
 

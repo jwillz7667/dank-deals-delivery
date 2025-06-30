@@ -1,5 +1,5 @@
 // Iconify icon configuration for optimized loading
-import React from 'react';
+import React, { memo } from 'react';
 import { Icon } from '@iconify/react';
 
 // Map of commonly used icons
@@ -94,21 +94,152 @@ export function DankIcon({
   />;
 }
 
-// Preload critical icons for performance
-export function preloadCriticalIcons() {
-  if (typeof window === 'undefined') return;
-  
-  const criticalIcons = [
-    icons.home,
-    icons.menu,
-    icons.cart,
-    icons.user,
-    icons.search,
-    icons.cannabis,
-  ];
-  
-  // Load icons in the background using the loadIcons API
-  import('@iconify/react').then(({ loadIcons }) => {
-    loadIcons(criticalIcons);
-  });
-} 
+// Optimized icon component with preloaded sprites
+interface OptimizedIconProps {
+  name: string
+  className?: string
+  size?: number | string
+  style?: React.CSSProperties
+}
+
+const OptimizedIcon = memo(function OptimizedIcon({ 
+  name, 
+  className = '', 
+  size = 20,
+  style 
+}: OptimizedIconProps) {
+  return (
+    <Icon 
+      icon={name} 
+      className={className}
+      width={size}
+      height={size}
+      style={style}
+    />
+  )
+})
+
+// Export commonly used icons with optimized sprites
+export const SearchIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:search" {...props} />
+)
+
+export const LeafIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:leaf" {...props} />
+)
+
+export const CookieIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:cookie" {...props} />
+)
+
+export const CigaretteIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:cigarette" {...props} />
+)
+
+export const HeartIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:heart" {...props} />
+)
+
+export const PillIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:pill" {...props} />
+)
+
+export const SparklesIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:sparkles" {...props} />
+)
+
+export const TrendingUpIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:trending-up" {...props} />
+)
+
+export const UsersIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:users" {...props} />
+)
+
+export const ShoppingCartIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:shopping-cart" {...props} />
+)
+
+export const StarIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:star" {...props} />
+)
+
+export const ClockIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:clock" {...props} />
+)
+
+export const ActivityIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:activity" {...props} />
+)
+
+export const CheckCircleIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:check-circle" {...props} />
+)
+
+export const MenuIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:menu" {...props} />
+)
+
+export const HomeIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:home" {...props} />
+)
+
+export const MapPinIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:map-pin" {...props} />
+)
+
+export const PhoneIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:phone" {...props} />
+)
+
+export const UserIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:user" {...props} />
+)
+
+export const TruckIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:truck" {...props} />
+)
+
+export const XIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:x" {...props} />
+)
+
+export const PlusIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:plus" {...props} />
+)
+
+export const MinusIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:minus" {...props} />
+)
+
+export const FilterIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:filter" {...props} />
+)
+
+export const ArrowUpIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:arrow-up" {...props} />
+)
+
+export const ArrowDownIcon = memo((props: Omit<OptimizedIconProps, 'name'>) => 
+  <OptimizedIcon name="lucide:arrow-down" {...props} />
+)
+
+// Preload critical icon sprites on app startup
+export const preloadCriticalIcons = () => {
+  if (typeof window !== 'undefined') {
+    // Use Iconify's loadIcons API for better performance
+    import('@iconify/react').then(({ loadIcons }) => {
+      loadIcons([
+        'lucide:search',
+        'lucide:leaf', 
+        'lucide:menu',
+        'lucide:home',
+        'lucide:shopping-cart',
+        'lucide:user',
+        'lucide:truck'
+      ])
+    })
+  }
+}
+
+export default OptimizedIcon 

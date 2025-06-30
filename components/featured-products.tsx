@@ -1,73 +1,153 @@
 "use client"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Autoplay, Pagination } from "swiper/modules"
-import "swiper/css"
-import "swiper/css/pagination"
+
+import { memo, Suspense } from "react"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import Image from "next/image"
-import type { Product } from "@/lib/products"
 import Link from "next/link"
+import Image from "next/image"
+import { products } from "@/lib/products"
 import { createProductSlug } from "@/lib/utils"
+import dynamic from "next/dynamic"
+
+// Lazy load heavy components
+const CyclingImage = dynamic(() => import("@/components/ui/cycling-image"), {
+  loading: () => <div className="aspect-square bg-gray-200 animate-pulse rounded-xl" />,
+  ssr: false
+})
+
+interface ProductCardProps {
+  product: typeof products[0]
+  index: number
+  isMobile?: boolean
+  onProductClick?: (product: typeof products[0]) => void
+}
+
+const ProductCard = memo(function ProductCard({ product, index, isMobile = false, onProductClick }: ProductCardProps) {
+  const gridClass = isMobile ? "p-3" : "p-4"
+  const titleClass = isMobile ? "text-sm" : "text-base"
+  const priceClass = isMobile ? "text-lg" : "text-xl"
+  const buttonClass = isMobile ? "text-xs h-8" : ""
+
+  return (
+    <Card className="product-card animate-slide-up h-full" style={{ animationDelay: `${index * 100}ms` }}>
+      <CardContent className={`${gridClass} h-full flex flex-col`}>
+        <Link 
+          href={`/product/${createProductSlug(product.name)}`}
+          onClick={(e) => {
+            if (onProductClick) {
+              e.preventDefault()
+              onProductClick(product)
+            }
+          }}
+        >
+          <div className="aspect-square relative mb-3 rounded-xl overflow-hidden bg-white shadow-md">
+            <Suspense fallback={
+              <div className="w-full h-full bg-gray-200 animate-pulse" />
+            }>
+              {product.images && product.images.length > 1 ? (
+                <CyclingImage
+                  images={product.images}
+                  alt={product.name}
+                  priority={index < 2}
+                  sizes={isMobile ? "(max-width: 768px) 180px, 250px" : "(max-width: 1024px) 200px, 250px"}
+                />
+              ) : (
+                <Image
+                  src={product.imageUrl}
+                  alt={product.name}
+                  fill
+                  className="object-cover hover:scale-110 transition-transform duration-300"
+                  priority={index < 2}
+                  sizes={isMobile ? "(max-width: 768px) 180px, 250px" : "(max-width: 1024px) 200px, 250px"}
+                />
+              )}
+            </Suspense>
+          </div>
+        </Link>
+        <div className="text-center flex flex-col h-full">
+          <p className={`text-app-green-600 font-medium mb-1 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+            {product.category}
+          </p>
+          <Link 
+            href={`/product/${createProductSlug(product.name)}`}
+            onClick={(e) => {
+              if (onProductClick) {
+                e.preventDefault()
+                onProductClick(product)
+              }
+            }}
+          >
+            <h3 className={`font-semibold ${titleClass} text-foreground mb-2 hover:text-app-green-600 transition-colors duration-200 line-clamp-2`}>
+              {product.name}
+            </h3>
+          </Link>
+          <div className="flex-grow flex flex-col justify-end">
+            <p className={`font-bold text-app-green-600 mb-3 ${priceClass}`}>
+              ${product.pricing?.[0]?.price || '25.50'}
+            </p>
+            <a href={`sms:+16129301390?&body=Hi! I'd like to order the ${encodeURIComponent(product.name)}.`}>
+              <Button className={`w-full primary-button ${buttonClass}`}>
+                Order Now
+              </Button>
+            </a>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+})
 
 interface FeaturedProductsProps {
-  products: Product[]
-  onProductClick: (product: Product) => void
+  limit?: number
+  isMobile?: boolean
+  products?: typeof products
+  onProductClick?: (product: typeof products[0]) => void
 }
 
-export default function FeaturedProducts({ products, onProductClick }: FeaturedProductsProps) {
+export default memo(function FeaturedProducts({ limit = 6, isMobile = false, products: customProducts, onProductClick }: FeaturedProductsProps) {
+  const featuredProducts = customProducts ? customProducts.slice(0, limit) : products.slice(0, limit)
+  const gridClass = isMobile ? "grid-cols-2 gap-3" : "grid-cols-4 gap-6"
+
+  if (isMobile) {
+    return (
+      <div className="animate-slide-up">
+        <h2 className="text-xl font-semibold text-foreground mb-6">Hot right now</h2>
+        <div className={`grid ${gridClass}`}>
+          {featuredProducts.map((product, index) => (
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              index={index} 
+              isMobile={true}
+              onProductClick={onProductClick}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <Swiper
-      modules={[Autoplay, Pagination]}
-      spaceBetween={16}
-      slidesPerView={1.2}
-      pagination={{ clickable: true }}
-      autoplay={{ delay: 4000, disableOnInteraction: false }}
-      breakpoints={{
-        480: { slidesPerView: 1.5, spaceBetween: 20 },
-        640: { slidesPerView: 2, spaceBetween: 20 },
-        768: { slidesPerView: 2.5, spaceBetween: 24 },
-        1024: { slidesPerView: 3, spaceBetween: 24 },
-        1280: { slidesPerView: 4, spaceBetween: 30 },
-      }}
-      className="!pb-12"
-    >
-      {products.map((product) => (
-        <SwiperSlide key={product.id}>
-          <Card
-            className="overflow-hidden cursor-pointer group transform transition-transform duration-300 hover:scale-105 bg-white/30 dark:bg-black/30 border-none"
-          >
-            <Link href={`/product/${createProductSlug(product.name)}`}>
-              <CardContent className="p-0">
-                <div className="relative h-40 sm:h-48 md:h-56 w-full">
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.imageAlt || product.name}
-                    fill
-                    style={{ objectFit: "cover" }}
-                    className="group-hover:opacity-90 transition-opacity"
-                    priority={products.indexOf(product) === 0} // FIXED: Priority load first product
-                    sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                  />
-                  {product.soldOut && (
-                    <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-lg font-bold text-xs shadow-lg">
-                      SOLD OUT
-                    </div>
-                  )}
-                </div>
-                <div className="p-3 sm:p-4">
-                  <h4 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">{product.name}</h4>
-                  <p className="text-xs sm:text-sm text-green-700 dark:text-green-400 font-medium">{product.category}</p>
-                  {product.category === "Flower" && product.pricing && !product.soldOut && (
-                    <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
-                      From ${product.pricing[0].price}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Link>
-          </Card>
-        </SwiperSlide>
-      ))}
-    </Swiper>
+    <div className="mb-16 animate-slide-up">
+      <div className="flex items-center justify-between mb-10">
+        <h2 className="text-3xl font-semibold text-foreground">Hot Right Now</h2>
+        <Link href="/menu">
+          <Button variant="outline" className="secondary-button">
+            View All Products
+          </Button>
+        </Link>
+      </div>
+      <div className={`grid ${gridClass}`}>
+        {featuredProducts.map((product, index) => (
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            index={index} 
+            isMobile={false}
+            onProductClick={onProductClick}
+          />
+        ))}
+      </div>
+    </div>
   )
-}
+})
