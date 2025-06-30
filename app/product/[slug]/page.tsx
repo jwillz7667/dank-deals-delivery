@@ -11,11 +11,17 @@ import JsonLd from "@/components/json-ld"
 import { createProductSlug } from "@/lib/utils"
 import ProductReviews from "@/components/product-reviews"
 import ImageModal from "@/components/modals/image-modal"
-import CartModal from "@/components/modals/cart-modal"
 import { useCart } from "@/hooks/use-cart"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, Suspense } from "react"
 import { useParams } from "next/navigation"
 import { toast } from "sonner"
+import dynamic from "next/dynamic"
+
+// Dynamic import for cart modal - only loads when user clicks "Add to Cart"
+const CartModal = dynamic(() => import("@/components/modals/cart-modal"), {
+  loading: () => null, // No loading state for modal overlay
+  ssr: false // Modal is client-side only
+})
 
 export default function ProductPage() {
   const params = useParams()

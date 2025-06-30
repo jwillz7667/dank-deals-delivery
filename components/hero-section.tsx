@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, memo, Suspense } from "react"
+import { useState, memo, Suspense, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -157,6 +157,20 @@ const ContactCTA = memo(function ContactCTA() {
 })
 
 export default function HeroSection({ isMobile = false }: HeroSectionProps) {
+  
+  // Hide server-rendered placeholders when this component mounts
+  useEffect(() => {
+    const mobilePlaceholder = document.getElementById('lcp-placeholder')
+    const desktopPlaceholder = document.getElementById('lcp-placeholder-desktop')
+    
+    if (mobilePlaceholder) {
+      mobilePlaceholder.style.display = 'none'
+    }
+    if (desktopPlaceholder) {
+      desktopPlaceholder.style.display = 'none'
+    }
+  }, [])
+
   if (isMobile) {
     return (
       <div className="max-w-sm mx-auto space-y-10">

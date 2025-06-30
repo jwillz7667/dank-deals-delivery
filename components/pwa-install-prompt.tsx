@@ -1,90 +1,134 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { DankIcon } from '@/lib/icons'
-import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
+import dynamic from 'next/dynamic'
 import { registerServiceWorker, initializePWAInstallPrompt, showInstallPrompt, isPWAInstalled } from '@/app/pwa'
+import { useToast } from '@/hooks/use-toast'
+import { DankIcon } from '@/lib/icons'
 import { useAnalytics } from '@/components/analytics'
 
+// Defer analytics until PWA prompt is actually shown
+const useAnalyticsDeferred = () => {
+  const [analytics, setAnalytics] = useState<any>(null)
+  
+  useEffect(() => {
+    // Only load analytics when PWA prompt is being used
+    if (analytics === null) {
+      import('@/components/analytics').then((mod) => {
+        setAnalytics(mod.useAnalytics())
+      })
+    }
+  }, [analytics])
+  
+  return analytics
+}
+
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed'
+    platform: string
+  }>
+  prompt(): Promise<void>
+}
+
 export default function PWAInstallPrompt() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
+  const [isInstalling, setIsInstalling] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
   const { toast } = useToast()
-  const { events } = useAnalytics()
+  const analytics = useAnalyticsDeferred() // Use deferred analytics
 
   useEffect(() => {
+    // Register service worker
+    registerServiceWorker()
+    
     // Check if already installed
     if (isPWAInstalled()) {
       setIsInstalled(true)
       return
     }
 
-    // Register service worker
-    registerServiceWorker()
-
-    // Initialize install prompt
+    // Initialize PWA install prompt
     initializePWAInstallPrompt()
 
-    // Listen for install available event
-    const handleInstallAvailable = () => {
-      // Don't show immediately, wait for user interaction
-      setTimeout(() => {
-        setShowPrompt(true)
-        events.pwaInstallPromptShown()
-      }, 30000) // Show after 30 seconds
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault()
+      setDeferredPrompt(e as BeforeInstallPromptEvent)
+      setShowPrompt(true)
     }
 
-    const handleInstallHidden = () => {
+    const handleAppInstalled = () => {
+      setIsInstalled(true)
       setShowPrompt(false)
+      setDeferredPrompt(null)
+      // Track installation with deferred analytics
+      if (analytics?.events?.pwaInstall) {
+        analytics.events.pwaInstall()
+      }
+      toast({
+        title: "App Installed!",
+        description: "DankDeals has been added to your home screen.",
+      })
     }
 
-    window.addEventListener('pwa-install-available', handleInstallAvailable)
-    window.addEventListener('pwa-install-hidden', handleInstallHidden)
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    window.addEventListener('appinstalled', handleAppInstalled)
 
     return () => {
-      window.removeEventListener('pwa-install-available', handleInstallAvailable)
-      window.removeEventListener('pwa-install-hidden', handleInstallHidden)
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      window.removeEventListener('appinstalled', handleAppInstalled)
     }
-  }, [events])
+  }, [toast, analytics])
 
   const handleInstall = async () => {
-    const accepted = await showInstallPrompt()
+    if (!deferredPrompt) return
+
+    setIsInstalling(true)
     
-    if (accepted) {
-      events.pwaInstallAccepted()
+    try {
+      const accepted = await showInstallPrompt()
+      
+      if (accepted) {
+        // Track successful install prompt acceptance
+        if (analytics?.events?.pwaInstallPromptAccepted) {
+          analytics.events.pwaInstallPromptAccepted()
+        }
+      } else {
+        // Track install prompt dismissal
+        if (analytics?.events?.pwaInstallPromptDismissed) {
+          analytics.events.pwaInstallPromptDismissed()
+        }
+      }
+    } catch (error) {
+      console.error('Error installing PWA:', error)
       toast({
-        title: 'App installed!',
-        description: 'You can now access Dank Deals from your home screen.',
+        title: "Installation Error",
+        description: "There was a problem installing the app. Please try again.",
+        variant: "destructive"
       })
+    } finally {
+      setIsInstalling(false)
       setShowPrompt(false)
-      setIsInstalled(true)
-    } else {
-      events.pwaInstallDismissed()
+      setDeferredPrompt(null)
     }
   }
 
   const handleDismiss = () => {
     setShowPrompt(false)
-    events.pwaInstallDismissed()
-    
-    // Don't show again for 7 days
-    localStorage.setItem('pwa-prompt-dismissed', Date.now().toString())
+    setDeferredPrompt(null)
+    // Track dismissal with deferred analytics
+    if (analytics?.events?.pwaInstallPromptDismissed) {
+      analytics.events.pwaInstallPromptDismissed()
+    }
   }
 
-  // Check if recently dismissed
-  useEffect(() => {
-    const dismissedTime = localStorage.getItem('pwa-prompt-dismissed')
-    if (dismissedTime) {
-      const daysSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24)
-      if (daysSinceDismissed < 7) {
-        setShowPrompt(false)
-      }
-    }
-  }, [])
-
-  if (!showPrompt || isInstalled) {
+  // Don't show if already installed or no prompt available
+  if (isInstalled || !showPrompt || !deferredPrompt) {
     return null
   }
 

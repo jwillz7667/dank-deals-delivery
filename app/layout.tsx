@@ -15,12 +15,14 @@ import { AgeVerificationProvider } from "@/hooks/use-age-verification"
 import AgeVerificationWrapper from "@/components/age-verification-wrapper"
 import { Suspense } from "react"
 import { createProductSlug } from "@/lib/utils"
-import Analytics from '@/components/analytics'
 import PWAInstallPrompt from '@/components/pwa-install-prompt'
+import { ThemeProvider } from "@/components/theme-provider"
+import Script from "next/script"
+import AnalyticsLoader from "@/components/analytics-loader"
 
 const inter = Inter({ 
   subsets: ["latin"], 
-  variable: "--font-sans",
+  variable: "--font-inter",
   display: 'swap',
   preload: true
 })
@@ -83,7 +85,26 @@ export const metadata: Metadata = {
   other: {
     'theme-color': '#2B5D3F',
     'color-scheme': 'light',
-  }
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
 }
 
 // Loading fallback component
@@ -209,9 +230,67 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
+        {/* Critical CSS for LCP optimization */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              /* Critical LCP styles - inline for immediate paint */
+              .glass-card {
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(12px);
+                border-radius: 0.75rem;
+                border: 1px solid rgba(34, 197, 94, 0.2);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+              }
+              
+              #lcp-placeholder, #lcp-placeholder-desktop {
+                opacity: 1;
+                transition: opacity 0.3s ease-out;
+              }
+              
+              #lcp-placeholder.hide, #lcp-placeholder-desktop.hide {
+                opacity: 0;
+                pointer-events: none;
+              }
+              
+              /* Prevent CLS during component swap */
+              [id^="lcp-placeholder"] {
+                will-change: opacity;
+                transform: translateZ(0);
+              }
+              
+              /* App green color variables for immediate use */
+              :root {
+                --app-green-600: #059669;
+                --app-green-700: #047857;
+                --app-green-800: #065f46;
+              }
+            `
+          }}
+        />
+        
+        {/* Preload critical fonts */}
+        <link
+          rel="preload"
+          href="/_next/static/media/inter-latin-400-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/_next/static/media/inter-latin-600-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        
+        {/* DNS prefetch for performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
         
@@ -228,27 +307,46 @@ export default function RootLayout({
         <JsonLd data={localBusinessSchema} />
       </head>
       <body className={cn("min-h-screen bg-app-bg font-sans antialiased", "pb-20 md:pb-0", inter.variable)}>
-        <StackProvider app={stackServerApp}>
-          <StackTheme>
-            <Suspense fallback={<LoadingFallback />}>
-              <AgeVerificationProvider>
-                <CartProvider>
-                  <AgeVerificationWrapper>
-                    <div className="min-h-screen bg-app-bg">
-                      <Suspense fallback={<LoadingFallback />}>
-                        {children}
-                      </Suspense>
-                    </div>
-                    <Toaster />
-                  </AgeVerificationWrapper>
-                  <BottomNavigation />
-                  <Analytics />
-                  <PWAInstallPrompt />
-                </CartProvider>
-              </AgeVerificationProvider>
-            </Suspense>
-          </StackTheme>
-        </StackProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <StackProvider app={stackServerApp}>
+            <StackTheme>
+              <Suspense fallback={<LoadingFallback />}>
+                <AgeVerificationProvider>
+                  <CartProvider>
+                    <AgeVerificationWrapper>
+                      <div className="min-h-screen bg-app-bg">
+                        <Suspense fallback={<LoadingFallback />}>
+                          {children}
+                        </Suspense>
+                      </div>
+                      <Toaster />
+                    </AgeVerificationWrapper>
+                    <BottomNavigation />
+                    <AnalyticsLoader />
+                    <PWAInstallPrompt />
+                  </CartProvider>
+                </AgeVerificationProvider>
+              </Suspense>
+            </StackTheme>
+          </StackProvider>
+        </ThemeProvider>
+        
+        {/* Analytics scripts - load async to not block LCP */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'GA_MEASUREMENT_ID'}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'GA_MEASUREMENT_ID'}', {
+              page_title: document.title,
+              page_location: window.location.href,
+            });
+          `}
+        </Script>
       </body>
     </html>
   )

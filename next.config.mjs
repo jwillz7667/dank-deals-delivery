@@ -36,6 +36,17 @@ const nextConfig = {
   experimental: {
     reactCompiler: true,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    // Enable runtime optimizations
+    serverMinification: true,
+    // Turbo mode for faster builds
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   
   // Enhanced modular imports
@@ -171,30 +182,140 @@ const nextConfig = {
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 150000, // Smaller max size for better caching
         cacheGroups: {
           default: false,
           vendors: false,
+          
+          // Critical components bundle - smallest, highest priority
+          critical: {
+            name: 'critical',
+            chunks: 'all',
+            test: /[\\/](components[\\/](hero-section|header|client-home-page))/,
+            priority: 40,
+            enforce: true,
+            maxSize: 100000
+          },
+          
+          // Auth-related chunks - defer until needed
+          auth: {
+            name: 'auth',
+            chunks: 'all',
+            test: /[\\/](@stackframe[\\/]stack|auth|verification)/,
+            priority: 35,
+            enforce: true
+          },
+          
+          // UI components bundle - separate from critical
+          ui: {
+            name: 'ui',
+            chunks: 'all',
+            test: /[\\/]components[\\/]ui[\\/]/,
+            priority: 30,
+            enforce: true,
+            maxSize: 80000
+          },
+          
+          // Radix UI components - separate chunk since they're heavy
+          radix: {
+            name: 'radix',
+            chunks: 'all',
+            test: /[\\/]@radix-ui[\\/]/,
+            priority: 28,
+            enforce: true,
+            maxSize: 120000
+          },
+          
+          // Analytics and tracking - can be deferred
+          analytics: {
+            name: 'analytics',
+            chunks: 'all',
+            test: /[\\/](analytics|tracking|plausible|gtag)/,
+            priority: 25,
+            enforce: true
+          },
+          
+          // Charts and dashboard components - only load when needed
+          charts: {
+            name: 'charts',
+            chunks: 'all',
+            test: /[\\/](recharts|chart|dashboard)/,
+            priority: 23,
+            enforce: true
+          },
+          
+          // Icon libraries - optimize separately
+          icons: {
+            name: 'icons',
+            chunks: 'all',
+            test: /[\\/](lucide-react|@iconify|heroicons)/,
+            priority: 22,
+            enforce: true,
+            maxSize: 60000
+          },
+          
+          // Large vendor libraries - split by size/usage
+          vendorLarge: {
+            name: 'vendor-large',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+            priority: 20,
+            enforce: true,
+            maxSize: 200000
+          },
+          
+          // Medium vendor libraries
+          vendorMedium: {
+            name: 'vendor-medium',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](drizzle|zod|ai|stripe)[\\/]/,
+            priority: 18,
+            enforce: true,
+            maxSize: 150000
+          },
+          
+          // Utility libraries
+          vendorUtils: {
+            name: 'vendor-utils',
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/](clsx|tailwind|class-variance|date-fns)[\\/]/,
+            priority: 16,
+            enforce: true,
+            maxSize: 100000
+          },
+          
+          // Remaining vendor code
           vendor: {
             name: 'vendor',
             chunks: 'all',
-            test: /node_modules/,
-            priority: 20
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+            maxSize: 120000,
           },
+          
+          // Common components
           common: {
             name: 'common',
             minChunks: 2,
-            priority: 10,
+            priority: 5,
             reuseExistingChunk: true,
-            enforce: true
+            enforce: true,
+            maxSize: 100000
           }
         }
       }
-    }
-    
-    // Bundle analyzer for production analysis
-    if (process.env.ANALYZE === 'true' && !isServer) {
-      const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')()
-      config.plugins.push(new BundleAnalyzerPlugin())
+      
+      // Optimize for LCP by preloading critical chunks
+      config.optimization.runtimeChunk = {
+        name: 'runtime'
+      }
+      
+      // Improve module concatenation
+      config.optimization.concatenateModules = true
+      
+      // Enable side effects optimization
+      config.optimization.sideEffects = false
     }
     
     return config
