@@ -34,20 +34,29 @@ const nextConfig = {
   
   // Enable React Compiler for automatic optimizations
   experimental: {
-    reactCompiler: true,
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    // Enable runtime optimizations
-    serverMinification: true,
-    // Turbo mode for faster builds
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
+    reactCompiler: {
+      compilationMode: 'annotation',
     },
-    optimizeCss: true,
+    serverActions: {
+      bodySizeLimit: '5mb',
+      allowedOrigins: process.env.NODE_ENV === 'production' 
+        ? ['https://dankdealsmn.com', 'https://www.dankdealsmn.com']
+        : ['localhost:3000'],
+    },
+    serverComponentsExternalPackages: [
+      '@neondatabase/serverless',
+      'sharp',
+    ],
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-icons',
+      'date-fns',
+      'recharts',
+      '@iconify/react',
+    ],
+    swcPlugins: [
+      // Add any SWC plugins here if needed
+    ],
   },
   
   // Enhanced modular imports
