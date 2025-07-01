@@ -338,6 +338,63 @@ export default function RootLayout({
                 transform: translateZ(0);
                 will-change: transform;
               }
+
+              /* Performance optimizations */
+              html {
+                scroll-behavior: smooth;
+              }
+
+              @media (prefers-reduced-motion: reduce) {
+                html {
+                  scroll-behavior: auto;
+                }
+              }
+
+              /* Safe area support for mobile devices */
+              .safe-bottom {
+                padding-bottom: env(safe-area-inset-bottom);
+              }
+
+              /* Enhanced contrast for high contrast mode */
+              @media (prefers-contrast: high) {
+                .glass-card {
+                  background: #000000 !important;
+                  border: 2px solid #ffffff !important;
+                  color: #ffffff !important;
+                }
+              }
+
+              /* Reduced motion support */
+              @media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                  animation-duration: 0.01ms !important;
+                  animation-iteration-count: 1 !important;
+                  transition-duration: 0.01ms !important;
+                  scroll-behavior: auto !important;
+                }
+              }
+
+              /* Print styles */
+              @media print {
+                .no-print {
+                  display: none !important;
+                }
+                
+                body {
+                  background: white !important;
+                  color: black !important;
+                }
+              }
+
+              /* Touch device optimizations */
+              @media (pointer: coarse) {
+                button, a, [role="button"] {
+                  min-height: 44px;
+                  min-width: 44px;
+                }
+              }
             `
           }}
         />
@@ -435,65 +492,7 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Enhanced CSS for global accessibility and performance */}
-        <style jsx global>{`
-          /* Performance optimizations */
-          html {
-            scroll-behavior: smooth;
-          }
 
-          @media (prefers-reduced-motion: reduce) {
-            html {
-              scroll-behavior: auto;
-            }
-          }
-
-          /* Safe area support for mobile devices */
-          .safe-bottom {
-            padding-bottom: env(safe-area-inset-bottom);
-          }
-
-          /* Enhanced contrast for high contrast mode */
-          @media (prefers-contrast: high) {
-            .glass-card {
-              background: #000000 !important;
-              border: 2px solid #ffffff !important;
-              color: #ffffff !important;
-            }
-          }
-
-          /* Reduced motion support */
-          @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-              animation-duration: 0.01ms !important;
-              animation-iteration-count: 1 !important;
-              transition-duration: 0.01ms !important;
-              scroll-behavior: auto !important;
-            }
-          }
-
-          /* Print styles */
-          @media print {
-            .no-print {
-              display: none !important;
-            }
-            
-            body {
-              background: white !important;
-              color: black !important;
-            }
-          }
-
-          /* Touch device optimizations */
-          @media (pointer: coarse) {
-            button, a, [role="button"] {
-              min-height: 44px;
-              min-width: 44px;
-            }
-          }
-        `}</style>
       </body>
     </html>
   )
