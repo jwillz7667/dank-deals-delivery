@@ -56,22 +56,8 @@ export default function ClientHomePage() {
   return (
     <main className="min-h-screen">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <section className="py-8 lg:py-12">
-          <Suspense fallback={
-            <div className="min-h-[400px] flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-app-green-600"></div>
-            </div>
-          }>
-            {isMobile === null ? (
-              <div className="min-h-[400px]" /> // Placeholder during detection
-            ) : (
-              <HeroSection isMobile={isMobile} />
-            )}
-          </Suspense>
-        </section>
-
         {/* Mobile Layout */}
-        <div className="lg:hidden px-4">
+        <div className="lg:hidden space-y-10 py-8">
           <Suspense fallback={
             <div className="max-w-sm mx-auto space-y-10">
               <div className="animate-pulse">
@@ -95,7 +81,7 @@ export default function ClientHomePage() {
         </div>
 
         {/* Desktop Layout */}
-        <div className="hidden lg:block px-4">
+        <div className="hidden lg:block space-y-16 py-12">
           <Suspense fallback={
             <div className="max-w-7xl mx-auto animate-pulse space-y-16">
               <div className="grid grid-cols-12 gap-8">
