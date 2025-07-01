@@ -276,6 +276,29 @@ export default function RootLayout({
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
               }
               
+              /* Prevent CLS by reserving space for header */
+              body {
+                padding-top: 64px; /* Reserve space for mobile header */
+              }
+              
+              @media (min-width: 1024px) {
+                body {
+                  padding-top: 80px; /* Reserve space for desktop header */
+                }
+              }
+              
+              /* Fix main content spacing to prevent CLS */
+              main {
+                min-height: 100vh;
+              }
+              
+              /* Reserve space for bottom navigation on mobile */
+              @media (max-width: 1023px) {
+                body {
+                  padding-bottom: 80px;
+                }
+              }
+              
               #lcp-placeholder, #lcp-placeholder-desktop {
                 opacity: 1;
                 transition: opacity 0.3s ease-out;
@@ -344,6 +367,15 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
         
+        {/* Preload the logo image with high priority for LCP optimization */}
+        <link 
+          rel="preload" 
+          as="image" 
+          href="/DANKDEALSMN.COM-LOGO.png" 
+          type="image/png"
+          fetchPriority="high"
+        />
+        
         {/* Only preload critical resources that are actually used */}
         <link rel="prefetch" href="/DANKDEALSMN.COM-LOGO.png" />
         
@@ -360,7 +392,7 @@ export default function RootLayout({
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />
       </head>
-      <body className={cn("min-h-screen bg-app-bg font-sans antialiased", "pb-20 md:pb-0", inter.variable)}>
+      <body className={cn("min-h-screen bg-app-bg font-sans antialiased", inter.variable)}>
         <AccessibilityProvider>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
             <StackProvider app={stackServerApp}>

@@ -17,9 +17,9 @@ const nextConfig = {
   },
   images: {
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 3600, // 1 hour cache
-    deviceSizes: [480, 640, 750, 828, 1080, 1200, 1920, 2048],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512],
+    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
+    deviceSizes: [640, 768, 1024, 1280, 1536],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     remotePatterns: [
@@ -47,6 +47,7 @@ const nextConfig = {
         },
       },
     },
+    optimizeCss: true,
   },
   
   // Enhanced modular imports

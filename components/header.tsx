@@ -120,6 +120,7 @@ function MobileMenu() {
               width={180}
               height={40}
               className="object-contain h-10 w-auto"
+              sizes="180px"
             />
           </DialogTitle>
         </DialogHeader>
@@ -199,6 +200,8 @@ export default function Header() {
                 height={80}
                 className="object-contain h-16 w-auto sm:h-20 lg:h-24 transition-all duration-300 group-hover:scale-105 gpu-accelerated"
                 priority
+                fetchPriority="high"
+                sizes="(max-width: 640px) 144px, (max-width: 1024px) 180px, 216px"
               />
             </Link>
           </div>

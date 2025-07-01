@@ -24,7 +24,7 @@ function CriticalLCPContent() {
     <>
       {/* Mobile LCP - Server rendered for immediate paint */}
       <div 
-        className="lg:hidden max-w-sm mx-auto pt-20 pb-4 px-4"
+        className="lg:hidden max-w-sm mx-auto pb-4 px-4"
         id="lcp-placeholder"
         style={{ 
           position: 'relative',
@@ -53,7 +53,7 @@ function CriticalLCPContent() {
 
       {/* Desktop LCP - Server rendered for immediate paint */}
       <div 
-        className="hidden lg:block max-w-7xl mx-auto pt-20 pb-4 px-4"
+        className="hidden lg:block max-w-7xl mx-auto pb-4 px-4"
         id="lcp-placeholder-desktop"
         style={{ 
           position: 'relative',
