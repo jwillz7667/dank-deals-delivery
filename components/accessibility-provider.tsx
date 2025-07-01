@@ -40,8 +40,15 @@ export const useAccessibility = () => {
 // Screen reader announcements
 class ScreenReaderAnnouncer {
   private liveRegions: Map<string, HTMLElement> = new Map()
+  private initialized = false
 
   constructor() {
+    // Don't create live regions in constructor - defer to init method
+  }
+
+  private init() {
+    if (this.initialized || typeof document === 'undefined') return
+    this.initialized = true
     this.createLiveRegions()
   }
 
@@ -76,6 +83,9 @@ class ScreenReaderAnnouncer {
   }
 
   announce(message: string, priority: 'polite' | 'assertive' = 'polite') {
+    if (typeof document === 'undefined') return
+    this.init() // Ensure initialization before announcing
+    
     const region = this.liveRegions.get(priority)
     if (region) {
       // Clear previous message
@@ -201,8 +211,10 @@ class FocusManager {
   }
 }
 
-// Keyboard navigation helper
+// Keyboard navigation helper - make SSR safe
 const setupKeyboardNavigation = () => {
+  if (typeof document === 'undefined') return
+
   // Global keyboard shortcuts
   document.addEventListener('keydown', (event) => {
     // Skip to main content (Alt + M)
@@ -260,10 +272,16 @@ export default function AccessibilityProvider({ children }: { children: React.Re
     focusVisible: true,
   })
 
-  const [announcer] = useState(() => new ScreenReaderAnnouncer())
-  const [focusManager] = useState(() => new FocusManager())
+  const [announcer, setAnnouncer] = useState<ScreenReaderAnnouncer | null>(null)
+  const [focusManager, setFocusManager] = useState<FocusManager | null>(null)
 
   useEffect(() => {
+    // Initialize client-side only components
+    const newAnnouncer = new ScreenReaderAnnouncer()
+    const newFocusManager = new FocusManager()
+    setAnnouncer(newAnnouncer)
+    setFocusManager(newFocusManager)
+
     // Detect user preferences
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches
@@ -359,19 +377,19 @@ export default function AccessibilityProvider({ children }: { children: React.Re
     setSettings(prev => ({ ...prev, [key]: value }))
     
     // Announce changes to screen readers
-    announcer.announce(`${key.replace(/([A-Z])/g, ' $1').toLowerCase()} ${value ? 'enabled' : 'disabled'}`)
+    announcer?.announce(`${key.replace(/([A-Z])/g, ' $1').toLowerCase()} ${value ? 'enabled' : 'disabled'}`)
   }, [announcer])
 
   const announceToScreenReader = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
-    announcer.announce(message, priority)
+    announcer?.announce(message, priority)
   }, [announcer])
 
   const manageFocus = useCallback((element: HTMLElement | null) => {
-    focusManager.manageFocus(element)
+    focusManager?.manageFocus(element)
   }, [focusManager])
 
   const trapFocus = useCallback((container: HTMLElement) => {
-    return focusManager.trapFocus(container)
+    return focusManager?.trapFocus(container) || (() => {})
   }, [focusManager])
 
   const contextValue: AccessibilityContextType = {

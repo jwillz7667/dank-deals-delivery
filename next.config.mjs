@@ -43,10 +43,6 @@ const nextConfig = {
         ? ['https://dankdealsmn.com', 'https://www.dankdealsmn.com']
         : ['localhost:3000'],
     },
-    serverComponentsExternalPackages: [
-      '@neondatabase/serverless',
-      'sharp',
-    ],
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-icons',
@@ -58,6 +54,11 @@ const nextConfig = {
       // Add any SWC plugins here if needed
     ],
   },
+  
+  serverExternalPackages: [
+    '@neondatabase/serverless',
+    'sharp',
+  ],
   
   // Enhanced modular imports
   modularizeImports: {
