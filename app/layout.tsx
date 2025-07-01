@@ -17,12 +17,14 @@ import PWAInstallPrompt from '@/components/pwa-install-prompt'
 import { ThemeProvider } from "@/components/theme-provider"
 import Script from "next/script"
 import AnalyticsLoader from "@/components/analytics-loader"
+import AccessibilityProvider from "@/components/accessibility-provider"
 
 const inter = Inter({ 
   subsets: ["latin"], 
   variable: "--font-inter",
   display: 'swap',
-  preload: true
+  preload: true,
+  fallback: ['system-ui', 'arial']
 })
 
 export const metadata: Metadata = {
@@ -101,15 +103,21 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'your-google-verification-code',
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
   },
 }
 
-// Loading fallback component
+// Loading fallback component with accessibility features
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-app-bg flex items-center justify-center">
+    <div 
+      className="min-h-screen bg-app-bg flex items-center justify-center"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading page content"
+    >
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-app-green-600"></div>
+      <span className="sr-only">Loading...</span>
     </div>
   )
 }
@@ -124,7 +132,7 @@ export default function RootLayout({
     "@type": "Organization",
     name: "DankDealsMN",
     url: siteConfig.url,
-    logo: `${siteConfig.url}/logo.png`,
+    logo: `${siteConfig.url}/DANKDEALSMN.COM-LOGO.png`,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+1-612-930-1390",
@@ -139,7 +147,8 @@ export default function RootLayout({
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "DeliveryService",
+    "@id": `${siteConfig.url}/#local-business`,
     name: "DankDealsMN",
     url: siteConfig.url,
     image: `${siteConfig.url}/og-image.png`,
@@ -225,6 +234,30 @@ export default function RootLayout({
         closes: "22:00",
       },
     ],
+    // Cannabis delivery specific schema properties
+    serviceType: "Cannabis Delivery",
+    availableDeliveryMethod: {
+      "@type": "DeliveryMethod",
+      "@id": "http://purl.org/goodrelations/v1#DeliveryModeDirect"
+    },
+    deliveryTimeSettings: {
+      "@type": "DeliveryTimeSettings",
+      deliveryTime: {
+        "@type": "ShippingDeliveryTime",
+        handlingTime: {
+          "@type": "QuantitativeValue",
+          minValue: 0,
+          maxValue: 30,
+          unitCode: "MIN"
+        },
+        transitTime: {
+          "@type": "QuantitativeValue",
+          minValue: 30,
+          maxValue: 90,
+          unitCode: "MIN"
+        }
+      }
+    }
   }
 
   return (
@@ -265,6 +298,23 @@ export default function RootLayout({
                 --app-green-700: #047857;
                 --app-green-800: #065f46;
               }
+
+              /* Enhanced performance optimizations */
+              *, *::before, *::after {
+                box-sizing: border-box;
+              }
+
+              /* Prevent layout shifts from images */
+              img {
+                max-width: 100%;
+                height: auto;
+              }
+
+              /* GPU acceleration for smooth animations */
+              .gpu-accelerated {
+                transform: translateZ(0);
+                will-change: transform;
+              }
             `
           }}
         />
@@ -288,6 +338,8 @@ export default function RootLayout({
         {/* DNS prefetch for performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="//analytics.google.com" />
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://stackframe.cloud" />
@@ -299,48 +351,117 @@ export default function RootLayout({
         <meta httpEquiv="x-dns-prefetch-control" content="on" />
         <meta name="format-detection" content="telephone=no" />
         
+        {/* Enhanced accessibility meta tags */}
+        <meta name="theme-color" content="#2B5D3F" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1a3d2e" media="(prefers-color-scheme: dark)" />
+        
         <link rel="dns-prefetch" href="//dankdealsmn.com" />
         
         <JsonLd data={organizationSchema} />
         <JsonLd data={localBusinessSchema} />
       </head>
       <body className={cn("min-h-screen bg-app-bg font-sans antialiased", "pb-20 md:pb-0", inter.variable)}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <StackProvider app={stackServerApp}>
-            <StackTheme>
-              <Suspense fallback={<LoadingFallback />}>
-                <CartProvider>
-                  <div className="min-h-screen bg-app-bg">
-                    <Suspense fallback={<LoadingFallback />}>
-                      {children}
-                    </Suspense>
-                  </div>
-                  <Toaster />
-                  <BottomNavigation />
-                  <AnalyticsLoader />
-                  <PWAInstallPrompt />
-                </CartProvider>
-              </Suspense>
-            </StackTheme>
-          </StackProvider>
-        </ThemeProvider>
+        <AccessibilityProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+            <StackProvider app={stackServerApp}>
+              <StackTheme>
+                <Suspense fallback={<LoadingFallback />}>
+                  <CartProvider>
+                    <div className="min-h-screen bg-app-bg">
+                      {/* Main landmark for screen readers */}
+                      <main id="main-content" tabIndex={-1} role="main" aria-label="Main content">
+                        <Suspense fallback={<LoadingFallback />}>
+                          {children}
+                        </Suspense>
+                      </main>
+                    </div>
+                    <Toaster />
+                    <BottomNavigation />
+                    <AnalyticsLoader />
+                    <PWAInstallPrompt />
+                  </CartProvider>
+                </Suspense>
+              </StackTheme>
+            </StackProvider>
+          </ThemeProvider>
+        </AccessibilityProvider>
         
-        {/* Analytics scripts - load async to not block LCP */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'GA_MEASUREMENT_ID'}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
+        {/* Service Worker Registration */}
+        <Script id="sw-registration" strategy="afterInteractive">
           {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'GA_MEASUREMENT_ID'}', {
-              page_title: document.title,
-              page_location: window.location.href,
-            });
+            if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                  .then(function(registration) {
+                    console.log('SW registered: ', registration);
+                  })
+                  .catch(function(registrationError) {
+                    console.log('SW registration failed: ', registrationError);
+                  });
+              });
+            }
           `}
         </Script>
+
+        {/* Enhanced CSS for global accessibility and performance */}
+        <style jsx global>{`
+          /* Performance optimizations */
+          html {
+            scroll-behavior: smooth;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            html {
+              scroll-behavior: auto;
+            }
+          }
+
+          /* Safe area support for mobile devices */
+          .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+          }
+
+          /* Enhanced contrast for high contrast mode */
+          @media (prefers-contrast: high) {
+            .glass-card {
+              background: #000000 !important;
+              border: 2px solid #ffffff !important;
+              color: #ffffff !important;
+            }
+          }
+
+          /* Reduced motion support */
+          @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+              scroll-behavior: auto !important;
+            }
+          }
+
+          /* Print styles */
+          @media print {
+            .no-print {
+              display: none !important;
+            }
+            
+            body {
+              background: white !important;
+              color: black !important;
+            }
+          }
+
+          /* Touch device optimizations */
+          @media (pointer: coarse) {
+            button, a, [role="button"] {
+              min-height: 44px;
+              min-width: 44px;
+            }
+          }
+        `}</style>
       </body>
     </html>
   )

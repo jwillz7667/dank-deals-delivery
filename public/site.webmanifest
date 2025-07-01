@@ -1,21 +1,164 @@
 {
-  "name": "DankDeals",
-  "short_name": "DankDeals",
+  "name": "DankDealsMN - Cannabis Delivery",
+  "short_name": "DankDealsMN",
+  "description": "Premium cannabis delivery service in Minneapolis & Twin Cities. Fast, discreet, and compliant delivery in under 30 minutes.",
+  "start_url": "/?source=pwa",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#2B5D3F",
+  "background_color": "#f8fafc",
+  "lang": "en-US",
+  "scope": "/",
+  "id": "com.dankdealsmn.app",
+  
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home screen showing cannabis products and delivery options"
+    },
+    {
+      "src": "/screenshots/mobile-menu.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Product menu with categories and search functionality"
+    },
+    {
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop view of cannabis delivery service"
+    }
+  ],
+
+  "categories": [
+    "shopping",
+    "food",
+    "health",
+    "lifestyle"
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Browse Menu",
+      "short_name": "Menu",
+      "description": "View our full cannabis product catalog",
+      "url": "/menu?source=shortcut",
+      "icons": [
+        {
+          "src": "/icons/cannabis.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Track Order",
+      "short_name": "Track",
+      "description": "Track your current delivery",
+      "url": "/track-order?source=shortcut",
+      "icons": [
+        {
+          "src": "/icons/delivery-driver.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Delivery Areas",
+      "short_name": "Areas",
+      "description": "Check delivery availability in your area",
+      "url": "/delivery?source=shortcut",
+      "icons": [
+        {
+          "src": "/icons/home-marker.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://dankdealsmn.com/manifest.json"
+    }
+  ],
+
+  "prefer_related_applications": false,
+
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+
+  "file_handlers": [],
+
+  "protocol_handlers": [
+    {
+      "protocol": "web+dankdeals",
+      "url": "/handle-protocol?url=%s"
+    }
+  ],
+
+  "handle_links": "preferred",
+
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+
+  "iarc_rating_id": "",
+
+  "share_target": {
+    "action": "/share-target/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*"]
+        }
+      ]
+    }
+  }
 }
