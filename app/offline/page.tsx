@@ -1,12 +1,7 @@
-import { Metadata } from 'next'
+"use client"
+
 import Image from 'next/image'
 import Link from 'next/link'
-
-export const metadata: Metadata = {
-  title: 'Offline - DankDealsMN',
-  description: 'You are currently offline. Please check your internet connection.',
-  robots: { index: false, follow: false }
-}
 
 export default function OfflinePage() {
   return (
